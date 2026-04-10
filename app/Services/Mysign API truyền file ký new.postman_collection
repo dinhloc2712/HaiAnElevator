@@ -1,0 +1,984 @@
+{
+  "info": {
+    "_postman_id": "884ce9d2-6dc3-4fc4-a8da-0d1a89bc3ca9",
+    "name": "Mysign API truyền file ký Copy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "9938286"
+  },
+  "item": [
+    {
+      "name": "1. RAS login get token Copy",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"client_id\": \"Test_Demo_Mysign\",\n    \"user_id\": \"CMT_013527833\",\n    \"client_secret\": \"860c5746f30d705ef9b16e0adbd7b5f6d8c4a4ee\",\n    \"profile_id\": \"adss:ras:profile:001\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/ras/v1/login",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "ras",
+            "v1",
+            "login"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"client_id\": \"{{client_id}}\",\n    \"user_id\": \"{{user_id}}\",\n    \"client_secret\": \"{{client_secret}}\",\n    \"profile_id\": \"{{profile_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/adss/service/ras/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "adss",
+                "service",
+                "ras",
+                "v1",
+                "login"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json;charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "465"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 12 Apr 2022 10:27:09 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhc2NlcnRpYSIsInN1YiI6InNhdmlzX25hbXZoIiwiZXhwIjoxNjQ5NzM3NjI5LCJpYXQiOjE2NDk3MzQwMjksInRva2VuX2lkIjoiNTZiY2QyYTktZmNmZi00YzUyLWIyMzktODM5NTIyYzBhYTMxIiwic2NvcGUiOiJTQ09QRV9DU0NfQlVTSU5FU1NfQVBQX0JBU0lDIiwicmFzX3Byb2ZpbGUiOiJhZHNzOnJhczpwcm9maWxlOjAwMSIsInRva2VuX3R5cGUiOiJhY2Nlc3NfdG9rZW4iLCJjbGllbnRfaWQiOiJzYW1wbGVzX3Rlc3RfY2xpZW50In0.sXahXq-s_wyG5Cc5Uxj0Q6D720XVNHrk2M7Bp84OPH0\",\n    \"expires_in\": 3600\n}"
+        }
+      ]
+    },
+    {
+      "name": "3.1.\tAPI danh sách thông tin CTS Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"client_id\": \"{{client_id}}\",\r\n    \"client_secret\": \"{{client_secret}}\",\r\n    \"profile_id\": \"{{profile_id}}\",\r\n    \"user_id\": \"{{user_id}}\",\r\n    \"certificates\": \"single\",\r\n    \"certInfo\": true,\r\n    \"authInfo\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/certificates/info",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "certificates",
+            "info"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "3.1.\tAPI danh sách thông tin CTS",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"client_id\": \"023\",\r\n    \"client_secret\": \"client_secret\",\r\n    \"profile_id\": \"adss:ras:profile:001\",\r\n    \"user_id\": \"CMT_0123456789\",\r\n    \"certificates\": \"chain\",\r\n    \"certInfo\": true,\r\n    \"authInfo\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9005/wrapper/api/v1/integrated/getLstCerInfo",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "wrapper",
+                "api",
+                "v1",
+                "integrated",
+                "getLstCerInfo"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Headers"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "key": "Expires",
+              "value": "0"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 07 Sep 2022 04:50:07 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n    {\n        \"description\": \"Go>Sign mobile based implicit credential authorization\",\n        \"key\": {\n            \"status\": \"enabled\",\n            \"algo\": [\n                \"1.2.840.113549.1.1.1\"\n            ],\n            \"len\": \"2048\",\n            \"curve\": null\n        },\n        \"cert\": {\n            \"status\": \"revoked\",\n            \"certificates\": [\n                \"MIIEXjCCA0agAwIBAgIQVAT//rcDP7MW1nIgG46B9zANBgkqhkiG9w0BAQUFADBO\\r\\nMQswCQYDVQQGEwJWTjESMBAGA1UEBwwJSMOgIE7hu5lpMRYwFAYDVQQKEw1WaWV0\\r\\ndGVsIEdyb3VwMRMwEQYDVQQDEwpWaWV0dGVsLUNBMB4XDTIyMDkwNjA2NDQxMFoX\\r\\nDTIzMDkwNjA2NDQxMFowVjELMAkGA1UEBhMCVk4xFDASBgNVBAcMC0Lhuq5DIEvh\\r\\nuqBOMRAwDgYDVQQDDAdLSCBURVNUMR8wHQYKCZImiZPyLGQBAQwPQ01ORDowMTIz\\r\\nNDU2Nzg5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl3m9XL/8nuuE\\r\\nhoMP6dll0IZ4Hm/A3I5+mHXhyKayvDEa73w/PFF0ahS3Pf7L9s813u1XTOr1ZBU+\\r\\nQo5CJIvDTA0KD9KNPBUh77rnZO365DG9BOrTLhn3wS2wk7QPcoQggTw59PWXV6C5\\r\\naP6xGvqujb1PpAt5NhG6lA9RRvLnracWZhC5qZ8/LhJv9x1o7+wfpBOx5Dep3vZP\\r\\ncVg6ZcEXuBiE985jVziM/nwjgXcbHHjg+yfMhAmcEa7F+/agtu371l+STgxi7a71\\r\\nxRf15xJVEBVX6l1PK+hLT4+G4SpIfM3fJGd6xy12FRUBZzuKEh59Kr++O84ccJl3\\r\\n+4344oxJOwIDAQABo4IBLjCCASowNQYIKwYBBQUHAQEEKTAnMCUGCCsGAQUFBzAB\\r\\nhhlodHRwOi8vb2NzcC52aWV0dGVsLWNhLnZuMB0GA1UdDgQWBBQHDX/iW69hQfVI\\r\\nivZIITYYEg6lrTAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFP7LQRTpXafZMg3k\\r\\nsghc8VzstrK1MIGSBgNVHR8EgYowgYcwgYSgLqAshipodHRwOi8vY3JsLnZpZXR0\\r\\nZWwtY2Eudm4vVmlldHRlbC1DQS12My5jcmyiUqRQME4xEzARBgNVBAMMClZpZXR0\\r\\nZWwtQ0ExFjAUBgNVBAoMDVZpZXR0ZWwgR3JvdXAxEjAQBgNVBAcMCUjDoCBO4buZ\\r\\naTELMAkGA1UEBhMCVk4wDgYDVR0PAQH/BAQDAgXgMA0GCSqGSIb3DQEBBQUAA4IB\\r\\nAQAY7jqH/9+DEGMu1ECmMkKmqYIXIi7mOz9pmdzxPzRZgxD9vT/hqct4puDyrYwW\\r\\ncC3XmgXCOxRfVN2sRcfMQNhH6MYvPSLDXwkaRDCsnd8TnYvb63KRg7d8ZpMT3eHo\\r\\n/ogoXIfCzkEiqTmTUIHkLpESHs4NmGrWlp5R8ZqgVj7aOYfCELCcrpAOe5lApAu/\\r\\n/Hc/t0IoH+TMTXlNUwjpNRxMY2TZ4wseOflsML6sRd0gqxzygquCF8wdCNDZY7mq\\r\\nCaK5nXJKEEPpzctw82ma2DYJXHiFmph1wDPmpNNcfOoBGMrJ66zU+p101JGpB8Fx\\r\\nJLHnOuxLfXdourrpf5JDIGDU\",\n                \"MIIEPDCCAySgAwIBAgIKYSGjcwAAAAAAEjANBgkqhkiG9w0BAQUFADB+MQswCQYD\\r\\nVQQGEwJWTjEzMDEGA1UEChMqTWluaXN0cnkgb2YgSW5mb3JtYXRpb24gYW5kIENv\\r\\nbW11bmljYXRpb25zMRswGQYDVQQLExJOYXRpb25hbCBDQSBDZW50ZXIxHTAbBgNV\\r\\nBAMTFE1JQyBOYXRpb25hbCBSb290IENBMB4XDTE5MDUxMzExNTUxMloXDTI0MDUx\\r\\nMzEyMDUxMlowTjELMAkGA1UEBhMCVk4xEjAQBgNVBAcMCUjDoCBO4buZaTEWMBQG\\r\\nA1UEChMNVmlldHRlbCBHcm91cDETMBEGA1UEAxMKVmlldHRlbC1DQTCCASIwDQYJ\\r\\nKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMZ8krmgQxo8WQct+qdkYYYJ+WJMkvbd\\r\\n+/8GSZ8s/0NskDBpcPqxovV+QrbYV+QQSkRilK41lGpas4fXffOyJTUTFQcRLz4x\\r\\nnFMYl7kppMd5vZfL/+Exfh1etKuTBh4BySWtrN7rbVLuluwnQT5QwtRnP0M3pPS6\\r\\nS2OxwuD/k6T2tM5Et9XoubaM+4WmZTemyoHyHZ2R6863ltx3U5Apu8VVDJHSNSqq\\r\\nXmDsmoTpUPFFYC/bu9u1/kMNY3gP2CObqaGf3uap2hYuXThtgr7NwAvvzHK/JkXH\\r\\nANRKc4W9RyZ//0XBRKQRm6CaXbvq7BN70yZSI5c/i6zRIHteI+54bHUCAwEAAaOB\\r\\n6zCB6DALBgNVHQ8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQU\\r\\n/stBFOldp9kyDeSyCFzxXOy2srUwHwYDVR0jBBgwFoAUzWJx5GG9/j3sskBg04F1\\r\\n3Tqsa8YwPAYDVR0fBDUwMzAxoC+gLYYraHR0cDovL3B1YmxpYy5yb290Y2EuZ292\\r\\nLnZuL2NybC9taWNucmNhLmNybDBHBggrBgEFBQcBAQQ7MDkwNwYIKwYBBQUHMAKG\\r\\nK2h0dHA6Ly9wdWJsaWMucm9vdGNhLmdvdi52bi9jcnQvbWljbnJjYS5jcnQwDQYJ\\r\\nKoZIhvcNAQEFBQADggEBAKB73l0nNuPDHRmbPkRpIQHqjRf/eCH5TZJekYjL4nX6\\r\\nO7uIyuuOCwmQX1wLFveyrKGvepkbL7xE/2KkumFn6PFOFD3IKEVkJiaxNi0t/q5C\\r\\nCisznHFlhBWnOq8vv+ae4u5LuxQEw9KvSGbAQyDDO7JOGWRKkdOZeQAr/jK6Gr67\\r\\neslFwLoDcV2sCWIEwRfYIL6ywLoGLGtTo1Hr7WWI/2Lja3jdi2jhuLI51M1m68TQ\\r\\njA1uj08eymqPpY8qzP15VLz1QiNuGC8szubdpl+VwgpmJnRkXefvwWO4yLEJ+cgO\\r\\n6FwjcmNWeABpIpOAHcuqwAu1wBtolNIRJyi7qpHLER0=\",\n                \"MIID1zCCAr+gAwIBAgIQG+Rzih8+wI9Hn6bPNcWYIjANBgkqhkiG9w0BAQUFADB+\\r\\nMQswCQYDVQQGEwJWTjEzMDEGA1UEChMqTWluaXN0cnkgb2YgSW5mb3JtYXRpb24g\\r\\nYW5kIENvbW11bmljYXRpb25zMRswGQYDVQQLExJOYXRpb25hbCBDQSBDZW50ZXIx\\r\\nHTAbBgNVBAMTFE1JQyBOYXRpb25hbCBSb290IENBMB4XDTA4MDUxNjAxMTI0OVoX\\r\\nDTQwMDUxNjAxMjAzMlowfjELMAkGA1UEBhMCVk4xMzAxBgNVBAoTKk1pbmlzdHJ5\\r\\nIG9mIEluZm9ybWF0aW9uIGFuZCBDb21tdW5pY2F0aW9uczEbMBkGA1UECxMSTmF0\\r\\naW9uYWwgQ0EgQ2VudGVyMR0wGwYDVQQDExRNSUMgTmF0aW9uYWwgUm9vdCBDQTCC\\r\\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKE/WVEO/jD/YduWeBSL20M8\\r\\nNr5hr9y1P2Ae0w0BQa34yYpCjsjtMoZHxf619+rWRDcQEsNICFFQuuVX6c41yY4c\\r\\ncwmFM0zhuzisjq23EwQuZoFXLcz7Gv0unIv9CUDwYBebcUVtfePbKtK7mt3rzF7k\\r\\nAN/VbDCFm71Xfy3UJNOA++AoUb6w1mEHzOWgR+eRbS+HWOi0rcGxRrPcWh04Cdn7\\r\\ntSeYnl788fRI/+ihO/9QM9kmq7KZYp3Me8hSTZ5cQotvdH78lBPeCtLwtWr4lkxQ\\r\\nnOYhjsHllwFOzZ+wQBl8G1lvXDgZmjfa0YE5FjLvga2wIWsRl8LBCL1vI1wED9MC\\r\\nAwEAAaNRME8wCwYDVR0PBAQDAgGGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYE\\r\\nFM1iceRhvf497LJAYNOBdd06rGvGMBAGCSsGAQQBgjcVAQQDAgEAMA0GCSqGSIb3\\r\\nDQEBBQUAA4IBAQBMnc1+IyCAHCjP8PHJ3xHKsmlTo/JfDLNlnC9U4RxQKuBVF8QX\\r\\nvqiTUUaqhu0kZC9PE46wtBScfEO+LU5jUmzb1nAXWUdbolqzx5Z6tg31LQ3ZZDqv\\r\\n0FQ60RNotvo4DgXr4Pww90ybX+LuZ3v4Yup0r3JUTNT6Xovs67gngSyYjvfKoFGW\\r\\nc8YXifn0U5c/V8PbVShJc09KNypnhMUTvsbJ7glHYr+osup85V8k2zu4dDWw4YWP\\r\\nipdIjud4Z4nL5aQC7FtXobnHlrfB6eVdjpmmpyWaHbDO1jtrM/K+SeEt1oeBuXau\\r\\np/zNs8Z2Mq9NUFJsLQ2yvddQ5dN1Y59dzQqZ\"\n            ],\n            \"issuerDN\": \"CN=Viettel-CA,O=Viettel Group,L=Hà Nội,C=VN\",\n            \"subjectDN\": \"UID=CMND:0123456789,CN=KH TEST,L=BẮC KẠN,C=VN\",\n            \"validFrom\": \"20220906064410+0000\",\n            \"validTo\": \"20230906064410+0000\",\n            \"serialNumber\": null\n        },\n        \"authMode\": \"implicit\",\n        \"multisign\": \"2147483647\",\n        \"lang\": null,\n        \"pin\": {\n            \"presence\": null,\n            \"format\": null,\n            \"label\": null,\n            \"description\": null\n        },\n        \"otp\": {\n            \"presence\": null,\n            \"type\": null,\n            \"format\": null,\n            \"label\": null,\n            \"description\": null\n        },\n        \"scal\": \"2\"\n    }\n]"
+        }
+      ]
+    },
+    {
+      "name": "Add file and property",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "request",
+              "value": "{\n    \"render\": 2,\n    \"fontType\": 1,\n    \"fontSize\": 12,\n    \"reason\": \"tesst123\",\n    \"location\": \"HUnegyeen\",\n    \"base64Image\": \"{{file_Image_Base64}}\",\n    \"document_name\": \"The name_12\",\n    \"display\": [\n        {\n            \"page\": 1,\n            \"coorX\": 10,\n            \"coorY\": 10,\n            \"widthRectangle\": 400,\n            \"heightRectangle\": 100\n        }\n    ]\n}",
+              "contentType": "application/json",
+              "type": "text"
+            },
+            {
+              "key": "file",
+              "type": "file",
+              "src": "/D:/mysign-document/data-file-test/Biên bản cuộc đấu giá.pdf"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/external/upload",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "external",
+            "upload"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Add file and property",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "request",
+                  "value": "{\n  \"render\" : 3,\n  \"fontType\" : 1,\n  \"fontSize\" : 12,\n  \"reason\" : \"Bruh\",\n  \"location\" : \"Hanoi\",\n  \"description\" : \"LMAO BRO\",\n  \"id\" : 1,\n  \"base64Image\" : \"{{file_Image_Base64}}\",\n  \"credential_id\" : \"{{key_alias}}\",\n  \"document_name\" : \"The name\",\n  \"display\" : [\n      {\n          \"page\":1,\n          \"coorX\":10,\n          \"coorY\":700,\n          \"widthRectangle\":200,\n          \"heightRectangle\":50\n      },\n      {\n          \"page\":1,\n          \"coorX\":10,\n          \"coorY\":300,\n          \"widthRectangle\":200,\n          \"heightRectangle\":50\n      }\n  ]\n}",
+                  "contentType": "application/json",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [
+                    "/home/thanhtt69/Downloads/Doc/sample_neac.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/vtss/external/service/file-signing/upload",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "vtss",
+                "external",
+                "service",
+                "file-signing",
+                "upload"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Headers"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Max-Age",
+              "value": "86400"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "key": "Expires",
+              "value": "0"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 23 Oct 2023 06:30:57 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"fileName\": \"sample_neac.pdf\",\n    \"file_id\": \"561\",\n    \"file_type\": \"pdf\",\n    \"size\": \"2 KB\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Sign file Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"file_id\": [\n        {{file_id}}\n    ],\n    \"credential_id\": \"{{key_alias}}\",\n    \"description\": \"test ký file\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/external/signing",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "external",
+            "signing"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Sign file",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"file_id\": [\n        562,\n        563\n    ],\n    \"credential_id\": \"{{key_alias}}\",\n    \"description\": \"LMAO BRO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/vtss/external/service/file-signing/signing",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "vtss",
+                "external",
+                "service",
+                "file-signing",
+                "signing"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Headers"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Max-Age",
+              "value": "86400"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 23 Oct 2023 06:54:38 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive, keep-alive"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "key": "Expires",
+              "value": "0"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"transactionId\": \"a30676c7-f945-415e-9947-59a1c0e03451\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get sign status Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept-Language",
+            "value": "vn",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"transactionId\":\"{{tranid}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/requests/status",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "requests",
+            "status"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get sign status",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept-Language",
+                "value": "vn",
+                "type": "default",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"transactionId\":\"{{tranid}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/vtss/service/requests/status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "vtss",
+                "service",
+                "requests",
+                "status"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Headers"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Max-Age",
+              "value": "86400"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "key": "Expires",
+              "value": "0"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 23 Oct 2023 07:10:19 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"signatures\": [\n        \"omN6/SoOBUqzX0D7gPvsroWUrVLU/D2UH/0A9fuHF6lY9SgNu7QpksKpgj2QpgvC\\r\\n04zuDMXiYedpI4YQoCOc2G3VT+Di0Dy5ChARuqBwf/dvbmhVovEtTXf6wRbTcwsb\\r\\nHwO3iynXqf5pp1nfVGSjvDSprN6xO++78Kgvhpv9v9GJAJWLWy68myVPUpcnC+y2\\r\\n19T1x5I916S9USUBNpdJ+8LbvLzj8y7DNCsh8XmxFkuw/uAEpSayLKuBgfHRWzSs\\r\\nPseU4VQVmRLCOoWbdbhzZEp/Gfybo5LUYUPwk+qCzw+imKLraiDKT6KywJP7qkY2\\r\\nQA212/Jo+PUpYtxSG3l+6w==\",\n        \"JPcBZ+mJYpxaAP5QkHdbZU1m2MR85Gf63v0ycKjE/VU0petk8EM4Y1zJdZig/MUY\\r\\nPpAxBhyNj63B9DjNn0PoAhwCjrpATt1rpv5YbeOEW+3qZ7qLfwQdFbB9xzFzlBCg\\r\\ngwQJ1Pz7bxnNSzEH/4HdCj1dbMEfFoAvPanQnjBiumFobnWRE+b9inMpdX/84tgG\\r\\nT+hcWdtezhy6VERj7bs0EwlMqk69qh1AbuWXRQcMuFJShmMzn7aStSyEVpFKN9cC\\r\\noVhRasFSQaYLpLijyvmV8gzJyM3vqxJcCQ5JXyhDvL6YNwAK2BNpt6pcTCs7R0jZ\\r\\nIrcUGqeJc/l3dOJz3pW3sg==\"\n    ],\n    \"status\": \"1\",\n    \"description\": \"Ký thành công\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get file status Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept-Language",
+            "value": "vn",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"file_id\": {{file_id}},\r\n    \"transactionId\":\"{{tranid}}\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/vtss/service/external/file/status",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "external",
+            "file",
+            "status"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get file status",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept-Language",
+                "value": "vn",
+                "type": "default",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"file_id\": 560,\r\n    \"transactionId\":\"{{tranid}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/vtss/service/external/file/status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "vtss",
+                "service",
+                "external",
+                "file",
+                "status"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Method"
+            },
+            {
+              "key": "Vary",
+              "value": "Access-Control-Request-Headers"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Max-Age",
+              "value": "86400"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "1; mode=block"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, no-store, max-age=0, must-revalidate"
+            },
+            {
+              "key": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "key": "Expires",
+              "value": "0"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "DENY"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 23 Oct 2023 07:56:29 GMT"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=60"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"status\": 1,\n    \"message\": \"Ký thành công\",\n    \"url\": \"http://10.207.252.118:9000/vtss/service/external/download/560\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "API Download File qua GW CloudCA Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{url}}/vtss/service/external/download/:file",
+          "host": [
+            "{{url}}"
+          ],
+          "path": [
+            "vtss",
+            "service",
+            "external",
+            "download",
+            ":file"
+          ],
+          "variable": [
+            {
+              "key": "file",
+              "value": "{{file_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": ""
+    },
+    {
+      "key": "client_id",
+      "value": ""
+    },
+    {
+      "key": "client_secret",
+      "value": ""
+    },
+    {
+      "key": "profile_id",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "file_Image_Base64",
+      "value": ""
+    },
+    {
+      "key": "key_alias",
+      "value": ""
+    },
+    {
+      "key": "tranid",
+      "value": ""
+    },
+    {
+      "key": "file_id",
+      "value": ""
+    }
+  ]
+}
