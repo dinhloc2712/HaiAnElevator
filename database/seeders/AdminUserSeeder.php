@@ -24,10 +24,10 @@ class AdminUserSeeder extends Seeder
 
         // 2. Create Admin User
         $admin = User::firstOrCreate(
-            ['email' => 'admin@dangkiemtauca.com'],
+            ['email' => 'admin@haian.com'],
             [
                 'name' => 'Administrator',
-                'password' => Hash::make('password'), // Default password
+                'password' => Hash::make('123456'), // Default password
                 'role_id' => $adminRole->id,
                 'phone' => '0901234567',
                 'is_active' => true,
@@ -35,7 +35,7 @@ class AdminUserSeeder extends Seeder
         );
         
         $this->command->info('Admin user created successfully.');
-        $this->command->info('Email: admin@dangkiemtauca.com');
-        $this->command->info('Password: password');
+        $this->command->info('Email: admin@haian.com');
+        $this->command->info('Password: 123456');
     }
 }

@@ -119,6 +119,17 @@
                     <label class="form-label fw-bold small text-uppercase text-muted">Ngày bắt đầu</label>
                     <input type="date" name="start_date" class="form-control modern-form-control" value="{{ old('start_date', $user->start_date ? $user->start_date->format('Y-m-d') : '') }}">
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Chi nhánh</label>
+                    <select name="branch_id" class="form-select modern-form-control">
+                        <option value="">-- Chọn chi nhánh --</option>
+                        @foreach($branches as $branch)
+                            <option value="{{ $branch->id }}" {{ old('branch_id', $user->branch_id) == $branch->id ? 'selected' : '' }}>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -179,55 +190,7 @@
         </div>
     </div>
 
-    {{-- === TÀU PHỤ TRÁCH === --}}
-    <div class="tech-card mt-4">
-        <div class="tech-header" style="background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);">
-            <i class="fas fa-ship me-2"></i>
-            Tàu phụ trách
-            <span class="badge bg-white text-primary ms-2" id="shipCountBadge">{{ count($assignedShipIds) }}</span>
-        </div>
-        <div class="card-body p-4">
-            <div class="mb-3">
-                <input type="text" id="shipSearch" class="form-control modern-form-control"
-                       placeholder="Tìm kiếm theo số hiệu hoặc chủ tàu...">
-            </div>
-            <div class="row g-2" id="shipList" style="max-height: 320px; overflow-y: auto;">
-                @forelse($ships as $ship)
-                    <div class="col-md-6 ship-item"
-                         data-search="{{ strtolower($ship->registration_number . ' ' . $ship->owner_name) }}">
-                        <label class="d-flex align-items-center gap-3 p-3 rounded-3 border ship-checkbox-label"
-                               style="cursor:pointer; transition: all 0.2s; border-color: #eaecf4 !important;">
-                            <input type="checkbox" name="ship_ids[]" value="{{ $ship->id }}"
-                                   class="form-check-input ship-check flex-shrink-0 mt-0"
-                                   {{ in_array($ship->id, $assignedShipIds) ? 'checked' : '' }}>
-                            <div class="overflow-hidden">
-                                <div class="fw-bold text-truncate" style="font-size: 0.85rem; color: #4e73df;">
-                                    {{ $ship->registration_number }}
-                                </div>
-                                <div class="text-muted text-truncate" style="font-size: 0.78rem;">
-                                    {{ $ship->owner_name ?? 'Chưa có chủ tàu' }}
-                                </div>
-                            </div>
-                            <span class="ms-auto flex-shrink-0">
-                                @if($ship->status === 'active')
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill" style="font-size: 0.65rem;">Đạt chuẩn</span>
-                                @elseif($ship->status === 'expired')
-                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill" style="font-size: 0.65rem;">Hết hạn</span>
-                                @else
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill" style="font-size: 0.65rem;">{{ $ship->status }}</span>
-                                @endif
-                            </span>
-                        </label>
-                    </div>
-                @empty
-                    <div class="col-12 text-center text-muted py-4">
-                        <i class="fas fa-ship fa-2x mb-2 d-block opacity-25"></i>
-                        Chưa có tàu nào trong hệ thống
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
+
 
     {{-- Mắt Bão CA - ẩn tạm, thay bằng MySign --}}
     {{-- <div class="tech-card mt-4" style="display:none;">
@@ -512,32 +475,5 @@
 
     document.addEventListener('DOMContentLoaded', initializeAddressPicker);
 
-    // Ship search + highlight
-    const shipSearch = document.getElementById('shipSearch');
-    if (shipSearch) {
-        shipSearch.addEventListener('input', function () {
-            const q = this.value.toLowerCase().trim();
-            document.querySelectorAll('.ship-item').forEach(item => {
-                const match = !q || item.dataset.search.includes(q);
-                item.style.display = match ? '' : 'none';
-            });
-        });
-    }
-
-    // Highlight checked ships
-    document.querySelectorAll('.ship-check').forEach(cb => {
-        const label = cb.closest('label');
-        function updateHighlight() {
-            label.style.borderColor = cb.checked ? '#4e73df' : '#eaecf4';
-            label.style.background  = cb.checked ? '#eff6ff' : '';
-        }
-        updateHighlight();
-        cb.addEventListener('change', () => {
-            updateHighlight();
-            const count = document.querySelectorAll('.ship-check:checked').length;
-            const badge = document.getElementById('shipCountBadge');
-            if (badge) badge.textContent = count;
-        });
-    });
 </script>
 @endsection

@@ -9,7 +9,7 @@
         <h1 class="h3 mb-1 text-gray-800 fw-bold">Thêm chức vụ mới</h1>
         <p class="mb-0 text-muted small">Tạo chức vụ và phân quyền</p>
     </div>
-    <a href="{{ route('admin.roles.index') }}" class="btn btn-outline-secondary rounded-pill px-3">
+    <a href="{{ route('admin.roles.index') }}" class="btn btn-add" style="background: #6c757d;">
         <i class="fas fa-arrow-left me-1"></i> Quay lại
     </a>
 </div>
@@ -29,12 +29,12 @@
                 <div class="card-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-uppercase text-muted">Tên hiển thị <span class="text-danger">*</span></label>
-                        <input type="text" name="display_name" class="form-control" value="{{ old('display_name') }}" required placeholder="Ví dụ: Quản lý kho">
+                        <input type="text" name="display_name" class="form-control modern-form-control" value="{{ old('display_name') }}" required placeholder="Ví dụ: Quản lý kho">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-uppercase text-muted">Mã chức vụ (Name) <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required placeholder="Ví dụ: inventory_manager">
+                        <input type="text" name="name" class="form-control modern-form-control" value="{{ old('name') }}" required placeholder="Ví dụ: inventory_manager">
                         <div class="form-text small">Mã chức vụ viết liền không dấu (tiếng Anh)</div>
                     </div>
                 </div>
@@ -68,18 +68,11 @@
                                 @php
                                     $modules = [
                                         'dashboard' => 'Tổng quan',
-                                        'user' => 'Tài khoản',
-                                        'role' => 'Phân quyền',
-                                        'media' => 'Tài liệu',
-                                        'inspection_process' => 'Quy trình Đăng kiểm',
-                                        'ship' => 'Danh sách Tàu thuyền',
-                                        'shipyard' => 'Cơ sở đóng mới',
-                                        'proposal' => 'Đề xuất & Phê duyệt',
-                                        'inspections' => 'Đợt đăng kiểm',
-                                        'crm' => 'Khách hàng',
-                                        'finance' => 'Tài chính & Phí',
-                                        'kpi' => 'KPI nhân viên',
-                                        'news' => 'Tin tức & Thông báo',
+                                        'user'      => 'Tài khoản',
+                                        'role'      => 'Phân quyền',
+                                        'branch'    => 'Chi nhánh',
+                                        'building'  => 'Tòa nhà',
+                                        'news'      => 'Tin tức & Thông báo',
                                     ];
                                     $actions = ['view', 'create', 'update', 'delete', 'approve'];
                                 @endphp
@@ -117,8 +110,8 @@
 
             {{-- Submit Buttons --}}
             <div class="d-flex gap-2 justify-content-end">
-                <a href="{{ route('admin.roles.index') }}" class="btn btn-light px-4">Hủy bỏ</a>
-                <button type="submit" class="btn btn-success fw-bold px-4">
+                <a href="{{ route('admin.roles.index') }}" class="btn btn-tech-outline">Hủy bỏ</a>
+                <button type="submit" class="btn btn-tech-primary">
                     <i class="fas fa-save me-1"></i> Lưu chức vụ
                 </button>
             </div>

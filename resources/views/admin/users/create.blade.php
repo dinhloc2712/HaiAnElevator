@@ -108,6 +108,17 @@
                     <label class="form-label fw-bold small text-uppercase text-muted">Ngày bắt đầu</label>
                     <input type="date" name="start_date" class="form-control modern-form-control" value="{{ old('start_date') }}">
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Chi nhánh</label>
+                    <select name="branch_id" class="form-select modern-form-control">
+                        <option value="">-- Chọn chi nhánh --</option>
+                        @foreach($branches as $branch)
+                            <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="mb-3">

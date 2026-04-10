@@ -40,7 +40,7 @@
 
                 {{-- Add Button --}}
                 @can('create_role')
-                <a href="{{ route('admin.roles.create') }}" class="btn bg-white rounded-pill text-primary fw-bold px-3 py-2 shadow-sm">
+                <a href="{{ route('admin.roles.create') }}" class="btn-add">
                     <i class="fas fa-plus me-1"></i> Thêm chức vụ
                 </a>
                 @endcan

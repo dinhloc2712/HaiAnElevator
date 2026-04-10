@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Đăng Kiểm Tàu Cá</title>
+    <title>Đăng Nhập - Hải An Elevator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -21,13 +22,19 @@
             position: relative;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5); /* Sáng tối vừa phải */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            /* Sáng tối vừa phải */
             z-index: 1;
         }
+
         .login-card {
             position: relative;
             z-index: 2;
@@ -35,14 +42,19 @@
             max-width: 420px;
             padding: 40px;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
-            backdrop-filter: blur(10px); /* Glassmorphism */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.85);
+            /* Semi-transparent white */
+            backdrop-filter: blur(10px);
+            /* Glassmorphism */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
+
         .text-primary {
-            color: #1a4f8b !important; /* Deep sea blue to fit theme */
+            color: #1a4f8b !important;
+            /* Deep sea blue to fit theme */
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #1a4f8b 0%, #2a75c9 100%);
             border: none;
@@ -52,31 +64,39 @@
             letter-spacing: 0.5px;
             transition: all 0.3s;
         }
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(26, 79, 139, 0.4);
             background: linear-gradient(135deg, #2a75c9 0%, #1a4f8b 100%);
         }
-        .form-control, .input-group-text {
+
+        .form-control,
+        .input-group-text {
             border-radius: 50px;
             background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
+
         .form-control {
             padding-left: 15px;
         }
+
         .form-control:focus {
             box-shadow: 0 0 0 0.25rem rgba(26, 79, 139, 0.25);
             border-color: #1a4f8b;
         }
+
         .input-group-text {
             border-right: none;
             color: #1a4f8b;
             padding-left: 20px;
         }
+
         .input-group .form-control {
             border-left: none;
         }
+
         .form-label {
             font-weight: 600;
             color: #333;
@@ -84,51 +104,56 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="login-card">
-    <div class="text-center mb-4">
-        <img src="{{ asset('logo.png') }}" alt="Logo" class="img-fluid mb-3" style="max-height: 80px;">
-        <h4 class="text-primary fw-bold mb-1">ĐĂNG NHẬP</h4>
-        <p class="text-muted small">Công ty cổ phần đăng kiểm tàu cá và dịch vụ hậu cần nghề các Nghệ An</p>
-    </div>
-    
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <img src="{{ asset('logo.png') }}" alt="Logo" class="img-fluid mb-3" style="max-height: 80px;">
+            <h4 class="text-primary fw-bold mb-1">ĐĂNG NHẬP</h4>
+            <p class="text-muted small">Hải An Elevator</p>
         </div>
-    @endif
 
-    <form action="{{ route('login.post') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-            <label class="form-label ps-2">Tên đăng nhập / Email</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                <input type="text" name="email" class="form-control" required value="{{ old('email') }}" placeholder="Email hoặc Số điện thoại">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-        </div>
-        <div class="mb-3">
-            <label class="form-label ps-2">Mật khẩu</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                <input type="password" name="password" id="password" class="form-control" required placeholder="Nhập mật khẩu">
+        @endif
+
+        <form action="{{ route('login.post') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label class="form-label ps-2">Tên đăng nhập / Email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" name="email" class="form-control" required value="{{ old('email') }}"
+                        placeholder="Email hoặc Số điện thoại">
+                </div>
             </div>
-        </div>
-        <div class="d-flex justify-content-between align-items-center mb-3 px-2">
-            <div class="form-check mb-0">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                <label class="form-check-label text-muted small" for="remember">Ghi nhớ đăng nhập</label>
+            <div class="mb-3">
+                <label class="form-label ps-2">Mật khẩu</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" id="password" class="form-control" required
+                        placeholder="Nhập mật khẩu">
+                </div>
             </div>
-            <a href="{{ route('password.request') }}" class="text-primary small text-decoration-none fw-bold">Quên mật khẩu?</a>
-        </div>
-        <button type="submit" class="btn btn-primary w-100 mb-2">Đăng nhập</button>
-    </form>
-</div>
+            <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                <div class="form-check mb-0">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label text-muted small" for="remember">Ghi nhớ đăng nhập</label>
+                </div>
+                <a href="{{ route('password.request') }}" class="text-primary small text-decoration-none fw-bold">Quên
+                    mật khẩu?</a>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-2">Đăng nhập</button>
+        </form>
+    </div>
 
 </body>
+
 </html>

@@ -113,6 +113,7 @@
                         <x-admin.table-header key="name" label="Họ tên" :sortColumn="$sortColumn" :sortOrder="$sortOrder" />
                         <x-admin.table-header key="email" label="Email" :sortColumn="$sortColumn" :sortOrder="$sortOrder" />
                         <th>Chức vụ</th>
+                        <th>Chi nhánh</th>
                         <x-admin.table-header key="is_active" label="Trạng thái" :sortColumn="$sortColumn" :sortOrder="$sortOrder" />
                         <x-admin.table-header key="created_at" label="Ngày tạo" :sortColumn="$sortColumn" :sortOrder="$sortOrder" />
                         <th class="text-end pe-4">Hành động</th>
@@ -155,6 +156,13 @@
                                     <span class="text-muted small fst-italic">Chưa cấp quyền</span>
                                 @endif
                             @endcan
+                        </td>
+                        <td>
+                            @if($user->branch)
+                                <span class="text-dark small fw-bold">{{ $user->branch->name }}</span>
+                            @else
+                                <span class="text-muted small">N/A</span>
+                            @endif
                         </td>
                         <td>
                             @if($user->is_active)

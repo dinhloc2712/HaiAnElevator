@@ -12,7 +12,7 @@
 </div>
 
 <div class="tech-card h-100 mb-4">
-    <div class="tech-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); padding: 20px 25px;">
+    <div class="tech-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <h6 class="mb-0 fw-bold text-white d-flex align-items-center">
                 <i class="fas fa-bullhorn me-2 bg-white bg-opacity-25 rounded-circle p-2" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"></i>
@@ -41,7 +41,7 @@
 
                 {{-- Add Button --}}
                 @can('create_news')
-                <a href="{{ route('admin.news.create') }}" class="btn btn-success fw-bold px-3 py-2 text-decoration-none d-flex align-items-center rounded-pill shadow-sm text-white">
+                <a href="{{ route('admin.news.create') }}" class="btn-add">
                     <i class="fas fa-plus me-1"></i> Tạo thông báo
                 </a>
                 @endcan

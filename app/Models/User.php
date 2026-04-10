@@ -83,21 +83,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the proposals created by the user
+     * Get the branch that the user belongs to.
      */
-    public function proposals()
+    public function branch()
     {
-        return $this->hasMany(Proposal::class, 'user_id');
+        return $this->belongsTo(Branch::class);
     }
 
-    /**
-     * Ships managed/assigned to this user (many-to-many)
-     */
-    public function managedShips()
-    {
-        return $this->belongsToMany(Ship::class, 'ship_user')
-                    ->withPivot('assigned_at');
-    }
 
     /**
      * News created by this user

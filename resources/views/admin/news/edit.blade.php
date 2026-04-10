@@ -8,7 +8,7 @@
         <h1 class="h3 mb-0 text-gray-800">Chỉnh sửa thông báo</h1>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0">
-        <a href="{{ route('admin.news.index') }}" class="btn btn-tech-outline">
+        <a href="{{ route('admin.news.index') }}" class="btn-add" style="background: #6c757d;">
             <i class="fas fa-arrow-left me-1"></i> Quay lại
         </a>
     </div>
@@ -24,36 +24,36 @@
             @method('PUT')
 
             <div class="mb-4">
-                <label for="title" class="form-label fw-bold">Tiêu đề thông báo <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $news->title) }}" required>
+                <label for="title" class="form-label fw-bold small text-uppercase text-muted">Tiêu đề thông báo <span class="text-danger">*</span></label>
+                <input type="text" class="form-control modern-form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $news->title) }}" required>
                 @error('title')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="mb-4">
-                <label for="content" class="form-label fw-bold">Nội dung <span class="text-danger">*</span></label>
-                <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="6" required>{{ old('content', $news->content) }}</textarea>
+                <label for="content" class="form-label fw-bold small text-uppercase text-muted">Nội dung <span class="text-danger">*</span></label>
+                <textarea class="form-control modern-form-control @error('content') is-invalid @enderror" id="content" name="content" rows="6" required>{{ old('content', $news->content) }}</textarea>
                 @error('content')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="mb-4">
-                <label for="attachment" class="form-label fw-bold">File đính kèm (Hình ảnh, PDF, Word, v.v...)</label>
+                <label for="attachment" class="form-label fw-bold small text-uppercase text-muted">File đính kèm (Hình ảnh, PDF, Word, v.v...)</label>
                 
                 @if($news->attachment)
                 <div class="d-flex align-items-center mb-2 p-2 bg-light rounded border" style="max-width: 400px;">
                     <i class="fas fa-paperclip text-muted me-2"></i>
-                    <span class="text-truncate flex-grow-1">{{ basename($news->attachment) }}</span>
+                    <span class="text-truncate flex-grow-1 small fw-bold">{{ basename($news->attachment) }}</span>
                     <div class="form-check mb-0 ms-3 text-nowrap">
                         <input class="form-check-input" type="checkbox" name="remove_attachment" value="1" id="removeAttachment">
-                        <label class="form-check-label text-danger" for="removeAttachment">Xóa file này</label>
+                        <label class="form-check-label text-danger small fw-bold" for="removeAttachment">Xóa file</label>
                     </div>
                 </div>
                 @endif
                 
-                <input class="form-control @error('attachment') is-invalid @enderror" type="file" id="attachment" name="attachment">
+                <input class="form-control modern-form-control @error('attachment') is-invalid @enderror" type="file" id="attachment" name="attachment">
                 <div class="form-text text-muted"><i class="fas fa-info-circle me-1"></i> Chọn file mới sẽ thay thế file cũ. Dung lượng tối đa 10MB.</div>
                 @error('attachment')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="card bg-light border-0 mb-4 p-4 rounded-4 shadow-sm">
-                <h5 class="fw-bold fs-6 mb-4"><i class="fas fa-users text-primary me-2"></i> Đối tượng nhận thông báo</h5>
+                <h5 class="fw-bold fs-6 mb-4 small text-uppercase text-primary"><i class="fas fa-users me-2"></i> Đối tượng nhận thông báo</h5>
                 
                 <div class="mb-3">
                     <div class="d-flex flex-wrap gap-4">
@@ -130,9 +130,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<style>
-    .cursor-pointer { cursor: pointer; }
-</style>
+@endsection
 
 <script>
     function toggleRecipientOptions() {

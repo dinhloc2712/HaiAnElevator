@@ -19,27 +19,37 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone')->nullable()->unique();
             $table->string('avatar')->nullable();
-            $table->foreignId('role_id')->nullable(); // Will constrain later or assume loose for now to avoid circular dependency if roles created later
-            
-            // Status/Location
+            $table->foreignId('role_id')->nullable();
+
+            // Status
             $table->boolean('is_active')->default(true);
-            $table->foreignId('province_id')->nullable();
-            $table->foreignId('ward_id')->nullable();
+
+            // Location (stored as strings)
+            $table->string('province_id')->nullable();
+            $table->string('ward_id')->nullable();
             $table->string('street_address')->nullable();
-            
+
             // Employee / HR fields
-            $table->string('code')->nullable()->unique(); // Staff ID
+            $table->string('code')->nullable()->unique();
             $table->string('position')->nullable();
             $table->decimal('salary_base', 15, 2)->default(0);
             $table->date('start_date')->nullable();
-            $table->foreignId('department_id')->nullable(); // Constrain if department exists
-            $table->foreignId('branch_id')->nullable(); 
+            $table->foreignId('department_id')->nullable();
+            $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
 
             // Company Info (for B2B/Client users)
             $table->string('company_name')->nullable();
             $table->string('tax_code')->nullable();
             $table->string('bank_account')->nullable();
             $table->string('bank_name')->nullable();
+
+            // Viettel MySign CA
+            $table->string('mysign_client_id')->nullable();
+            $table->string('mysign_client_secret')->nullable();
+            $table->string('mysign_profile_id')->nullable();
+            $table->string('mysign_user_id')->nullable();
+            $table->string('mysign_credential_id')->nullable();
+            $table->string('mysign_signature_image')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

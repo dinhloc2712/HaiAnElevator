@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Ship;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $this->authorize('view_user');
 
-        $query = User::with(['role']);
+        $query = User::with(['role', 'branch']);
 
         // Search
         if ($request->has('search') && $request->search != '') {
@@ -64,7 +64,8 @@ class UserController extends Controller
     {
         $this->authorize('create_user');
         $roles = Role::all();
-        return view('admin.users.create', compact('roles'));
+        $branches = Branch::where('is_active', true)->get();
+        return view('admin.users.create', compact('roles', 'branches'));
     }
 
     public function store(Request $request)
@@ -94,6 +95,7 @@ class UserController extends Controller
             'mysign_user_id'         => 'nullable|string|max:255',
             'mysign_credential_id'   => 'nullable|string|max:255',
             'mysign_signature_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'branch_id'              => 'nullable|exists:branches,id',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -109,9 +111,8 @@ class UserController extends Controller
     {
         $this->authorize('update_user');
         $roles = Role::all();
-        $ships = Ship::orderBy('registration_number')->get();
-        $assignedShipIds = $user->managedShips->pluck('id')->toArray();
-        return view('admin.users.edit', compact('user', 'roles', 'ships', 'assignedShipIds'));
+        $branches = Branch::where('is_active', true)->get();
+        return view('admin.users.edit', compact('user', 'roles', 'branches'));
     }
 
     public function update(Request $request, User $user)
@@ -142,6 +143,7 @@ class UserController extends Controller
             'mysign_user_id'         => 'nullable|string|max:255',
             'mysign_credential_id'   => 'nullable|string|max:255',
             'mysign_signature_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'branch_id'              => 'nullable|exists:branches,id',
         ]);
 
         if ($request->filled('password')) {
@@ -180,10 +182,6 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-
-        // Sync managed ships
-        $shipIds = $request->input('ship_ids', []);
-        $user->managedShips()->sync($shipIds);
 
         return redirect()->route('admin.users.index')->with('success', 'Cập nhật tài khoản thành công.');
     }

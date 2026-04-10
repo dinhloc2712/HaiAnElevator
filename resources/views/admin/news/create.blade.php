@@ -8,7 +8,7 @@
         <h1 class="h3 mb-0 text-gray-800">Tạo thông báo mới</h1>
     </div>
     <div class="col-md-6 text-md-end mt-3 mt-md-0">
-        <a href="{{ route('admin.news.index') }}" class="btn btn-tech-outline">
+        <a href="{{ route('admin.news.index') }}" class="btn-add" style="background: #6c757d;">
             <i class="fas fa-arrow-left me-1"></i> Quay lại
         </a>
     </div>
@@ -23,24 +23,24 @@
             @csrf
 
             <div class="mb-4">
-                <label for="title" class="form-label fw-bold">Tiêu đề thông báo <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" required placeholder="Nhập tiêu đề...">
+                <label for="title" class="form-label fw-bold small text-uppercase text-muted">Tiêu đề thông báo <span class="text-danger">*</span></label>
+                <input type="text" class="form-control modern-form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" required placeholder="Nhập tiêu đề...">
                 @error('title')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="mb-4">
-                <label for="content" class="form-label fw-bold">Nội dung <span class="text-danger">*</span></label>
-                <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="6" required placeholder="Nhập nội dung chi tiết...">{{ old('content') }}</textarea>
+                <label for="content" class="form-label fw-bold small text-uppercase text-muted">Nội dung <span class="text-danger">*</span></label>
+                <textarea class="form-control modern-form-control @error('content') is-invalid @enderror" id="content" name="content" rows="6" required placeholder="Nhập nội dung chi tiết...">{{ old('content') }}</textarea>
                 @error('content')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="mb-4">
-                <label for="attachment" class="form-label fw-bold">File đính kèm (Hình ảnh, PDF, Word, v.v...)</label>
-                <input class="form-control @error('attachment') is-invalid @enderror" type="file" id="attachment" name="attachment">
+                <label for="attachment" class="form-label fw-bold small text-uppercase text-muted">File đính kèm (Hình ảnh, PDF, Word, v.v...)</label>
+                <input class="form-control modern-form-control @error('attachment') is-invalid @enderror" type="file" id="attachment" name="attachment">
                 <div class="form-text text-muted"><i class="fas fa-info-circle me-1"></i> Dung lượng tối đa 10MB.</div>
                 @error('attachment')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -48,7 +48,7 @@
             </div>
 
             <div class="card bg-light border-0 mb-4 p-4 rounded-4 shadow-sm">
-                <h5 class="fw-bold fs-6 mb-4"><i class="fas fa-users text-primary me-2"></i> Đối tượng nhận thông báo</h5>
+                <h5 class="fw-bold fs-6 mb-4 small text-uppercase text-primary"><i class="fas fa-users me-2"></i> Đối tượng nhận thông báo</h5>
                 
                 <div class="mb-3">
                     <div class="d-flex flex-wrap gap-4">
@@ -112,9 +112,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<style>
-    .cursor-pointer { cursor: pointer; }
-</style>
+@endsection
 
 <script>
     function toggleRecipientOptions() {

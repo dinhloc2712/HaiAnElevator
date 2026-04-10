@@ -1,0 +1,342 @@
+/* =============================================================
+   ADMIN SHARED COMPONENTS CSS
+   Các component dùng chung cho toàn bộ admin panel
+   Bổ sung cho admin-pro-tech.css (sidebar, layout, buttons...)
+   ============================================================= */
+
+/* ── PAGE HEADER ── */
+.page-header-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+.page-header-sub {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* ── SEARCH BAR ── */
+.search-wrap {
+    position: relative;
+    display: inline-block;
+}
+.search-wrap .fa-search {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #adb5bd;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+.search-input {
+    border-radius: 50px;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 18px 10px 42px;
+    font-size: 0.9rem;
+    width: 300px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+    outline: none;
+}
+.search-input:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
+}
+
+/* ── DATA TABLE CARD (for buildings, branches, etc.) ── */
+.data-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+/* Alias classes kept for backwards compat */
+.branches-card,
+.buildings-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+.data-card .table,
+.branches-card .table,
+.buildings-card .table {
+    margin-bottom: 0;
+}
+
+.data-card .table thead th,
+.branches-card .table thead th,
+.buildings-card .table thead th {
+    background: #f8f9fc;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    border-bottom: 1.5px solid #e9ecef;
+    padding: 14px 18px;
+}
+
+.data-card .table tbody td,
+.branches-card .table tbody td,
+.buildings-card .table tbody td {
+    padding: 16px 18px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f9;
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+.data-card .table tbody tr:last-child td,
+.branches-card .table tbody tr:last-child td,
+.buildings-card .table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-card .table tbody tr:hover,
+.branches-card .table tbody tr:hover,
+.buildings-card .table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+/* ── ROW ICON (building / branch icon) ── */
+.row-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #e8edf9 0%, #d0d9f5 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4e73df;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+/* Backwards compat aliases */
+.building-icon { width: 36px; height: 36px; background: #e8edf9; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: #4e73df; font-size: 1rem; flex-shrink: 0; }
+.branch-icon   { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #e8edf9, #d0d9f5); display: inline-flex; align-items: center; justify-content: center; color: #4e73df; font-size: 1rem; flex-shrink: 0; }
+
+/* ── TABLE TEXT HELPERS ── */
+.row-name,
+.building-name,
+.branch-name {
+    font-weight: 600;
+    color: #1a1a2e;
+}
+.row-sub,
+.customer-name { color: #4a5568; }
+.address-text,
+.branch-addr   { color: #6c757d; font-size: 0.85rem; }
+.contact-name  { font-weight: 500; color: #2d3748; font-size: 0.88rem; }
+.contact-phone { color: #6c757d; font-size: 0.8rem; }
+.elevator-count,
+.users-count   { font-size: 1.15rem; font-weight: 700; color: #4e73df; }
+
+/* ── STATUS BADGES ── */
+.badge-active {
+    background: #e6f9f0;
+    color: #1a9e5c;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.badge-inactive {
+    background: #f9e6e6;
+    color: #c0392b;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── ADD BUTTON ── */
+.btn-add {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 115, 223, 0.35);
+    color: #fff;
+}
+
+/* ── ACTION ICON BUTTONS ── */
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.15s;
+    cursor: pointer;
+    text-decoration: none;
+}
+.action-btn.edit  { background: #e8edf9; color: #4e73df; }
+.action-btn.edit:hover { background: #4e73df; color: #fff; }
+.action-btn.del   { background: #fde8e8; color: #e53e3e; }
+.action-btn.del:hover  { background: #e53e3e; color: #fff; }
+.action-btn.view  { background: #e6f9f0; color: #1a9e5c; }
+.action-btn.view:hover { background: #1a9e5c; color: #fff; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: #adb5bd;
+}
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+    opacity: 0.3;
+}
+.empty-state p { margin: 0; }
+
+/* ── FORM CARD (create / edit pages) ── */
+.form-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+.form-card .card-body { padding: 28px 32px; }
+.form-card .card-footer {
+    background: #f8f9fc;
+    border-top: 1px solid #e9ecef;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* ── MODERN FORM CONTROL ── */
+.modern-form-control {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+}
+.modern-form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
+    outline: none;
+}
+
+/* ── STAT CARD (Dashboard) ── */
+.stat-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+.stat-value { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; line-height: 1; }
+.stat-label { font-size: 0.82rem; color: #6c757d; margin-top: 4px; }
+.stat-trend { font-size: 0.78rem; font-weight: 600; margin-top: 6px; }
+.trend-up   { color: #1a9e5c; }
+.trend-down { color: #e53e3e; }
+
+/* ── DASHBOARD SPECIFIC ── */
+.stat-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+.stat-card .card-body { padding: 1.5rem; }
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.stat-label {
+    font-size: 0.82rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.badge-growth {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.chart-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+}
+.table-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+.table-card .table { margin-bottom: 0; }
+
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+.page-subtitle {
+    color: #6c757d;
+    font-size: 0.9rem;
+}

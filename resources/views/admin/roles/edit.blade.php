@@ -9,7 +9,7 @@
         <h1 class="h3 mb-1 text-gray-800 fw-bold">Cập nhật chức vụ</h1>
         <p class="mb-0 text-muted small">Chỉnh sửa: {{ $role->display_name }}</p>
     </div>
-    <a href="{{ route('admin.roles.index') }}" class="btn btn-outline-secondary rounded-pill px-3">
+    <a href="{{ route('admin.roles.index') }}" class="btn btn-add" style="background: #6c757d;">
         <i class="fas fa-arrow-left me-1"></i> Quay lại
     </a>
 </div>
@@ -21,7 +21,7 @@
         {{-- Left Column: Basic Info --}}
         <div class="col-lg-4">
             <div class="tech-card mb-4">
-                <div class="tech-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); padding: 16px 20px;">
+                <div class="tech-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
                     <h6 class="mb-0 fw-bold text-white d-flex align-items-center">
                         <i class="fas fa-info-circle me-2"></i>
                         Thông tin chức vụ
@@ -30,12 +30,12 @@
                 <div class="card-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-uppercase text-muted">Tên hiển thị <span class="text-danger">*</span></label>
-                        <input type="text" name="display_name" class="form-control" value="{{ old('display_name', $role->display_name) }}" required>
+                        <input type="text" name="display_name" class="form-control modern-form-control" value="{{ old('display_name', $role->display_name) }}" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-uppercase text-muted">Mã chức vụ (Name) <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name', $role->name) }}" required {{ in_array($role->name, ['admin', 'employee', 'customer']) ? 'readonly' : '' }}>
+                        <input type="text" name="name" class="form-control modern-form-control" value="{{ old('name', $role->name) }}" required {{ in_array($role->name, ['admin', 'employee', 'customer']) ? 'readonly' : '' }}>
                         @if(in_array($role->name, ['admin', 'employee', 'customer']))
                             <div class="form-text small text-warning"><i class="fas fa-lock me-1"></i> Không thể đổi mã của chức vụ mặc định hệ thống</div>
                         @else
@@ -49,7 +49,7 @@
         {{-- Right Column: Permissions --}}
         <div class="col-lg-8">
             <div class="tech-card mb-4">
-                <div class="tech-header" style="background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); padding: 16px 20px;">
+                <div class="tech-header" style="background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);">
                     <h6 class="mb-0 fw-bold text-white d-flex align-items-center">
                         <i class="fas fa-lock me-2"></i>
                         Phân quyền theo Module
@@ -73,18 +73,11 @@
                                 @php
                                     $modules = [
                                         'dashboard' => 'Tổng quan',
-                                        'user' => 'Tài khoản',
-                                        'role' => 'Phân quyền',
-                                        'media' => 'Tài liệu',
-                                        'inspection_process' => 'Quy trình Đăng kiểm',
-                                        'ship' => 'Danh sách Tàu thuyền',
-                                        'shipyard' => 'Cơ sở đóng mới',
-                                        'proposal' => 'Đề xuất & Phê duyệt',
-                                        'inspections' => 'Đợt đăng kiểm',
-                                        'crm' => 'Khách hàng',
-                                        'finance' => 'Tài chính & Phí',
-                                        'kpi' => 'KPI nhân viên',
-                                        'news' => 'Tin tức & Thông báo',
+                                        'user'      => 'Tài khoản',
+                                        'role'      => 'Phân quyền',
+                                        'branch'    => 'Chi nhánh',
+                                        'building'  => 'Tòa nhà',
+                                        'news'      => 'Tin tức & Thông báo',
                                     ];
                                     $actions = ['view', 'create', 'update', 'delete', 'approve'];
                                     $rolePermissionIds = $role->permissions->pluck('id')->toArray();
@@ -123,8 +116,8 @@
 
             {{-- Submit Buttons --}}
             <div class="d-flex gap-2 justify-content-end">
-                <a href="{{ route('admin.roles.index') }}" class="btn btn-light px-4">Hủy bỏ</a>
-                <button type="submit" class="btn btn-primary fw-bold px-4">
+                <a href="{{ route('admin.roles.index') }}" class="btn btn-tech-outline">Hủy bỏ</a>
+                <button type="submit" class="btn btn-tech-primary">
                     <i class="fas fa-save me-1"></i> Cập nhật chức vụ
                 </button>
             </div>
