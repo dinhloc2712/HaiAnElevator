@@ -340,3 +340,189 @@
     color: #6c757d;
     font-size: 0.9rem;
 }
+
+/* ── GROUPED TABLE (Province/District) ── */
+.group-header-province {
+    background-color: #f8f9fc;
+    padding: 12px 20px;
+    font-weight: 700;
+    color: #4e73df;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e3e6f0;
+}
+.group-header-district {
+    background-color: #fff;
+    padding: 10px 35px;
+    font-weight: 600;
+    color: #5a5c69;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #eaecf4;
+}
+.group-header-province i,
+.group-header-district i {
+    width: 20px;
+    text-align: center;
+}
+
+/* ── HORIZONTAL TABLE ON MOBILE (Override admin-pro-tech.css default mobile cards) ── */
+@media (max-width: 768px) {
+    .table-horizontal-mobile {
+        display: table !important;
+    }
+    .table-horizontal-mobile thead {
+        display: table-header-group !important;
+    }
+    .table-horizontal-mobile tbody {
+        display: table-row-group !important;
+    }
+    .table-horizontal-mobile tr {
+        display: table-row !important;
+    }
+    .table-horizontal-mobile td, 
+    .table-horizontal-mobile th {
+        display: table-cell !important;
+        width: auto !important;
+        white-space: nowrap !important;
+        padding: 12px 15px !important;
+        border: 1px solid #f1f3f9 !important;
+    }
+    .table-horizontal-mobile .group-header-province,
+    .table-horizontal-mobile .group-header-district {
+        display: table-cell !important;
+        width: 100% !important;
+    }
+}
+
+/* ── ADVANCED FILTER STYLING ── */
+#advancedFilter .card-body {
+    background-color: #f8f9fc;
+    border-bottom: 2px solid #eaecf4;
+}
+#advancedFilter .form-label {
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+}
+#advancedFilter .form-label i {
+    color: #4e73df;
+    opacity: 0.8;
+}
+#advancedFilter .input-group .modern-form-control:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#advancedFilter .input-group .modern-form-control:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+}
+
+/* ── DASHBOARD PREMIUM EFFECTS ── */
+@keyframes fadeInUpScale {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+    70% { transform: translateY(-5px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.stats-card-premium {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fadeInUpScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0;
+    cursor: default;
+}
+
+.stats-card-premium:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(78, 115, 223, 0.15) !important;
+}
+
+.stats-card-premium i.fa-chart-pie,
+.stats-card-premium i.fa-chart-bar {
+    transition: transform 0.5s ease;
+}
+
+.stats-card-premium:hover i.fa-chart-pie,
+.stats-card-premium:hover i.fa-chart-bar {
+    transform: rotate(15deg) scale(1.2);
+    color: #4e73df !important;
+}
+
+/* Glassmorphism accent for chart containers */
+.chart-glass-wrapper {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.chart-glass-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+}
+
+/* ── INSTALLATION MODULE STYLES ── */
+.badge-pill-modern {
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-status-pending { background-color: #f1f3f9; color: #5a5c69; }
+.badge-status-in-progress { background-color: #4e73df; color: #ffffff; }
+.badge-status-completed { background-color: #e2f9ed; color: #1cc88a; }
+
+.staff-avatar-circle {
+    width: 32px;
+    height: 32px;
+    background-color: #ebf0ff;
+    color: #4e73df;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-right: 10px;
+}
+
+.card-summary-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.icon-bg-blue { background-color: #ebf0ff; color: #4e73df; }
+.icon-bg-orange { background-color: #fff4e5; color: #ff9800; }
+.icon-bg-green { background-color: #e2f9ed; color: #1cc88a; }
+
+.btn-ghost-complete {
+    color: #1cc88a;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+}
+.btn-ghost-complete:hover {
+    background-color: #e2f9ed;
+    color: #16a06e;
+    border-radius: 8px;
+}

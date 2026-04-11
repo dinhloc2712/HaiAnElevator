@@ -57,6 +57,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 
     Route::resource('buildings', \App\Http\Controllers\Admin\BuildingController::class);
+    Route::resource('elevators', \App\Http\Controllers\Admin\ElevatorController::class);
+    Route::resource('installations', \App\Http\Controllers\Admin\InstallationController::class);
+    Route::post('installations/{installation}/complete', [\App\Http\Controllers\Admin\InstallationController::class, 'complete'])->name('installations.complete');
+
+    Route::post('maintenance/schedule', [\App\Http\Controllers\Admin\MaintenanceController::class, 'schedule'])->name('maintenance.schedule');
+    Route::resource('maintenance', \App\Http\Controllers\Admin\MaintenanceController::class);
 
     // Profile Management
     Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'show'])->name('profile.show');

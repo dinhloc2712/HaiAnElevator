@@ -75,7 +75,6 @@
                     </li>
                 @endcan
 
-                <!-- Tòa nhà & Khách hàng -->
                 @can('view_building')
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.buildings.*') ? 'active' : '' }}"
@@ -84,6 +83,32 @@
                         </a>
                     </li>
                 @endcan
+
+                <!-- Quản lý Thang máy -->
+                @can('view_elevator')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.elevators.*') ? 'active' : '' }}"
+                            href="{{ route('admin.elevators.index') }}">
+                            <i class="fas fa-elevator"></i> <span>Quản lý Thang máy</span>
+                        </a>
+                    </li>
+                @endcan
+
+                <!-- Quản lý Lắp đặt -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.installations.*') ? 'active' : '' }}"
+                        href="{{ route('admin.installations.index') }}">
+                        <i class="fas fa-wrench"></i> <span>Quản lý Lắp đặt</span>
+                    </a>
+                </li>
+
+                <!-- Nhật ký bảo trì -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.maintenance.*') ? 'active' : '' }}"
+                        href="{{ route('admin.maintenance.index') }}">
+                        <i class="fas fa-toolbox"></i> <span>Nhật ký Bảo trì</span>
+                    </a>
+                </li>
 
                 <!-- Nav Item - Tin tuc (News) -->
                 @can('view_news')
@@ -171,7 +196,7 @@
                 </button>
 
                 {{-- Mobile Brand (visible only on mobile) --}}
-                <div class="d-md-none ms-3 fw-bold text-primary">TÀU CÁ NGHỆ AN</div>
+                <div class="d-md-none ms-3 fw-bold text-primary">HẢI AN ELEVATOR</div>
 
 
 

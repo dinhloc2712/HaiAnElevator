@@ -49,6 +49,12 @@ class PermissionSeeder extends Seeder
             'update_building' => 'Chỉnh sửa tòa nhà',
             'delete_building' => 'Xóa tòa nhà',
 
+            // Elevator Management (NEW)
+            'view_elevator' => 'Xem danh sách thang máy',
+            'create_elevator' => 'Thêm mới thang máy',
+            'update_elevator' => 'Chỉnh sửa thang máy',
+            'delete_elevator' => 'Xóa thang máy',
+
             // News / Notifications
             'view_news' => 'Xem danh sách tin tức',
             'create_news' => 'Tạo tin tức',
