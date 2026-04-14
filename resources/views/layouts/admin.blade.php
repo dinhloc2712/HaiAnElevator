@@ -102,11 +102,35 @@
                     </a>
                 </li>
 
+                <!-- Đơn bảo trì & Báo giá -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
+                        href="{{ route('admin.maintenance.orders') }}">
+                        <i class="fas fa-file-invoice-dollar"></i> <span>Đơn bảo trì & Báo giá</span>
+                    </a>
+                </li>
+
                 <!-- Nhật ký bảo trì -->
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.maintenance.*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('admin.maintenance.*') && !request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
                         href="{{ route('admin.maintenance.index') }}">
                         <i class="fas fa-toolbox"></i> <span>Nhật ký Bảo trì</span>
+                    </a>
+                </li>
+ 
+                <!-- Quản lý Sự cố -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.incidents.*') ? 'active' : '' }}"
+                        href="{{ route('admin.incidents.index') }}">
+                        <i class="fas fa-exclamation-triangle"></i> <span>Quản lý Sự cố</span>
+                    </a>
+                </li>
+
+                <!-- Báo cáo & Phân tích -->
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
+                        href="{{ route('admin.reports.index') }}">
+                        <i class="fas fa-chart-pie"></i> <span>Báo cáo & Phân tích</span>
                     </a>
                 </li>
 

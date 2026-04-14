@@ -35,13 +35,15 @@
     padding: 10px 18px 10px 42px;
     font-size: 0.9rem;
     width: 300px;
+    max-width: 100%;
     transition: border-color 0.2s, box-shadow 0.2s;
     background: #fff;
     outline: none;
 }
-.search-input:focus {
-    border-color: #4e73df;
-    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.12);
+@media (max-width: 576px) {
+    .search-input {
+        width: 100%;
+    }
 }
 
 /* ── DATA TABLE CARD (for buildings, branches, etc.) ── */
@@ -58,6 +60,7 @@
     border-radius: 16px;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
     overflow: hidden;
+    height: auto;
 }
 
 .data-card .table,

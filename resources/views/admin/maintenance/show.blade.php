@@ -58,9 +58,9 @@
                 <p class="mb-0 text-muted small">Phiếu bảo trì thang máy {{ $maintenance->elevator->code ?? 'N/A' }} ngày {{ $maintenance->check_date ? $maintenance->check_date->format('d/m/Y') : 'N/A' }}</p>
             </div>
             <div>
-                <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 me-2">
-                    <i class="fas fa-print me-2"></i> In phiếu
-                </button>
+                <a href="{{ route('admin.maintenance.export', $maintenance->id) }}" target="_blank" class="btn btn-primary rounded-pill px-4 me-2">
+                    <i class="fas fa-print me-2"></i> Xuất phiếu (PDF)
+                </a>
                 <a href="{{ route('admin.maintenance.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
                     <i class="fas fa-arrow-left me-2"></i> Quay lại
                 </a>
@@ -118,16 +118,18 @@
                                 <div class="border rounded-4 overflow-hidden">
                                     @foreach($items as $id => $name)
                                         @php 
-                                            $symbol = $results[$id] ?? 'Δ'; 
-                                            $desc = $symbols[$symbol] ?? 'Bình thường';
+                                            $val = $results[$id] ?? ''; 
+                                            $statusName = $symbols[$val] ?? 'N/A';
                                         @endphp
                                         <div class="checklist-item">
                                             <div class="d-flex align-items-start gap-3">
-                                                <span class="text-muted small fw-bold" style="min-width: 20px;">{{ $id }}.</span>
+                                                <span class="text-muted small fw-bold" style="min-width: 20px;">{{ $loop->iteration }}.</span>
                                                 <span class="small text-dark fw-bold">{{ $name }}</span>
                                             </div>
                                             <div>
-                                                <span class="symbol-badge {{ getSymbolClass($symbol) }}" title="{{ $desc }}">{{ $symbol }}</span>
+                                                <span class="badge bg-light text-primary rounded-pill border px-3 py-2 fw-bold" style="font-size: 0.75rem;">
+                                                    {{ $statusName }}
+                                                </span>
                                             </div>
                                         </div>
                                     @endforeach

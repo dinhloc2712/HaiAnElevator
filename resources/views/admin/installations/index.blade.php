@@ -61,16 +61,16 @@
     {{-- Orders List Section --}}
     <div class="tech-card h-100">
         <div class="tech-header" style="background: white; border-bottom: 1px solid #f1f3f9;">
-            <div class="d-flex justify-content-between align-items-center flex-nowrap gap-2">
-                <h6 class="mb-0 fw-bold text-dark d-flex align-items-center text-nowrap me-2">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h6 class="mb-0 fw-bold text-dark d-flex align-items-center text-nowrap">
                     <i class="fas fa-wrench me-2 bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-none d-md-flex"
                         style="width: 36px; height: 36px; align-items: center; justify-content: center;"></i>
                     <span>Danh sách đơn lắp đặt</span>
                 </h6>
 
-                <div class="d-flex align-items-center flex-nowrap gap-2">
+                <div class="d-flex align-items-center flex-wrap gap-2 w-100 w-sm-auto justify-content-md-end">
                     {{-- Quick Search --}}
-                    <div class="bg-light rounded-pill px-3 py-1 d-flex align-items-center" style="min-width: 250px;">
+                    <div class="bg-light rounded-pill px-3 py-1 d-flex align-items-center flex-grow-1" style="min-width: 250px;">
                         <i class="fas fa-search text-muted me-2"></i>
                         <input type="text" class="form-control border-0 bg-transparent shadow-none small" 
                                placeholder="Tìm kiếm khách hàng, mã..." style="font-size: 0.85rem;">

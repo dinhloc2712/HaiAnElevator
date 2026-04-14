@@ -61,8 +61,30 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('installations', \App\Http\Controllers\Admin\InstallationController::class);
     Route::post('installations/{installation}/complete', [\App\Http\Controllers\Admin\InstallationController::class, 'complete'])->name('installations.complete');
 
-    Route::post('maintenance/schedule', [\App\Http\Controllers\Admin\MaintenanceController::class, 'schedule'])->name('maintenance.schedule');
+
+    Route::get('maintenance/orders', [\App\Http\Controllers\Admin\MaintenanceController::class, 'orders'])->name('maintenance.orders');
+    Route::post('maintenance/orders', [\App\Http\Controllers\Admin\MaintenanceController::class, 'storeOrder'])->name('maintenance.orders.store');
+    Route::get('maintenance/orders/{order}/edit', [\App\Http\Controllers\Admin\MaintenanceController::class, 'editOrder'])->name('maintenance.orders.edit');
+    Route::put('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateOrder'])->name('maintenance.orders.update');
+    Route::get('maintenance/{maintenance}/export', [\App\Http\Controllers\Admin\MaintenanceController::class, 'export'])->name('maintenance.export');
     Route::resource('maintenance', \App\Http\Controllers\Admin\MaintenanceController::class);
+    Route::resource('incidents', \App\Http\Controllers\Admin\IncidentController::class);
+    
+    // Maintenance Settings
+    Route::get('maintenance-settings', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'index'])->name('maintenance.settings');
+    Route::post('maintenance-settings/categories', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'storeCategory'])->name('maintenance.categories.store');
+    Route::put('maintenance-settings/categories/{category}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'updateCategory'])->name('maintenance.categories.update');
+    Route::delete('maintenance-settings/categories/{category}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'destroyCategory'])->name('maintenance.categories.destroy');
+    
+    Route::post('maintenance-settings/items', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'storeItem'])->name('maintenance.items.store');
+    Route::put('maintenance-settings/items/{item}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'updateItem'])->name('maintenance.items.update');
+    Route::delete('maintenance-settings/items/{item}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'destroyItem'])->name('maintenance.items.destroy');
+    
+    Route::post('maintenance-settings/statuses', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'storeStatus'])->name('maintenance.statuses.store');
+    Route::put('maintenance-settings/statuses/{status}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'updateStatus'])->name('maintenance.statuses.update');
+    Route::delete('maintenance-settings/statuses/{status}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'destroyStatus'])->name('maintenance.statuses.destroy');
+
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
 
     // Profile Management
     Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'show'])->name('profile.show');

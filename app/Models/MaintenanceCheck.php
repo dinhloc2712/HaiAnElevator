@@ -14,7 +14,7 @@ class MaintenanceCheck extends Model
         'user_id',
         'status',
         'task_type',
-        'scheduled_date',
+        'fault_category',
         'check_date',
         'results',
         'evaluation',
@@ -27,10 +27,10 @@ class MaintenanceCheck extends Model
     ];
 
     protected $casts = [
-        'scheduled_date' => 'date',
         'check_date' => 'date',
         'results' => 'array', 
         'staff_ids' => 'array',
+        'fault_category' => 'array',
     ];
 
     /**

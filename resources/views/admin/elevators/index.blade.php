@@ -96,7 +96,7 @@
                     <button class="btn btn-outline-light rounded-pill px-3 fw-bold flex-shrink-0 shadow-sm" type="button"
                         data-bs-toggle="collapse" data-bs-target="#advancedFilter" aria-expanded="false"
                         style="font-size: 0.8rem; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.1);">
-                        <i class="fas fa-filter me-1"></i> Bộ lọc nâng cao
+                        <i class="fas fa-filter me-sm-1"></i> <span class="d-none d-sm-inline">Bộ lọc nâng cao</span>
                     </button>
                 </div>
             </div>

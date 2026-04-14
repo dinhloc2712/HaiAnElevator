@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MaintenanceCheck;
 use App\Models\Elevator;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class MaintenanceController extends Controller
@@ -13,76 +14,35 @@ class MaintenanceController extends Controller
     /**
      * Define the sections and items as seen in the paper form.
      */
+    /**
+     * Define the sections and items as seen in the paper form.
+     */
     protected function getChecklistItems()
     {
-        return [
-            '1. PHÒNG MÁY' => [
-                1 => 'Môi trường phòng máy', 2 => 'Máy kéo', 3 => 'Phanh từ',
-                4 => 'Puly dẫn hướng', 5 => 'Tủ điều khiển', 6 => 'Encoder',
-                7 => 'Bộ hạn chế tốc độ', 8 => 'INTERCOM', 9 => 'Bộ cứu hộ ARD',
-                10 => 'Bộ ắc quy cứu hộ', 11 => 'Dầu máy'
-            ],
-            '2. CABIN' => [
-                12 => 'Nóc cabin', 13 => 'Puly nóc cabin', 14 => 'Shoes dẫn hướng cabin',
-                15 => 'Shoes dẫn hướng đối trọng', 16 => 'Dầu ray cabin, đối trọng',
-                17 => 'Hộp dầu cabin, đối trọng', 18 => 'Mô tơ cửa',
-                19 => 'Phanh hãm sự cố vượt tốc', 20 => 'Công tắc an toàn', 21 => 'Cửa cabin'
-            ],
-            '3. CỬA TẦNG' => [
-                22 => 'Nút gọi tầng', 23 => 'Hiển thị', 24 => 'Khóa liên động',
-                25 => 'Cánh cửa', 26 => 'Cáp mềm', 27 => 'Công tắc giới hạn', 28 => 'Guốc cửa tầng'
-            ],
-            '4. GIẾNG THANG' => [
-                29 => 'Cáp tải', 30 => 'Cáp GOV'
-            ],
-            '5. BUỒNG THANG' => [
-                31 => 'Môi trường trong cabin', 32 => 'Hiển thị số', 33 => 'Đèn, quạt',
-                34 => 'Cảm biến hồng ngoại', 35 => 'Độ bằng tầng', 36 => 'Nút bấm trong cabin'
-            ],
-            '6. HỐ THANG' => [
-                38 => 'Môi trường hố thang', 39 => 'Công tắc an toàn',
-                40 => 'K/cách đối trọng đến giảm chấn'
-            ],
-        ];
+        return \App\Models\MaintenanceCategory::with('items')->orderBy('sort_order')->get()
+            ->mapWithKeys(function ($cat) {
+                return [$cat->name => $cat->items->pluck('name', 'id')->toArray()];
+            })->toArray();
     }
 
     protected function getSymbols()
     {
-        return [
-            'Δ' => 'Bình thường',
-            '√' => 'Đã kiểm tra, bảo trì và hiệu chỉnh',
-            '#' => 'Đã thay thế',
-            'X' => 'Đã sửa chữa, đại tu',
-            'A' => 'Đang chờ thay thế, bổ sung',
-            '/' => 'Không sử dụng',
-            'K' => 'Không có thiết bị',
-        ];
+        return \App\Models\MaintenanceStatus::orderBy('sort_order')->pluck('name', 'id')->toArray();
     }
 
     public function index()
     {
         // Automatically mark pending tasks as overdue if their scheduled date (or check date) has passed
         MaintenanceCheck::where('status', 'pending')
-            ->where(function($query) {
-                $query->where(function($q) {
-                    $q->whereNotNull('scheduled_date')
-                      ->where('scheduled_date', '<', now()->startOfDay());
-                })->orWhere(function($q) {
-                    $q->whereNull('scheduled_date')
-                      ->whereNotNull('check_date')
-                      ->where('check_date', '<', now()->startOfDay());
-                });
-            })
+            ->where('check_date', '<', now()->startOfDay())
+            ->whereNotNull('check_date')
             ->update(['status' => 'overdue']);
 
         // DASHBOARD STATISTICS
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
-        $monthTasks = MaintenanceCheck::where(function($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('scheduled_date', [$startOfMonth, $endOfMonth])
-                  ->orWhereBetween('check_date', [$startOfMonth, $endOfMonth]);
-            })->get();
+        $monthTasks = MaintenanceCheck::whereBetween('check_date', [$startOfMonth, $endOfMonth])->get();
 
         $stats = [
             'completed' => $monthTasks->where('status', 'completed')->count(),
@@ -98,16 +58,11 @@ class MaintenanceController extends Controller
         $startOfLastMonth = now()->subMonth()->startOfMonth();
         $endOfLastMonth = now()->subMonth()->endOfMonth();
         
-        $lastMonthTotal = MaintenanceCheck::where(function($q) use ($startOfLastMonth, $endOfLastMonth) {
-                $q->whereBetween('scheduled_date', [$startOfLastMonth, $endOfLastMonth])
-                  ->orWhereBetween('check_date', [$startOfLastMonth, $endOfLastMonth]);
-            })->count();
+        $lastMonthTotal = MaintenanceCheck::whereBetween('check_date', [$startOfLastMonth, $endOfLastMonth])->count();
             
         $lastMonthCompleted = MaintenanceCheck::where('status', 'completed')
-            ->where(function($q) use ($startOfLastMonth, $endOfLastMonth) {
-                $q->whereBetween('scheduled_date', [$startOfLastMonth, $endOfLastMonth])
-                  ->orWhereBetween('check_date', [$startOfLastMonth, $endOfLastMonth]);
-            })->count();
+            ->whereBetween('check_date', [$startOfLastMonth, $endOfLastMonth])
+            ->count();
 
         $lastMonthRate = $lastMonthTotal > 0 ? round(($lastMonthCompleted / $lastMonthTotal) * 100) : 0;
         $trend = $stats['completion_rate'] - $lastMonthRate;
@@ -115,43 +70,172 @@ class MaintenanceController extends Controller
         $elevators = Elevator::all();
         
         $upcomingTasks = MaintenanceCheck::with('elevator.building', 'staff')
-            ->orderBy('scheduled_date', 'asc')
+            ->orderBy('check_date', 'asc')
             ->orderBy('start_time', 'asc')
             ->get();
-            
+
         return view('admin.maintenance.index', compact('upcomingTasks', 'elevators', 'stats', 'trend'));
     }
 
-    public function schedule(Request $request)
+    public function orders()
     {
-        $request->validate([
-            'elevator_id' => 'required|exists:elevators,id',
-            'task_type' => 'required|in:periodic,repair',
-            'scheduled_date' => 'required|date',
-            'start_time' => 'nullable',
-            'end_time' => 'nullable',
-            'staff_ids' => 'nullable|array'
-        ]);
+        // 1. Current Month & Previous Month Stats
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+        
+        $startOfLastMonth = now()->subMonth()->startOfMonth();
+        $endOfLastMonth = now()->subMonth()->endOfMonth();
 
-        $staffNamesStr = null;
-        if ($request->staff_ids) {
-            $staffNamesStr = User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+        $currentMonthRevenue = Order::where('status', 'paid')
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->sum('total_amount');
+
+        $lastMonthRevenue = Order::where('status', 'paid')
+            ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('total_amount');
+
+        $revenueIncreasePercent = 0;
+        if ($lastMonthRevenue > 0) {
+            $revenueIncreasePercent = round((($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100);
+        } elseif ($currentMonthRevenue > 0) {
+            $revenueIncreasePercent = 100;
         }
 
-        MaintenanceCheck::create([
-            'elevator_id' => $request->elevator_id,
-            'user_id' => auth()->id(),
-            'status' => 'pending',
-            'task_type' => $request->task_type,
-            'scheduled_date' => $request->scheduled_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'staff_ids' => $request->staff_ids,
-            'staff_names' => $staffNamesStr
+        // 2. Six Months Revenue Chart Data
+        $chartLabels = [];
+        $chartData = [];
+
+        // Loop from 5 months ago to current month
+        for ($i = 5; $i >= 0; $i--) {
+            $monthStart = now()->subMonths($i)->startOfMonth();
+            $monthEnd = now()->subMonths($i)->endOfMonth();
+            
+            $monthRevenue = Order::where('status', 'paid')
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->sum('total_amount');
+
+            $chartLabels[] = 'T' . $monthStart->format('n'); // e.g., T10, T11
+            $chartData[] = $monthRevenue;
+        }
+
+        $stats = [
+            'current_month_revenue' => $currentMonthRevenue,
+            'revenue_increase_percent' => $revenueIncreasePercent,
+            'chart_labels' => $chartLabels,
+            'chart_data' => $chartData,
+        ];
+
+        $orders = Order::with('building', 'elevator')->latest()->paginate(15);
+        $buildings = \App\Models\Building::all();
+        $elevators = Elevator::all();
+        return view('admin.maintenance.orders', compact('orders', 'buildings', 'elevators', 'stats'));
+    }
+
+    public function storeOrder(Request $request)
+    {
+        $request->validate([
+            'building_id' => 'required|exists:buildings,id',
+            'elevator_id' => 'required|exists:elevators,id',
+            'created_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.name' => 'required|string',
+            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.price' => 'required|numeric|min:0',
         ]);
 
-        return redirect()->route('admin.maintenance.index')->with('success', 'Đã tạo lịch bảo trì mới.');
+        $status = $request->has('save_draft') ? 'draft' : 'pending';
+
+        // Auto-generate order code (e.g., HD-20260413-001)
+        $datePrefix = date('Ymd');
+        $latestOrder = Order::where('code', 'like', "HD-{$datePrefix}-%")->latest()->first();
+        $sequence = $latestOrder ? intval(substr($latestOrder->code, -3)) + 1 : 1;
+        $orderCode = "HD-{$datePrefix}-" . str_pad($sequence, 3, '0', STR_PAD_LEFT);
+
+        // Calculate total
+        $totalAmount = 0;
+        foreach ($request->items as $item) {
+            $totalAmount += $item['quantity'] * $item['price'];
+        }
+
+        $order = Order::create([
+            'code' => $orderCode,
+            'building_id' => $request->building_id,
+            'elevator_id' => $request->elevator_id,
+            'total_amount' => $totalAmount,
+            'status' => $status,
+            'created_at' => $request->created_date . ' ' . date('H:i:s'),
+        ]);
+
+        foreach ($request->items as $item) {
+            $subtotal = $item['quantity'] * $item['price'];
+            \App\Models\OrderItem::create([
+                'order_id' => $order->id,
+                'service_name' => $item['name'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'subtotal' => $subtotal,
+            ]);
+        }
+
+        return redirect()->route('admin.maintenance.orders')->with('success', 'Tạo đơn bảo trì/báo giá thành công.');
     }
+
+    public function editOrder(Order $order)
+    {
+        $order->load('items');
+        $buildings = \App\Models\Building::all();
+        $elevators = Elevator::all();
+        return view('admin.maintenance.orders_edit', compact('order', 'buildings', 'elevators'));
+    }
+
+    public function updateOrder(Request $request, Order $order)
+    {
+        $request->validate([
+            'building_id' => 'required|exists:buildings,id',
+            'elevator_id' => 'required|exists:elevators,id',
+            'created_date' => 'required|date',
+            'status' => 'required|in:pending,paid,draft',
+            'items' => 'required|array|min:1',
+            'items.*.name' => 'required|string',
+            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+        ]);
+
+        // Calculate total
+        $totalAmount = 0;
+        foreach ($request->items as $item) {
+            $totalAmount += $item['quantity'] * $item['price'];
+        }
+
+        // Keep the original time part of created_at
+        $timePart = $order->created_at ? $order->created_at->format('H:i:s') : date('H:i:s');
+
+        $order->update([
+            'building_id' => $request->building_id,
+            'elevator_id' => $request->elevator_id,
+            'total_amount' => $totalAmount,
+            'status' => $request->status,
+            'created_at' => $request->created_date . ' ' . $timePart,
+        ]);
+
+        // Delete old items and insert new ones
+        $order->items()->delete();
+
+        foreach ($request->items as $item) {
+            $subtotal = $item['quantity'] * $item['price'];
+            \App\Models\OrderItem::create([
+                'order_id' => $order->id,
+                'service_name' => $item['name'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'subtotal' => $subtotal,
+            ]);
+        }
+
+        return redirect()->route('admin.maintenance.orders')->with('success', 'Cập nhật đơn bảo trì/báo giá thành công.');
+    }
+
+
 
     public function create(Request $request)
     {
@@ -282,6 +366,13 @@ class MaintenanceController extends Controller
         $sections = $this->getChecklistItems();
         $symbols = $this->getSymbols();
         return view('admin.maintenance.show', compact('maintenance', 'sections', 'symbols'));
+    }
+
+    public function export(MaintenanceCheck $maintenance)
+    {
+        $sections = $this->getChecklistItems();
+        $symbols = $this->getSymbols();
+        return view('admin.maintenance.export', compact('maintenance', 'sections', 'symbols'));
     }
 
     public function destroy(MaintenanceCheck $maintenance)
