@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
     <title>@yield('title', 'Quản trị hệ thống') - Hải An Elevator</title>
 
     <!-- Fonts -->
@@ -110,14 +111,14 @@
                     </a>
                 </li>
 
-                <!-- Nhật ký bảo trì -->
+                <!-- Lịch bảo trì -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.maintenance.*') && !request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
                         href="{{ route('admin.maintenance.index') }}">
-                        <i class="fas fa-toolbox"></i> <span>Nhật ký Bảo trì</span>
+                        <i class="fas fa-toolbox"></i> <span>Lịch Bảo trì</span>
                     </a>
                 </li>
- 
+
                 <!-- Quản lý Sự cố -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.incidents.*') ? 'active' : '' }}"
@@ -213,7 +214,8 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Header -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow-sm" style="height: 60px;">
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow-sm"
+            style="height: 60px;">
             <div class="container-fluid">
                 <button class="btn btn-link text-primary" onclick="toggleSidebar()">
                     <i class="fas fa-bars fa-lg"></i>
@@ -230,62 +232,135 @@
                     @auth
                         @php
                             $unreadNewsCount = auth()->user()->unreadNewsCount();
-                            $unreadNewsList = auth()->user()->unreadNews(5);
+                            $unreadSysCount = auth()->user()->unreadNotifications->count();
+                            $totalUnread = $unreadNewsCount + $unreadSysCount;
+
+                            // Merge news and notifications for display
+                            $displayLimit = 10;
+                            $latestNews = auth()
+                                ->user()
+                                ->unreadNews($displayLimit)
+                                ->map(function ($item) {
+                                    return (object) [
+                                        'id' => $item->id,
+                                        'title' => $item->title,
+                                        'body' => 'Tin tức mới vừa được đăng tải',
+                                        'url' => route('admin.news.show', $item->id),
+                                        'time' => $item->created_at,
+                                        'icon' => 'fas fa-bullhorn',
+                                        'color' => 'primary',
+                                        'is_news' => true,
+                                    ];
+                                });
+
+                            $latestSys = auth()
+                                ->user()
+                                ->unreadNotifications->take($displayLimit)
+                                ->map(function ($item) {
+                                    return (object) [
+                                        'id' => $item->id,
+                                        'title' => $item->data['title'] ?? 'Thông báo hệ thống',
+                                        'body' => $item->data['body'] ?? '',
+                                        'url' => route('admin.notifications.mark-as-read', $item->id),
+                                        'time' => $item->created_at,
+                                        'icon' => $item->data['icon'] ?? 'fas fa-info-circle',
+                                        'color' => 'info',
+                                        'is_news' => false,
+                                    ];
+                                });
+
+                            $mergedNotifications = $latestNews
+                                ->concat($latestSys)
+                                ->sortByDesc('time')
+                                ->take($displayLimit);
                         @endphp
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle position-relative" href="#" id="alertsDropdown"
-                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-bell fa-lg text-primary"></i>
-                                @if ($unreadNewsCount > 0)
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                        style="font-size: 0.6rem; margin-top: 10px; margin-left: -10px;">
-                                        {{ $unreadNewsCount > 9 ? '9+' : $unreadNewsCount }}
-                                        <span class="visually-hidden">unread messages</span>
-                                    </span>
-                                @endif
-                            </a>
-                            <div class="dropdown-list dropdown-menu dropdown-menu-end shadow animated--grow-in p-0 border-0"
-                                aria-labelledby="alertsDropdown" style="width: 300px; max-height: 400px;">
-                                <h6 class="dropdown-header text-white p-3 fw-bold rounded-top align-items-center d-flex justify-content-between"
-                                    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
-                                    <div><i class="fas fa-bullhorn me-1"></i> Tin tức mới</div>
-                                    @if ($unreadNewsCount > 0)
+                            <a class="nav-link dropdown-toggle p-2" href="#" id="alertsDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false"
+                                style="border-radius: 12px; transition: all 0.3s;">
+                                <span style="position: relative; display: inline-block;">
+                                    <i class="fas fa-bell fa-lg text-primary"></i>
+                                    @if ($totalUnread > 0)
                                         <span
-                                            class="badge bg-white text-primary rounded-pill">{{ $unreadNewsCount }}</span>
+                                            style="
+                                            position: absolute;
+                                            top: -6px;
+                                            right: -8px;
+                                            background: #e74a3b;
+                                            color: #fff;
+                                            font-size: 0.58rem;
+                                            font-weight: 700;
+                                            min-width: 16px;
+                                            height: 16px;
+                                            border-radius: 8px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            padding: 0 3px;
+                                            border: 1.5px solid #fff;
+                                            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+                                            line-height: 1;
+                                        ">{{ $totalUnread > 99 ? '99+' : $totalUnread }}</span>
                                     @endif
-                                </h6>
+                                </span>
+                            </a>
+                            <div class="dropdown-list dropdown-menu dropdown-menu-end shadow-lg animated--grow-in p-0 border-0"
+                                aria-labelledby="alertsDropdown"
+                                style="width: 350px; border-radius: 16px; overflow: hidden;">
+                                <div class="dropdown-header text-white p-3 fw-bold d-flex justify-content-between align-items-center"
+                                    style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                                    <div class="fs-6"><i class="fas fa-bell me-2"></i> Trung tâm thông báo</div>
+                                    @if ($totalUnread > 0)
+                                        <form action="{{ route('admin.notifications.mark-all-as-read') }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            <button type="submit"
+                                                class="btn btn-sm btn-link text-white text-decoration-none p-0 small"
+                                                style="font-size: 0.75rem;">
+                                                <i class="fas fa-check-double me-1"></i> Đọc tất cả
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
 
-                                <div class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
-                                    @forelse($unreadNewsList as $news)
-                                        <a class="list-group-item list-group-item-action border-bottom p-3"
-                                            href="{{ route('admin.news.show', $news->id) }}">
+                                <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                                    @forelse($mergedNotifications as $notify)
+                                        <a class="list-group-item list-group-item-action border-bottom p-3 notification-item"
+                                            href="{{ $notify->url }}" style="transition: background 0.2s;">
                                             <div class="d-flex align-items-start">
-                                                <div class="mr-3 me-3">
-                                                    <div class="icon-circle bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-                                                        style="width: 36px; height: 36px;">
-                                                        <i class="fas fa-file-alt"></i>
+                                                <div class="me-3">
+                                                    <div class="icon-circle bg-{{ $notify->color }} bg-opacity-10 text-{{ $notify->color }} rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                                        style="width: 42px; height: 42px;">
+                                                        <i class="{{ $notify->icon }}"></i>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <div class="small text-muted mb-1">
-                                                        {{ $news->created_at->diffForHumans() }}</div>
-                                                    <span class="fw-bold text-dark d-block text-truncate"
-                                                        style="max-width: 200px; font-size: 0.9rem;">{{ $news->title }}</span>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="fw-bold text-dark small">{{ $notify->title }}</span>
+                                                        <small class="text-muted"
+                                                            style="font-size: 0.7rem;">{{ $notify->time->diffForHumans() }}</small>
+                                                    </div>
+                                                    <p class="mb-0 text-muted small text-truncate"
+                                                        style="max-width: 240px;">
+                                                        {{ $notify->body }}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </a>
                                     @empty
-                                        <div class="p-4 text-center text-muted">
-                                            <i class="fas fa-check-circle fa-2x mb-2 text-success opacity-50"></i>
-                                            <p class="mb-0 small">Bạn đã xem hết thông báo.</p>
+                                        <div class="p-5 text-center text-muted">
+                                            <div class="mb-3">
+                                                <i class="fas fa-bell-slash fa-3x opacity-20"></i>
+                                            </div>
+                                            <p class="mb-0 fw-medium">Không có thông báo mới nào</p>
+                                            <small class="opacity-75">Chúng tôi sẽ báo cho bạn khi có tin mới!</small>
                                         </div>
                                     @endforelse
                                 </div>
 
                                 <a class="dropdown-item text-center small text-primary fw-bold p-3 bg-light border-top"
-                                    style="border-radius: 0 0 0.5rem 0.5rem;" href="{{ route('admin.news.index') }}">
-                                    Xem tất cả thông báo
+                                    href="{{ route('admin.news.index') }}">
+                                    Xem tất cả lịch sử
                                 </a>
                             </div>
                         </li>
@@ -455,6 +530,7 @@
             });
         @endif
     </script>
+    <script src="{{ asset('js/webpush.js') }}"></script>
     @yield('scripts')
 </body>
 

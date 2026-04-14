@@ -18,10 +18,13 @@ class Incident extends Model
         'priority',
         'status',
         'reported_at',
+        'staff_ids',
+        'staff_names',
     ];
 
     protected $casts = [
         'reported_at' => 'datetime',
+        'staff_ids' => 'array',
     ];
 
     /**

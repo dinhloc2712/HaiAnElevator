@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PushSubscriptionController;
+use App\Http\Controllers\Admin\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,4 +96,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // News/Announcements Management
     Route::resource('news', \App\Http\Controllers\Admin\NewsController::class);
     Route::get('news/{news}/download', [\App\Http\Controllers\Admin\NewsController::class, 'downloadAttachment'])->name('news.download');
+
+    // Push Subscriptions
+    Route::post('push-subscriptions', [PushSubscriptionController::class, 'store'])->name('push.subscriptions.store');
+    Route::delete('push-subscriptions', [PushSubscriptionController::class, 'destroy'])->name('push.subscriptions.destroy');
+
+    // Notifications
+    Route::get('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
 });

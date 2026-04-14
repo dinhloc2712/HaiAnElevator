@@ -144,6 +144,31 @@ class DashboardController extends Controller
                 ];
             });
 
+        // 9. Banner cảnh báo cho Admin - Thang máy đến hạn/quá hạn bảo trì
+        // Exclude elevators unless they have an active (pending/in_progress) maintenance check
+        $overdueElevators = Elevator::with('building')
+            ->whereNotNull('maintenance_deadline')
+            ->whereDate('maintenance_deadline', '<=', now())
+            ->whereHas('maintenanceChecks', function($q) {
+                $q->whereIn('status', ['pending', 'in_progress']); // Only pending and in_progress as requested
+            })
+            ->orderBy('maintenance_deadline', 'asc')
+            ->get();
+
+        // 10. Banner lịch bảo trì cho Nhân viên - 7 ngày tới
+        $userId = auth()->id();
+        $staffUpcomingMaintenance = MaintenanceCheck::with('elevator.building')
+            ->where(function($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereJsonContains('staff_ids', (string) $userId)
+                  ->orWhereJsonContains('staff_ids', $userId);
+            })
+            ->whereBetween('check_date', [now()->startOfDay(), now()->addDays(7)->endOfDay()])
+            ->whereIn('status', ['pending', 'in_progress']) // DO NOT SHOW completed or canceled
+            ->orderBy('check_date', 'asc')
+            ->take(5)
+            ->get();
+
         return view('admin.dashboard', [
             'totalElevators' => $totalElevators,
             'activeIncidents' => $activeIncidentsCount,
@@ -163,7 +188,10 @@ class DashboardController extends Controller
             'dueCustomers' => $dueCustomers,
             'orderLabels' => $orderLabels,
             'orderTrendData' => $orderTrendData,
-            'recentOrders' => $recentOrders
+            'recentOrders' => $recentOrders,
+            // Banner alerts
+            'overdueElevators' => $overdueElevators,
+            'staffUpcomingMaintenance' => $staffUpcomingMaintenance,
         ]);
     }
 }

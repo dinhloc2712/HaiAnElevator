@@ -72,7 +72,8 @@ class IncidentController extends Controller
     public function create()
     {
         $elevators = Elevator::with('building')->get();
-        return view('admin.incidents.create', compact('elevators'));
+        $staffs = \App\Models\User::all();
+        return view('admin.incidents.create', compact('elevators', 'staffs'));
     }
 
     /**
@@ -98,6 +99,12 @@ class IncidentController extends Controller
         $sequence = $latest ? intval(substr($latest->code, -3)) + 1 : 1;
         $code = $prefix . str_pad($sequence, 3, '0', STR_PAD_LEFT);
 
+        // Handle staff assignments
+        $staffNamesStr = null;
+        if ($request->has('staff_ids')) {
+            $staffNamesStr = \App\Models\User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+        }
+
         Incident::create([
             'code' => $code,
             'elevator_id' => $request->elevator_id,
@@ -107,7 +114,12 @@ class IncidentController extends Controller
             'priority' => $request->priority,
             'status' => $request->status,
             'reported_at' => $request->reported_date . ' ' . $request->reported_time,
+            'staff_ids' => $request->staff_ids,
+            'staff_names' => $staffNamesStr,
         ]);
+
+        // Auto-sync: set elevator status to 'error' when incident created
+        Elevator::where('id', $request->elevator_id)->update(['status' => 'error']);
 
         return redirect()->route('admin.incidents.index')->with('success', 'Đã báo cáo sự cố mới thành công.');
     }
@@ -126,7 +138,8 @@ class IncidentController extends Controller
     public function edit(Incident $incident)
     {
         $elevators = Elevator::with('building')->get();
-        return view('admin.incidents.edit', compact('incident', 'elevators'));
+        $staffs = \App\Models\User::all();
+        return view('admin.incidents.edit', compact('incident', 'elevators', 'staffs'));
     }
 
     /**
@@ -145,6 +158,12 @@ class IncidentController extends Controller
             'reported_time' => 'required',
         ]);
 
+        // Handle staff assignments
+        $staffNamesStr = null;
+        if ($request->has('staff_ids')) {
+            $staffNamesStr = \App\Models\User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+        }
+
         $incident->update([
             'elevator_id' => $request->elevator_id,
             'reporter_name' => $request->reporter_name,
@@ -153,7 +172,16 @@ class IncidentController extends Controller
             'priority' => $request->priority,
             'status' => $request->status,
             'reported_at' => $request->reported_date . ' ' . $request->reported_time,
+            'staff_ids' => $request->staff_ids,
+            'staff_names' => $staffNamesStr,
         ]);
+
+        // Auto-sync elevator status based on incident status
+        $elevatorStatus = in_array($request->status, ['resolved', 'canceled'])
+            ? 'active'   // Incident closed → elevator back to active
+            : 'error';   // Incident still open → elevator stays in error
+
+        Elevator::where('id', $request->elevator_id)->update(['status' => $elevatorStatus]);
 
         return redirect()->route('admin.incidents.index')->with('success', 'Cập nhật thông tin sự cố thành công.');
     }

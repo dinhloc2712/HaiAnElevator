@@ -5,6 +5,14 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Fix OpenSSL configuration for Web Push on Windows (Laragon/XAMPP)
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $opensslConf = 'C:/laragon/bin/php/php/extras/ssl/openssl.cnf';
+    if (file_exists($opensslConf)) {
+        putenv("OPENSSL_CONF=$opensslConf");
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Check If The Application Is Under Maintenance

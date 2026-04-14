@@ -72,6 +72,7 @@
                                         'role'      => 'Phân quyền',
                                         'branch'    => 'Chi nhánh',
                                         'building'  => 'Tòa nhà',
+                                        'elevator'  => 'Thang máy',
                                         'news'      => 'Tin tức & Thông báo',
                                     ];
                                     $actions = ['view', 'create', 'update', 'delete', 'approve'];

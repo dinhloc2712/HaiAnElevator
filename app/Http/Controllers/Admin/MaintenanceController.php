@@ -269,7 +269,7 @@ class MaintenanceController extends Controller
         MaintenanceCheck::create([
             'elevator_id'     => $request->elevator_id,
             'user_id'         => auth()->id(),
-            'status'          => 'completed',
+            'status'          => 'pending',
             'task_type'       => $request->task_type ?? 'periodic',
             'check_date'      => $request->check_date,
             'results'         => $request->results,

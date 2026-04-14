@@ -39,4 +39,9 @@ class Elevator extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function maintenanceChecks()
+    {
+        return $this->hasMany(MaintenanceCheck::class);
+    }
 }

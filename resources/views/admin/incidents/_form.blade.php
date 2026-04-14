@@ -35,6 +35,27 @@
         @enderror
     </div>
 
+    <!-- Phân công nhân viên -->
+    <div class="col-lg-12">
+        <label class="form-label fw-bold text-dark"><i class="fas fa-tools me-1"></i> Nhân viên xử lý</label>
+        <select name="staff_ids[]" class="form-select form-control p-3 rounded-4 shadow-sm @error('staff_ids') is-invalid @enderror">
+            <option value="">-- Chọn nhân viên xử lý --</option>
+            @php 
+                // Since it's a single select now but sends an array, we get the first selected item
+                $selectedStaff = isset($incident) && !empty($incident->staff_ids) ? $incident->staff_ids[0] : (old('staff_ids') ? old('staff_ids')[0] : ''); 
+            @endphp
+            @foreach($staffs as $staff)
+                <option value="{{ $staff->id }}" {{ $selectedStaff == $staff->id ? 'selected' : '' }}>
+                    {{ $staff->code ? $staff->code . ' - ' : '' }}{{ $staff->name }}
+                </option>
+            @endforeach
+        </select>
+        <div class="form-text text-muted small"><i class="fas fa-info-circle me-1"></i>Hệ thống sẽ tự động gửi thông báo đến các nhân viên được chọn.</div>
+        @error('staff_ids')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
     <!-- Mức độ & Trạng thái -->
     <div class="col-md-6">
         <label class="form-label fw-bold text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Mức độ ưu tiên <span class="text-danger">*</span></label>
