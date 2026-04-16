@@ -135,15 +135,7 @@
                     </a>
                 </li>
 
-                <!-- Nav Item - Tin tuc (News) -->
-                @can('view_news')
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.news.*') ? 'active' : '' }}"
-                            href="{{ route('admin.news.index') }}">
-                            <i class="fas fa-fw fa-bullhorn"></i> <span>Tin tức & Thông báo</span>
-                        </a>
-                    </li>
-                @endcan
+
 
                 <!-- System Admin -->
                 @if (auth()->user()->can('view_user') || auth()->user()->can('view_role') || auth()->user()->can('view_branch'))
@@ -231,32 +223,13 @@
                     {{-- Notifications Dropdown --}}
                     @auth
                         @php
-                            $unreadNewsCount = auth()->user()->unreadNewsCount();
                             $unreadSysCount = auth()->user()->unreadNotifications->count();
-                            $totalUnread = $unreadNewsCount + $unreadSysCount;
+                            $totalUnread = $unreadSysCount;
 
                             // Merge news and notifications for display
                             $displayLimit = 10;
-                            $latestNews = auth()
-                                ->user()
-                                ->unreadNews($displayLimit)
-                                ->map(function ($item) {
-                                    return (object) [
-                                        'id' => $item->id,
-                                        'title' => $item->title,
-                                        'body' => 'Tin tức mới vừa được đăng tải',
-                                        'url' => route('admin.news.show', $item->id),
-                                        'time' => $item->created_at,
-                                        'icon' => 'fas fa-bullhorn',
-                                        'color' => 'primary',
-                                        'is_news' => true,
-                                    ];
-                                });
-
-                            $latestSys = auth()
-                                ->user()
-                                ->unreadNotifications->take($displayLimit)
-                                ->map(function ($item) {
+                            $mergedNotifications = $unreadSysCount > 0 
+                                ? auth()->user()->unreadNotifications->take($displayLimit)->map(function ($item) {
                                     return (object) [
                                         'id' => $item->id,
                                         'title' => $item->data['title'] ?? 'Thông báo hệ thống',
@@ -265,14 +238,9 @@
                                         'time' => $item->created_at,
                                         'icon' => $item->data['icon'] ?? 'fas fa-info-circle',
                                         'color' => 'info',
-                                        'is_news' => false,
                                     ];
-                                });
-
-                            $mergedNotifications = $latestNews
-                                ->concat($latestSys)
-                                ->sortByDesc('time')
-                                ->take($displayLimit);
+                                })
+                                : collect();
                         @endphp
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle p-2" href="#" id="alertsDropdown" role="button"
@@ -359,7 +327,7 @@
                                 </div>
 
                                 <a class="dropdown-item text-center small text-primary fw-bold p-3 bg-light border-top"
-                                    href="{{ route('admin.news.index') }}">
+                                    href="{{ route('admin.notifications.index') }}">
                                     Xem tất cả lịch sử
                                 </a>
                             </div>

@@ -93,15 +93,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('profile/edit', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
-    // News/Announcements Management
-    Route::resource('news', \App\Http\Controllers\Admin\NewsController::class);
-    Route::get('news/{news}/download', [\App\Http\Controllers\Admin\NewsController::class, 'downloadAttachment'])->name('news.download');
-
     // Push Subscriptions
     Route::post('push-subscriptions', [PushSubscriptionController::class, 'store'])->name('push.subscriptions.store');
     Route::delete('push-subscriptions', [PushSubscriptionController::class, 'destroy'])->name('push.subscriptions.destroy');
 
     // Notifications
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
 });

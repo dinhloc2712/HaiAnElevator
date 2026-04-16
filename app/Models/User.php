@@ -91,67 +91,6 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
-
-    /**
-     * News created by this user
-     */
-    public function createdNews()
-    {
-        return $this->hasMany(News::class, 'created_by');
-    }
-
-    /**
-     * News that this user has read
-     */
-    public function readNews()
-    {
-        return $this->hasMany(NewsRead::class, 'user_id');
-    }
-
-    /**
-     * Get unread news count for this user
-     */
-    public function unreadNewsCount()
-    {
-        $readNewsIds = $this->readNews()->pluck('news_id')->toArray();
-        $userId  = (string) $this->id;
-        $roleId  = (string) $this->role_id;
-
-        return News::where(function($query) use ($userId, $roleId) {
-            $query->where('recipient_type', 'all')
-                  ->orWhere(function($q) use ($roleId) {
-                      $q->where('recipient_type', 'role')
-                        ->whereJsonContains('recipient_ids', $roleId);
-                  })
-                  ->orWhere(function($q) use ($userId) {
-                      $q->where('recipient_type', 'user')
-                        ->whereJsonContains('recipient_ids', $userId);
-                  });
-        })->whereNotIn('id', $readNewsIds)->count();
-    }
-
-    /**
-     * Get unread news list for this user
-     */
-    public function unreadNews($limit = 5)
-    {
-        $readNewsIds = $this->readNews()->pluck('news_id')->toArray();
-        $userId  = (string) $this->id;
-        $roleId  = (string) $this->role_id;
-
-        return News::where(function($query) use ($userId, $roleId) {
-            $query->where('recipient_type', 'all')
-                  ->orWhere(function($q) use ($roleId) {
-                      $q->where('recipient_type', 'role')
-                        ->whereJsonContains('recipient_ids', $roleId);
-                  })
-                  ->orWhere(function($q) use ($userId) {
-                      $q->where('recipient_type', 'user')
-                        ->whereJsonContains('recipient_ids', $userId);
-                  });
-        })->whereNotIn('id', $readNewsIds)->latest()->take($limit)->get();
-    }
-
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\DB;
 class NotificationController extends Controller
 {
     /**
+     * Display a listing of system notifications
+     */
+    public function index()
+    {
+        $notifications = auth()->user()->notifications()->paginate(20);
+        return view('admin.notifications.index', compact('notifications'));
+    }
+
+    /**
      * Mark a system notification as read
      */
     public function markAsRead($id)
@@ -26,23 +35,12 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mark all notifications (including news) as read
+     * Mark all notifications as read
      */
     public function markAllAsRead()
     {
         // Mark database notifications as read
         auth()->user()->unreadNotifications->markAsRead();
-
-        // Mark news as read
-        $userId = auth()->user()->id;
-        $unreadNews = auth()->user()->unreadNews(null); // Get all unread news
-        
-        foreach ($unreadNews as $news) {
-            \App\Models\NewsRead::updateOrCreate([
-                'user_id' => $userId,
-                'news_id' => $news->id
-            ]);
-        }
 
         return redirect()->back()->with('success', 'Đã đánh dấu tất cả thông báo là đã xem.');
     }
