@@ -10,9 +10,14 @@
         <h1 class="page-header-title mb-1">Tòa nhà &amp; Khách hàng</h1>
         <p class="page-header-sub mb-0">Quản lý thông tin đơn vị sở hữu và địa điểm lắp đặt thang máy.</p>
     </div>
-    <a href="{{ route('admin.buildings.create') }}" class="btn btn-add">
-        <i class="fas fa-plus me-2"></i>Thêm tòa nhà
-    </a>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fas fa-file-import me-2"></i>Import Excel
+        </button>
+        <a href="{{ route('admin.buildings.create') }}" class="btn btn-add">
+            <i class="fas fa-plus me-2"></i>Thêm tòa nhà
+        </a>
+    </div>
 </div>
 
 {{-- Table Card --}}
@@ -114,3 +119,52 @@
     @endif
 </div>
 @endsection
+
+@push('modals')
+{{-- Import Modal --}}
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.buildings.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="importModalLabel">Import Tòa Nhà</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-file-excel text-success" style="font-size: 3rem;"></i>
+                        </div>
+                        <p class="text-muted small">Chọn file Excel để nhập dữ liệu tòa nhà hàng loạt vào hệ thống.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="file" class="form-label fw-semibold">Chọn file dữ liệu</label>
+                        <input type="file" name="file" class="form-control shadow-none" id="file" required accept=".xlsx, .xls, .csv">
+                        <div class="form-text mt-2">Định dạng hỗ trợ: .xlsx, .xls, .csv (Tối đa 10MB)</div>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3">
+                        <p class="mb-2 fw-semibold small text-primary"><i class="fas fa-info-circle me-1"></i> Thứ tự các cột trong file:</p>
+                        <div class="row g-2">
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 1</span> Tên tòa nhà <span class="text-danger">*</span></div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 2</span> Tên khách hàng</div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 3</span> Địa chỉ</div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 4</span> Người liên hệ</div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 5</span> Số điện thoại</div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 6</span> Số lượng thang</div>
+                            <div class="col-12"><span class="badge bg-white text-dark border fw-normal">Cột 7</span> Ghi chú</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary px-4">Bắt đầu Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endpush
+

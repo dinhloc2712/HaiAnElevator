@@ -90,4 +90,44 @@ class BuildingController extends Controller
         $building->delete();
         return redirect()->route('admin.buildings.index')->with('success', 'Đã xóa tòa nhà.');
     }
+
+    public function import(Request $request)
+    {
+        $this->authorize('create_building');
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            // Bỏ qua dòng đầu tiên nếu là tiêu đề
+            array_shift($rows);
+
+            $count = 0;
+            foreach ($rows as $row) {
+                if (empty($row[0])) continue;
+
+                Building::create([
+                    'name'           => $row[0],
+                    'customer_name'  => $row[1] ?? null,
+                    'address'        => $row[2] ?? null,
+                    'contact_name'   => $row[3] ?? null,
+                    'contact_phone'  => $row[4] ?? null,
+                    'elevator_count' => is_numeric($row[5]) ? intval($row[5]) : 0,
+                    'notes'          => $row[6] ?? null,
+                    'is_active'      => true,
+                ]);
+                $count++;
+            }
+
+            return back()->with('success', "Đã import thành công $count tòa nhà.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra khi import: ' . $e->getMessage());
+        }
+    }
 }
+

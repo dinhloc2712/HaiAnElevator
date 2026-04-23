@@ -2,6 +2,14 @@
 
 @section('title', 'Lắp đặt thang máy')
 
+@section('styles')
+<style>
+    .table-responsive {
+        min-height: 350px; /* Đảm bảo đủ khoảng trống cho dropdown ở dòng cuối */
+    }
+</style>
+@endsection
+
 @section('content')
     <div class="tech-header-container mb-4">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -61,7 +69,7 @@
     </div>
 
     {{-- Orders List Section --}}
-    <div class="tech-card h-100">
+    <div class="tech-card">
         <div class="tech-header" style="background: white; border-bottom: 1px solid #f1f3f9;">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h6 class="mb-0 fw-bold text-dark d-flex align-items-center text-nowrap">
@@ -85,7 +93,7 @@
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="pb-5">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
@@ -148,8 +156,8 @@
                                             </button>
                                         @endcan
                                     @endif
-                                    <div class="dropdown">
-                                        <button class="btn btn-link text-muted p-0 shadow-none" data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                    <div class="dropdown {{ $loop->last ? 'dropup' : '' }}">
+                                        <button class="btn btn-link text-muted p-0 shadow-none" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-strategy="fixed">
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">

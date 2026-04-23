@@ -58,7 +58,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('branches', \App\Http\Controllers\Admin\BranchController::class);
 
 
+    Route::post('buildings/import', [\App\Http\Controllers\Admin\BuildingController::class, 'import'])->name('buildings.import');
     Route::resource('buildings', \App\Http\Controllers\Admin\BuildingController::class);
+
     Route::resource('elevators', \App\Http\Controllers\Admin\ElevatorController::class);
     Route::resource('installations', \App\Http\Controllers\Admin\InstallationController::class);
     Route::post('installations/{installation}/start', [\App\Http\Controllers\Admin\InstallationController::class, 'start'])->name('installations.start');

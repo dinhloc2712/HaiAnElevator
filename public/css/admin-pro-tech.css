@@ -302,7 +302,7 @@
 .table-responsive {
     border-radius: 0 0 16px 16px !important;
     overflow-x: auto !important;
-    overflow-y: hidden;
+    overflow-y: visible !important; /* Allow dropdowns to pop out */
     -webkit-overflow-scrolling: touch;
 }
 
