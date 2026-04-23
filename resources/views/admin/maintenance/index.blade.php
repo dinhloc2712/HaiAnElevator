@@ -207,9 +207,11 @@
                         <i class="fas fa-cog"></i>
                     </a>
 
-                    <a href="{{ route('admin.maintenance.create') }}" class="btn btn-tech-success rounded-3 px-4 shadow-sm">
-                        <i class="fas fa-plus me-2"></i> Tạo phiếu bảo trì
-                    </a>
+                    @can('create_maintenance_schedule')
+                        <a href="{{ route('admin.maintenance.create') }}" class="btn btn-tech-success rounded-3 px-4 shadow-sm">
+                            <i class="fas fa-plus me-2"></i> Tạo phiếu bảo trì
+                        </a>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -320,13 +322,17 @@
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <a href="{{ route('admin.maintenance.show', $task->id) }}"
-                                        class="btn btn-outline-secondary fw-bold px-4 rounded-3">Chi tiết</a>
+                                    @can('view_maintenance_schedule')
+                                        <a href="{{ route('admin.maintenance.show', $task->id) }}"
+                                            class="btn btn-outline-secondary fw-bold px-4 rounded-3">Chi tiết</a>
+                                    @endcan
                                     @if ($task->status != 'completed')
-                                        <a href="{{ route('admin.maintenance.edit', $task->id) }}"
-                                            class="btn btn-success fw-bold px-3 rounded-3 shadow-sm">
-                                            <i class="fas fa-check-square me-1"></i> Hoàn thành
-                                        </a>
+                                        @can('update_maintenance_schedule')
+                                            <a href="{{ route('admin.maintenance.edit', $task->id) }}"
+                                                class="btn btn-success fw-bold px-3 rounded-3 shadow-sm">
+                                                <i class="fas fa-check-square me-1"></i> Hoàn thành
+                                            </a>
+                                        @endcan
                                     @endif
 
                                     <div class="dropdown">
@@ -335,37 +341,43 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            <li>
-                                                <a class="dropdown-item small"
-                                                    href="{{ route('admin.maintenance.export', $task->id) }}"
-                                                    target="_blank">
-                                                    <i class="fas fa-print me-2 text-info"></i>
-                                                    Xuất phiếu (PDF)
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item small"
-                                                    href="{{ route('admin.maintenance.edit', $task->id) }}">
-                                                    <i class="fas fa-edit me-2 text-primary"></i>
-                                                    {{ $task->status == 'completed' ? 'Chỉnh sửa kết quả' : 'Chỉnh sửa' }}
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <form action="{{ route('admin.maintenance.destroy', $task->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item small text-danger"><i
-                                                            class="fas fa-trash-alt me-2"></i> Xóa lịch</button>
-                                                </form>
-                                            </li>
+                                            @can('view_maintenance_schedule')
+                                                <li>
+                                                    <a class="dropdown-item small"
+                                                        href="{{ route('admin.maintenance.export', $task->id) }}"
+                                                        target="_blank">
+                                                        <i class="fas fa-print me-2 text-info"></i>
+                                                        Xuất phiếu (PDF)
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('update_maintenance_schedule')
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item small"
+                                                        href="{{ route('admin.maintenance.edit', $task->id) }}">
+                                                        <i class="fas fa-edit me-2 text-primary"></i>
+                                                        {{ $task->status == 'completed' ? 'Chỉnh sửa kết quả' : 'Chỉnh sửa' }}
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('delete_maintenance_schedule')
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('admin.maintenance.destroy', $task->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item small text-danger"><i
+                                                                class="fas fa-trash-alt me-2"></i> Xóa lịch</button>
+                                                    </form>
+                                                </li>
+                                            @endcan
                                         </ul>
                                     </div>
                                 </div>

@@ -9,9 +9,11 @@
         <h1 class="page-header-title mb-1">Đơn bảo trì & Báo giá</h1>
         <p class="page-header-sub mb-0">Lên đơn, nhập giá dịch vụ/linh kiện và theo dõi thanh toán.</p>
     </div>
-    <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createOrderModal">
-        <i class="fas fa-plus me-2"></i>Tạo đơn mới
-    </button>
+    @can('create_maintenance_order')
+        <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createOrderModal">
+            <i class="fas fa-plus me-2"></i>Tạo đơn mới
+        </button>
+    @endcan
 </div>
 
 {{-- Statistics Section --}}
@@ -105,7 +107,11 @@
                         @endif
                     </td>
                     <td class="text-end">
-                        <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
+                        @can('update_maintenance_order')
+                            <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
+                        @elsecan('view_maintenance_order')
+                            <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
+                        @endcan
                     </td>
                 </tr>
                 @empty

@@ -100,7 +100,7 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['is_active'] = $request->has('is_active');
-        $validated['role_id'] = Role::where('name', 'customer')->value('id') ?? null; // Default to customer if not specified, or null
+        $validated['role_id'] = Role::where('name', 'staff')->value('id') ?? null; // Default to staff if not specified, or null
 
         User::create($validated);
 

@@ -96,44 +96,54 @@
                 @endcan
 
                 <!-- Quản lý Lắp đặt -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.installations.*') ? 'active' : '' }}"
-                        href="{{ route('admin.installations.index') }}">
-                        <i class="fas fa-wrench"></i> <span>Quản lý Lắp đặt</span>
-                    </a>
-                </li>
+                @can('view_installation')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.installations.*') ? 'active' : '' }}"
+                            href="{{ route('admin.installations.index') }}">
+                            <i class="fas fa-wrench"></i> <span>Quản lý Lắp đặt</span>
+                        </a>
+                    </li>
+                @endcan
 
                 <!-- Đơn bảo trì & Báo giá -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
-                        href="{{ route('admin.maintenance.orders') }}">
-                        <i class="fas fa-file-invoice-dollar"></i> <span>Đơn bảo trì & Báo giá</span>
-                    </a>
-                </li>
+                @can('view_maintenance_order')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
+                            href="{{ route('admin.maintenance.orders') }}">
+                            <i class="fas fa-file-invoice-dollar"></i> <span>Đơn bảo trì & Báo giá</span>
+                        </a>
+                    </li>
+                @endcan
 
                 <!-- Lịch bảo trì -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.maintenance.*') && !request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
-                        href="{{ route('admin.maintenance.index') }}">
-                        <i class="fas fa-toolbox"></i> <span>Lịch Bảo trì</span>
-                    </a>
-                </li>
+                @can('view_maintenance_schedule')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.maintenance.*') && !request()->routeIs('admin.maintenance.orders') ? 'active' : '' }}"
+                            href="{{ route('admin.maintenance.index') }}">
+                            <i class="fas fa-toolbox"></i> <span>Lịch Bảo trì</span>
+                        </a>
+                    </li>
+                @endcan
 
                 <!-- Quản lý Sự cố -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.incidents.*') ? 'active' : '' }}"
-                        href="{{ route('admin.incidents.index') }}">
-                        <i class="fas fa-exclamation-triangle"></i> <span>Quản lý Sự cố</span>
-                    </a>
-                </li>
+                @can('view_incident')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.incidents.*') ? 'active' : '' }}"
+                            href="{{ route('admin.incidents.index') }}">
+                            <i class="fas fa-exclamation-triangle"></i> <span>Quản lý Sự cố</span>
+                        </a>
+                    </li>
+                @endcan
 
                 <!-- Báo cáo & Phân tích -->
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
-                        href="{{ route('admin.reports.index') }}">
-                        <i class="fas fa-chart-pie"></i> <span>Báo cáo & Phân tích</span>
-                    </a>
-                </li>
+                @can('view_report')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}"
+                            href="{{ route('admin.reports.index') }}">
+                            <i class="fas fa-chart-pie"></i> <span>Báo cáo & Phân tích</span>
+                        </a>
+                    </li>
+                @endcan
 
 
 

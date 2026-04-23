@@ -32,6 +32,7 @@ class MaintenanceController extends Controller
 
     public function index()
     {
+        $this->authorize('view_maintenance_schedule');
         // Automatically mark pending tasks as overdue if their scheduled date (or check date) has passed
         MaintenanceCheck::where('status', 'pending')
             ->where('check_date', '<', now()->startOfDay())
@@ -79,6 +80,7 @@ class MaintenanceController extends Controller
 
     public function orders()
     {
+        $this->authorize('view_maintenance_order');
         // 1. Current Month & Previous Month Stats
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
@@ -133,6 +135,7 @@ class MaintenanceController extends Controller
 
     public function storeOrder(Request $request)
     {
+        $this->authorize('create_maintenance_order');
         $request->validate([
             'building_id' => 'required|exists:buildings,id',
             'elevator_id' => 'required|exists:elevators,id',
@@ -182,6 +185,7 @@ class MaintenanceController extends Controller
 
     public function editOrder(Order $order)
     {
+        $this->authorize('update_maintenance_order');
         $order->load('items');
         $buildings = \App\Models\Building::all();
         $elevators = Elevator::all();
@@ -190,6 +194,7 @@ class MaintenanceController extends Controller
 
     public function updateOrder(Request $request, Order $order)
     {
+        $this->authorize('update_maintenance_order');
         $request->validate([
             'building_id' => 'required|exists:buildings,id',
             'elevator_id' => 'required|exists:elevators,id',
@@ -239,6 +244,7 @@ class MaintenanceController extends Controller
 
     public function create(Request $request)
     {
+        $this->authorize('create_maintenance_schedule');
         $elevators = Elevator::all();
         $selectedElevator = null;
         if ($request->has('elevator_id')) {
@@ -254,6 +260,7 @@ class MaintenanceController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create_maintenance_schedule');
         $request->validate([
             'elevator_id' => 'required|exists:elevators,id',
             'check_date'  => 'required|date',
@@ -301,6 +308,7 @@ class MaintenanceController extends Controller
 
     public function edit(MaintenanceCheck $maintenance)
     {
+        $this->authorize('update_maintenance_schedule');
         $elevators = Elevator::all();
         $selectedElevator = $maintenance->elevator;
         $sections = $this->getChecklistItems();
@@ -312,6 +320,7 @@ class MaintenanceController extends Controller
 
     public function update(Request $request, MaintenanceCheck $maintenance)
     {
+        $this->authorize('update_maintenance_schedule');
         $request->validate([
             'status'      => 'required|in:pending,overdue,in_progress,completed',
             'task_type'   => 'required|in:periodic,repair',
@@ -363,6 +372,7 @@ class MaintenanceController extends Controller
 
     public function show(MaintenanceCheck $maintenance)
     {
+        $this->authorize('view_maintenance_schedule');
         $sections = $this->getChecklistItems();
         $symbols = $this->getSymbols();
         return view('admin.maintenance.show', compact('maintenance', 'sections', 'symbols'));
@@ -370,6 +380,7 @@ class MaintenanceController extends Controller
 
     public function export(MaintenanceCheck $maintenance)
     {
+        $this->authorize('view_maintenance_schedule');
         $sections = $this->getChecklistItems();
         $symbols = $this->getSymbols();
         return view('admin.maintenance.export', compact('maintenance', 'sections', 'symbols'));
@@ -377,6 +388,7 @@ class MaintenanceController extends Controller
 
     public function destroy(MaintenanceCheck $maintenance)
     {
+        $this->authorize('delete_maintenance_schedule');
         $maintenance->delete();
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã xóa công việc / lịch bảo trì.');
     }

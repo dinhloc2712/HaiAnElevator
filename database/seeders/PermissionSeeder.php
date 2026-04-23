@@ -55,11 +55,32 @@ class PermissionSeeder extends Seeder
             'update_elevator' => 'Chỉnh sửa thang máy',
             'delete_elevator' => 'Xóa thang máy',
 
-            // News / Notifications
-            'view_news' => 'Xem danh sách tin tức',
-            'create_news' => 'Tạo tin tức',
-            'update_news' => 'Cập nhật tin tức',
-            'delete_news' => 'Xóa tin tức',
+            // Installation Management (NEW)
+            'view_installation' => 'Xem danh sách lắp đặt',
+            'create_installation' => 'Thêm mới lắp đặt',
+            'update_installation' => 'Chỉnh sửa lắp đặt',
+            'delete_installation' => 'Xóa lắp đặt',
+
+            // Maintenance Order & Quote Management (NEW)
+            'view_maintenance_order' => 'Xem danh sách đơn bảo trì & báo giá',
+            'create_maintenance_order' => 'Thêm mới đơn bảo trì & báo giá',
+            'update_maintenance_order' => 'Chỉnh sửa đơn bảo trì & báo giá',
+            'delete_maintenance_order' => 'Xóa đơn bảo trì & báo giá',
+
+            // Maintenance Schedule (NEW)
+            'view_maintenance_schedule' => 'Xem lịch bảo trì',
+            'create_maintenance_schedule' => 'Thêm lịch bảo trì',
+            'update_maintenance_schedule' => 'Chỉnh sửa lịch bảo trì',
+            'delete_maintenance_schedule' => 'Xóa lịch bảo trì',
+
+            // Incident Management (NEW)
+            'view_incident' => 'Xem danh sách sự cố',
+            'create_incident' => 'Báo cáo sự cố',
+            'update_incident' => 'Xử lý sự cố',
+            'delete_incident' => 'Xóa sự cố',
+
+            // Reports & Analytics (NEW)
+            'view_report' => 'Xem báo cáo & phân tích',
         ];
 
         // Clean up OLD permissions that are NOT in the new list

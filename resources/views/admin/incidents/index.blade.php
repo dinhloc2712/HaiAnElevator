@@ -229,9 +229,11 @@
             <h1 class="incident-header-title mb-1">Quản lý Sự cố</h1>
             <p class="text-muted mb-0">Tổng hợp và xử lý các sự cố được báo từ khách hàng.</p>
         </div>
-        <a href="{{ route('admin.incidents.create') }}" class="btn btn-danger fw-bold rounded-3 px-4 py-2 shadow-sm">
-            <i class="fas fa-plus me-2"></i> Báo sự cố mới
-        </a>
+        @can('create_incident')
+            <a href="{{ route('admin.incidents.create') }}" class="btn btn-danger fw-bold rounded-3 px-4 py-2 shadow-sm">
+                <i class="fas fa-plus me-2"></i> Báo sự cố mới
+            </a>
+        @endcan
     </div>
 
     <!-- Thống kê -->
@@ -396,23 +398,29 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ route('admin.incidents.show', $incident->id) }}"
-                                        class="btn-action btn-action-view" data-bs-toggle="tooltip" title="Xem chi tiết">
-                                        <i class="far fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.incidents.edit', $incident->id) }}"
-                                        class="btn-action btn-action-edit" data-bs-toggle="tooltip" title="Sửa">
-                                        <i class="far fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('admin.incidents.destroy', $incident->id) }}" method="POST"
-                                        class="d-inline" onsubmit="return confirm('Xác nhận xóa sự cố này?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-action btn-action-delete"
-                                            data-bs-toggle="tooltip" title="Xóa">
-                                            <i class="far fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    @can('view_incident')
+                                        <a href="{{ route('admin.incidents.show', $incident->id) }}"
+                                            class="btn-action btn-action-view" data-bs-toggle="tooltip" title="Xem chi tiết">
+                                            <i class="far fa-eye"></i>
+                                        </a>
+                                    @endcan
+                                    @can('update_incident')
+                                        <a href="{{ route('admin.incidents.edit', $incident->id) }}"
+                                            class="btn-action btn-action-edit" data-bs-toggle="tooltip" title="Sửa">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                    @endcan
+                                    @can('delete_incident')
+                                        <form action="{{ route('admin.incidents.destroy', $incident->id) }}" method="POST"
+                                            class="d-inline" onsubmit="return confirm('Xác nhận xóa sự cố này?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-action btn-action-delete"
+                                                data-bs-toggle="tooltip" title="Xóa">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

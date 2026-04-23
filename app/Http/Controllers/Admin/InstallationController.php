@@ -16,6 +16,7 @@ class InstallationController extends Controller
      */
     public function index()
     {
+        $this->authorize('view_installation');
         $installations = Installation::with(['building', 'staff', 'branch'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -34,6 +35,7 @@ class InstallationController extends Controller
      */
     public function create()
     {
+        $this->authorize('create_installation');
         $buildings = Building::where('is_active', true)->get();
         $branches = Branch::where('is_active', true)->get();
         $staffs = User::all(); // You might want to filter by role 'technical' or similar
@@ -46,6 +48,7 @@ class InstallationController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create_installation');
         $request->validate([
             'code' => 'required|unique:installations,code',
             'branch_id' => 'required|exists:branches,id',
@@ -88,6 +91,7 @@ class InstallationController extends Controller
      */
     public function edit(Installation $installation)
     {
+        $this->authorize('update_installation');
         $buildings = Building::where('is_active', true)->get();
         $branches = Branch::where('is_active', true)->get();
         $staffs = User::all();
@@ -100,6 +104,7 @@ class InstallationController extends Controller
      */
     public function update(Request $request, Installation $installation)
     {
+        $this->authorize('update_installation');
         $rules = [
             'code' => 'sometimes|required|unique:installations,code,' . $installation->id,
             'branch_id' => 'sometimes|required|exists:branches,id',
@@ -130,10 +135,23 @@ class InstallationController extends Controller
     }
 
     /**
+     * Start the installation process.
+     */
+    public function start(Installation $installation)
+    {
+        $this->authorize('update_installation');
+        $installation->update(['status' => 'in_progress']);
+
+        return redirect()->route('admin.installations.index')
+            ->with('success', 'Đã bắt đầu quá trình lắp đặt.');
+    }
+
+    /**
      * Complete the installation by registering an elevator.
      */
     public function complete(Request $request, Installation $installation)
     {
+        $this->authorize('update_installation');
         $request->validate([
             'elevator_code' => 'required|unique:elevators,code',
             'manufacturer'   => 'nullable|string|max:255',
@@ -178,6 +196,7 @@ class InstallationController extends Controller
      */
     public function destroy(Installation $installation)
     {
+        $this->authorize('delete_installation');
         $installation->delete();
         return redirect()->route('admin.installations.index')
             ->with('success', 'Xóa đơn lắp đặt thành công.');

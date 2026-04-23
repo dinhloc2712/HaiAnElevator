@@ -9,9 +9,11 @@
                 <h1 class="h3 mb-1 text-gray-800 fw-bold">Lắp đặt thang máy</h1>
                 <p class="mb-0 text-muted small">Quản lý tiến độ lắp đặt và giao việc cho nhân viên</p>
             </div>
-            <a href="{{ route('admin.installations.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-                <i class="fas fa-plus me-2"></i> Tạo đơn lắp đặt
-            </a>
+            @can('create_installation')
+                <a href="{{ route('admin.installations.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="fas fa-plus me-2"></i> Tạo đơn lắp đặt
+                </a>
+            @endcan
         </div>
     </div>
 
@@ -117,7 +119,7 @@
                             </td>
                             <td>
                                 @if($inst->status == 'in_progress')
-                                    <span class="badge-pill-modern badge-status-in-progress">Dang lắp</span>
+                                    <span class="badge-pill-modern badge-status-in-progress">Đang lắp</span>
                                 @elseif($inst->status == 'pending')
                                     <span class="badge-pill-modern badge-status-pending">Chờ giao</span>
                                 @else
@@ -126,29 +128,44 @@
                             </td>
                             <td class="pe-4 text-end">
                                 <div class="d-flex justify-content-end align-items-center gap-2">
-                                    @if($inst->status != 'completed')
-                                        <button type="button" class="btn-ghost-complete open-complete-modal" 
-                                            data-id="{{ $inst->id }}"
-                                            data-code="{{ $inst->code }}"
-                                            data-building="{{ $inst->building->name ?? '' }}"
-                                            data-branch="{{ $inst->branch->name ?? 'N/A' }}">
-                                            <i class="far fa-check-circle me-1"></i> Hoàn thành
-                                        </button>
+                                    @if($inst->status == 'pending')
+                                        @can('update_installation')
+                                            <form action="{{ route('admin.installations.start', $inst->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" style="font-size: 0.75rem;">
+                                                    <i class="fas fa-play me-1"></i> Bắt đầu lắp đặt
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    @elseif($inst->status == 'in_progress')
+                                        @can('update_installation')
+                                            <button type="button" class="btn-ghost-complete open-complete-modal" 
+                                                data-id="{{ $inst->id }}"
+                                                data-code="{{ $inst->code }}"
+                                                data-building="{{ $inst->building->name ?? '' }}"
+                                                data-branch="{{ $inst->branch->name ?? 'N/A' }}">
+                                                <i class="far fa-check-circle me-1"></i> Hoàn thành
+                                            </button>
+                                        @endcan
                                     @endif
                                     <div class="dropdown">
                                         <button class="btn btn-link text-muted p-0 shadow-none" data-bs-toggle="dropdown" data-bs-boundary="viewport">
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            <li><a class="dropdown-item small" href="{{ route('admin.installations.edit', $inst->id) }}"><i class="fas fa-edit me-2"></i> Chỉnh sửa</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <form action="{{ route('admin.installations.destroy', $inst->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="dropdown-item small text-danger"><i class="fas fa-trash-alt me-2"></i> Xóa</button>
-                                                </form>
-                                            </li>
+                                            @can('update_installation')
+                                                <li><a class="dropdown-item small" href="{{ route('admin.installations.edit', $inst->id) }}"><i class="fas fa-edit me-2"></i> Chỉnh sửa</a></li>
+                                            @endcan
+                                            @can('delete_installation')
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form action="{{ route('admin.installations.destroy', $inst->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item small text-danger"><i class="fas fa-trash-alt me-2"></i> Xóa</button>
+                                                    </form>
+                                                </li>
+                                            @endcan
                                         </ul>
                                     </div>
                                 </div>

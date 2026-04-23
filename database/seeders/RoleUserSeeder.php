@@ -19,10 +19,8 @@ class RoleUserSeeder extends Seeder
     {
         // Define Roles
         $roles = [
-            'inspector' => 'Đăng kiểm viên',
             'staff' => 'Nhân viên',
             'manager' => 'Quản lý',
-            'customer' => 'Khách hàng',
         ];
 
         foreach ($roles as $name => $displayName) {
@@ -38,13 +36,6 @@ class RoleUserSeeder extends Seeder
         // Define Users
         $users = [
             [
-                'name' => 'Nguyễn Văn Kiểm',
-                'email' => 'kiem@dangkiemtauca.com',
-                'role' => 'inspector',
-                'password' => 'password',
-                'phone' => '0912345678',
-            ],
-            [
                 'name' => 'Trần Thị Nhân',
                 'email' => 'nhan@dangkiemtauca.com',
                 'role' => 'staff',
@@ -58,13 +49,7 @@ class RoleUserSeeder extends Seeder
                 'password' => 'password',
                 'phone' => '0909090909',
             ],
-            [
-                'name' => 'Phạm Văn Khách',
-                'email' => 'khach@dangkiemtauca.com',
-                'role' => 'customer',
-                'password' => 'password',
-                'phone' => '0911223344',
-            ],
+            
         ];
 
         foreach ($users as $userData) {

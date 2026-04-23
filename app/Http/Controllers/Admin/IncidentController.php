@@ -14,6 +14,7 @@ class IncidentController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('view_incident');
         $query = Incident::with(['elevator.building', 'elevator.branch']);
 
         // DASHBOARD STATISTICS
@@ -71,6 +72,7 @@ class IncidentController extends Controller
      */
     public function create()
     {
+        $this->authorize('create_incident');
         $elevators = Elevator::with('building')->get();
         $staffs = \App\Models\User::all();
         return view('admin.incidents.create', compact('elevators', 'staffs'));
@@ -81,6 +83,7 @@ class IncidentController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create_incident');
         $request->validate([
             'elevator_id' => 'required|exists:elevators,id',
             'reporter_name' => 'nullable|string|max:255',
@@ -129,6 +132,7 @@ class IncidentController extends Controller
      */
     public function show(Incident $incident)
     {
+        $this->authorize('view_incident');
         return view('admin.incidents.show', compact('incident'));
     }
 
@@ -137,6 +141,7 @@ class IncidentController extends Controller
      */
     public function edit(Incident $incident)
     {
+        $this->authorize('update_incident');
         $elevators = Elevator::with('building')->get();
         $staffs = \App\Models\User::all();
         return view('admin.incidents.edit', compact('incident', 'elevators', 'staffs'));
@@ -147,6 +152,7 @@ class IncidentController extends Controller
      */
     public function update(Request $request, Incident $incident)
     {
+        $this->authorize('update_incident');
         $request->validate([
             'elevator_id' => 'required|exists:elevators,id',
             'reporter_name' => 'nullable|string|max:255',
@@ -191,6 +197,7 @@ class IncidentController extends Controller
      */
     public function destroy(Incident $incident)
     {
+        $this->authorize('delete_incident');
         $incident->delete();
         return redirect()->route('admin.incidents.index')->with('success', 'Đã xóa hồ sơ sự cố.');
     }

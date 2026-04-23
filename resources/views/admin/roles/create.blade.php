@@ -73,7 +73,11 @@
                                         'branch'    => 'Chi nhánh',
                                         'building'  => 'Tòa nhà',
                                         'elevator'  => 'Thang máy',
-                                        'news'      => 'Tin tức & Thông báo',
+                                        'installation' => 'Lắp đặt',
+                                        'maintenance_order' => 'Đơn bảo trì & Báo giá',
+                                        'maintenance_schedule' => 'Lịch bảo trì',
+                                        'incident' => 'Quản lý sự cố',
+                                        'report' => 'Báo cáo & Phân tích',
                                     ];
                                     $actions = ['view', 'create', 'update', 'delete', 'approve'];
                                 @endphp

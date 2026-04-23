@@ -14,6 +14,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('view_report');
         $now = Carbon::now();
         $month = $request->input('month', $now->month);
         $year = $request->input('year', $now->year);
