@@ -11,7 +11,7 @@
         <p class="page-header-sub mb-0">Quản lý danh sách chi nhánh trong hệ thống.</p>
     </div>
     <a href="{{ route('admin.branches.create') }}" class="btn btn-add">
-        <i class="fas fa-plus me-2"></i>Thêm chi nhánh
+        <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Thêm chi nhánh</span>
     </a>
 </div>
 

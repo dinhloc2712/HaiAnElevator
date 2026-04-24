@@ -7,6 +7,12 @@ use App\Models\Elevator;
 use App\Models\Building;
 use App\Models\Branch;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class ElevatorController extends Controller
 {
@@ -16,14 +22,17 @@ class ElevatorController extends Controller
 
         $query = Elevator::with(['building', 'branch']);
 
-        // Quick Search (keep existing)
+        // Quick Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
                   ->orWhere('customer_name', 'like', "%{$search}%")
                   ->orWhere('province', 'like', "%{$search}%")
-                  ->orWhere('district', 'like', "%{$search}%");
+                  ->orWhere('district', 'like', "%{$search}%")
+                  ->orWhereHas('building', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -80,14 +89,12 @@ class ElevatorController extends Controller
             $query->whereDate('created_at', '<=', $request->created_to);
         }
 
-        // Maintenance Deadline Logic
-        if ($request->filled('deadline_status')) {
-            $today = now()->startOfDay();
-            if ($request->deadline_status === 'upcoming') {
-                $query->whereBetween('maintenance_deadline', [$today, $today->copy()->addDays(7)]);
-            } elseif ($request->deadline_status === 'overdue') {
-                $query->where('maintenance_deadline', '<', $today);
-            }
+        // Maintenance Deadline Range
+        if ($request->filled('deadline_from')) {
+            $query->whereDate('maintenance_deadline', '>=', $request->deadline_from);
+        }
+        if ($request->filled('deadline_to')) {
+            $query->whereDate('maintenance_deadline', '<=', $request->deadline_to);
         }
 
         // Sorting logic
@@ -162,10 +169,29 @@ class ElevatorController extends Controller
             'model'                => 'nullable|string|max:255',
             'type'                 => 'nullable|string|max:255',
             'capacity'             => 'nullable|string|max:255',
+            'floors'               => 'nullable|integer',
             'cycle_days'           => 'required|integer|min:1',
             'status'               => 'required|string|in:active,error,maintenance',
+            'address'              => 'nullable|string|max:500',
+            'note'                 => 'nullable|string',
+            'map'                  => 'nullable|string',
             'maintenance_deadline' => 'nullable|date',
+            'maintenance_end_date' => 'nullable|date',
         ]);
+
+        // Custom Validation Logic
+        if ($request->filled('maintenance_deadline') && $request->filled('maintenance_end_date')) {
+            $deadline = Carbon::parse($request->maintenance_deadline);
+            $endDate = Carbon::parse($request->maintenance_end_date);
+
+            if ($deadline->gt($endDate)) {
+                return back()->withErrors(['maintenance_deadline' => 'Hạn bảo trì tiếp theo không được vượt quá ngày kết thúc thời hạn bảo trì.'])->withInput();
+            }
+
+            if ($endDate->isPast() && $deadline->gt(now())) {
+                 return back()->withErrors(['maintenance_deadline' => 'Hợp đồng bảo trì đã hết hạn. Không thể gia hạn bảo trì mới.'])->withInput();
+            }
+        }
 
         Elevator::create($validated);
 
@@ -174,7 +200,9 @@ class ElevatorController extends Controller
 
     public function show(Elevator $elevator)
     {
-        return redirect()->route('admin.elevators.edit', $elevator);
+        $this->authorize('view_elevator');
+        $elevator->load(['building', 'branch']);
+        return view('admin.elevators.show', compact('elevator'));
     }
 
     public function edit(Elevator $elevator)
@@ -201,10 +229,31 @@ class ElevatorController extends Controller
             'model'                => 'nullable|string|max:255',
             'type'                 => 'nullable|string|max:255',
             'capacity'             => 'nullable|string|max:255',
+            'floors'               => 'nullable|integer',
             'cycle_days'           => 'required|integer|min:1',
             'status'               => 'required|string|in:active,error,maintenance',
+            'address'              => 'nullable|string|max:500',
+            'note'                 => 'nullable|string',
+            'map'                  => 'nullable|string',
             'maintenance_deadline' => 'nullable|date',
+            'maintenance_end_date' => 'nullable|date',
         ]);
+
+        // Custom Validation Logic
+        if ($request->filled('maintenance_deadline') && $request->filled('maintenance_end_date')) {
+            $deadline = Carbon::parse($request->maintenance_deadline);
+            $endDate = Carbon::parse($request->maintenance_end_date);
+
+            // 1. Hạn bảo trì tiếp theo không được quá ngày kết thúc
+            if ($deadline->gt($endDate)) {
+                return back()->withErrors(['maintenance_deadline' => 'Hạn bảo trì tiếp theo không được vượt quá ngày kết thúc thời hạn bảo trì.'])->withInput();
+            }
+
+            // 2. Nếu đã quá ngày kết thúc hợp đồng, không cho cập nhật hạn bảo trì mới trong tương lai
+            if ($endDate->isPast() && $deadline->gt($elevator->maintenance_deadline)) {
+                 return back()->withErrors(['maintenance_deadline' => 'Hợp đồng bảo trì đã hết hạn. Không thể cập nhật thêm hạn bảo trì mới.'])->withInput();
+            }
+        }
 
         $elevator->update($validated);
 
@@ -216,5 +265,67 @@ class ElevatorController extends Controller
         $this->authorize('delete_elevator');
         $elevator->delete();
         return redirect()->route('admin.elevators.index')->with('success', 'Đã xóa thang máy.');
+    }
+
+    public function export(Request $request)
+    {
+        $this->authorize('view_elevator');
+        
+        $query = Elevator::with(['building']);
+        
+        $type = $request->get('type', 'location');
+        
+        if ($type === 'deadline') {
+            $query->orderBy('maintenance_deadline', 'asc');
+            $filename = "danh_sach_thang_may_theo_han_bao_tri.xlsx";
+        } else {
+            $query->orderBy('province', 'asc')->orderBy('district', 'asc');
+            $filename = "danh_sach_thang_may_theo_khu_vuc.xlsx";
+        }
+        
+        $elevators = $query->get();
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $headers = ['Mã thang máy', 'Tòa nhà/Khách hàng', 'Số điện thoại', 'Địa chỉ', 'Hạn bảo trì'];
+        $sheet->fromArray($headers, null, 'A1');
+        
+        $sheet->getStyle('A1:E1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => '4e73df']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+        
+        $row = 2;
+        foreach ($elevators as $elevator) {
+            $customer = $elevator->customer_name ?? ($elevator->building->name ?? 'N/A');
+            $phone = $elevator->customer_phone ?? ($elevator->building->contact_phone ?? 'N/A');
+            $fullAddress = ($elevator->address ? $elevator->address . ', ' : '') . $elevator->district . ', ' . $elevator->province;
+            
+            $sheet->setCellValue('A' . $row, $elevator->code);
+            $sheet->setCellValue('B' . $row, $customer);
+            $sheet->setCellValue('C' . $row, $phone);
+            $sheet->setCellValue('D' . $row, $fullAddress);
+            $sheet->setCellValue('E' . $row, $elevator->maintenance_deadline ? $elevator->maintenance_deadline->format('d/m/Y') : 'N/A');
+            $row++;
+        }
+        
+        foreach (range('A', 'E') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $sheet->getStyle('A1:E' . ($row - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                ],
+            ],
+        ]);
+        
+        return response()->streamDownload(function() use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $filename);
     }
 }

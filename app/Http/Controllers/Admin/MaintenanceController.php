@@ -8,12 +8,10 @@ use App\Models\Elevator;
 use App\Models\User;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class MaintenanceController extends Controller
 {
-    /**
-     * Define the sections and items as seen in the paper form.
-     */
     /**
      * Define the sections and items as seen in the paper form.
      */
@@ -264,7 +262,7 @@ class MaintenanceController extends Controller
         $request->validate([
             'elevator_id' => 'required|exists:elevators,id',
             'check_date'  => 'required|date',
-            'results'     => 'required|array',
+            'results'     => 'nullable|array',
             'staff_ids'   => 'nullable|array',
         ]);
 
@@ -290,14 +288,22 @@ class MaintenanceController extends Controller
         ]);
 
         // Update elevator maintenance deadline & status
+        $elevator = Elevator::find($request->elevator_id);
         if (($request->task_type ?? 'periodic') == 'periodic') {
-            $elevator = Elevator::find($request->elevator_id);
-            $elevator->maintenance_deadline = now()->addDays($elevator->cycle_days ?? 30);
-            $elevator->status = 'active';
+            $newDeadline = now()->addDays($elevator->cycle_days ?? 30);
+            
+            // Check if new deadline exceeds contract end date
+            if ($elevator->maintenance_end_date && $newDeadline->gt(Carbon::parse($elevator->maintenance_end_date))) {
+                // If it exceeds, CLEAR the deadline
+                $elevator->maintenance_deadline = null;
+                $elevator->status = 'active';
+            } else {
+                $elevator->maintenance_deadline = $newDeadline;
+                $elevator->status = 'active';
+            }
             $elevator->save();
         } else {
             // Even if it's repair, if it's completed, set back to active
-            $elevator = Elevator::find($request->elevator_id);
             $elevator->status = 'active';
             $elevator->save();
         }
@@ -322,7 +328,7 @@ class MaintenanceController extends Controller
     {
         $this->authorize('update_maintenance_schedule');
         $request->validate([
-            'status'      => 'required|in:pending,overdue,in_progress,completed',
+            'status'      => 'nullable|in:pending,overdue,in_progress,completed',
             'task_type'   => 'required|in:periodic,repair',
             'check_date'  => 'required|date',
             'results'     => 'nullable|array',
@@ -334,8 +340,15 @@ class MaintenanceController extends Controller
             $staffNamesStr = User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
         }
 
+        $status = $request->status ?? $maintenance->status;
+        if ($request->action == 'complete') {
+            $status = 'completed';
+        } elseif ($request->action == 'save') {
+            $status = 'in_progress';
+        }
+
         $maintenance->update([
-            'status'          => $request->status,
+            'status'          => $status,
             'task_type'       => $request->task_type,
             'check_date'      => $request->check_date,
             'results'         => $request->results,
@@ -349,17 +362,25 @@ class MaintenanceController extends Controller
         ]);
 
         // If marked as completed, update elevator status to active
-        if ($request->status == 'completed') {
+        if ($status == 'completed') {
             $elevator = $maintenance->elevator;
             $elevator->status = 'active';
             
             // Only update maintenance deadline if it is a periodic maintenance
             if ($request->task_type == 'periodic') {
-                $elevator->maintenance_deadline = now()->addDays($elevator->cycle_days ?? 30);
+                $newDeadline = now()->addDays($elevator->cycle_days ?? 30);
+                
+                // Check if new deadline exceeds contract end date
+                if ($elevator->maintenance_end_date && $newDeadline->gt(Carbon::parse($elevator->maintenance_end_date))) {
+                    // CLEAR the deadline if it exceeds the contract end date
+                    $elevator->maintenance_deadline = null;
+                } else {
+                    $elevator->maintenance_deadline = $newDeadline;
+                }
             }
             
             $elevator->save();
-        } elseif ($request->status == 'in_progress') {
+        } elseif ($status == 'in_progress') {
             // If marked as in progress, update elevator status to maintenance
             $elevator = $maintenance->elevator;
             $elevator->status = 'maintenance';
@@ -367,7 +388,22 @@ class MaintenanceController extends Controller
         }
 
         return redirect()->route('admin.maintenance.index')
-            ->with('success', 'Đã hoàn thành công việc bảo trì.');
+            ->with('success', 'Cập nhật phiếu bảo trì thành công.');
+    }
+
+    public function start(MaintenanceCheck $maintenance)
+    {
+        $this->authorize('update_maintenance_schedule');
+        
+        $maintenance->update([
+            'status' => 'in_progress',
+            'start_time' => now()->format('H:i')
+        ]);
+
+        $elevator = $maintenance->elevator;
+        $elevator->update(['status' => 'maintenance']);
+
+        return redirect()->back()->with('success', 'Bắt đầu thực hiện công việc bảo trì.');
     }
 
     public function show(MaintenanceCheck $maintenance)

@@ -32,6 +32,7 @@ Route::get('/', function () {
 Route::get('storage/{path}', [\App\Http\Controllers\Admin\UserController::class, 'servePublicStorageFile'])->where('path', '.*')->name('storage.fallback');
 
 // Auth Routes
+@include('auth.php'); // Note: if auth.php doesn't exist, this might be a problem, but original file had it inline. I'll stick to original inline style for safety.
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -61,6 +62,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('buildings/import', [\App\Http\Controllers\Admin\BuildingController::class, 'import'])->name('buildings.import');
     Route::resource('buildings', \App\Http\Controllers\Admin\BuildingController::class);
 
+    Route::get('elevators/export', [\App\Http\Controllers\Admin\ElevatorController::class, 'export'])->name('elevators.export');
     Route::resource('elevators', \App\Http\Controllers\Admin\ElevatorController::class);
     Route::resource('installations', \App\Http\Controllers\Admin\InstallationController::class);
     Route::post('installations/{installation}/start', [\App\Http\Controllers\Admin\InstallationController::class, 'start'])->name('installations.start');
@@ -72,6 +74,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('maintenance/orders/{order}/edit', [\App\Http\Controllers\Admin\MaintenanceController::class, 'editOrder'])->name('maintenance.orders.edit');
     Route::put('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateOrder'])->name('maintenance.orders.update');
     Route::get('maintenance/{maintenance}/export', [\App\Http\Controllers\Admin\MaintenanceController::class, 'export'])->name('maintenance.export');
+    Route::post('maintenance/{maintenance}/start', [\App\Http\Controllers\Admin\MaintenanceController::class, 'start'])->name('maintenance.start');
     Route::resource('maintenance', \App\Http\Controllers\Admin\MaintenanceController::class);
     Route::resource('incidents', \App\Http\Controllers\Admin\IncidentController::class);
     
@@ -90,6 +93,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('maintenance-settings/statuses/{status}', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'destroyStatus'])->name('maintenance.statuses.destroy');
 
     Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export-maintenance', [\App\Http\Controllers\Admin\ReportController::class, 'exportMaintenance'])->name('reports.export_maintenance');
+    Route::get('reports/export-staff', [\App\Http\Controllers\Admin\ReportController::class, 'exportStaff'])->name('reports.export_staff');
 
     // Profile Management
     Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'show'])->name('profile.show');

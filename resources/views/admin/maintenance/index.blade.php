@@ -1,14 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Lịch bảo trì & Công việc')
+@section('title', 'Quản lý Bảo trì')
 
 @section('styles')
     <style>
         .schedule-card {
-            border: 1px solid #e3e6f0;
-            border-radius: 12px;
-            transition: all 0.2s;
             background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e3e6f0;
+            transition: all 0.2s;
+            border-left: 4px solid #4e73df;
         }
 
         .schedule-card:hover {
@@ -17,162 +18,229 @@
         }
 
         .badge-soft-primary {
-            background: #e3f2fd;
-            color: #0d6efd;
+            background-color: rgba(78, 115, 223, 0.1);
+            color: #4e73df;
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 6px;
         }
 
         .badge-soft-warning {
-            background: #fff3cd;
-            color: #856404;
+            background-color: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 6px;
         }
 
         .badge-soft-success {
-            background: #d1e7dd;
-            color: #0f5132;
+            background-color: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 6px;
         }
 
         .badge-soft-secondary {
-            background: #f8f9fa;
-            color: #6c757d;
+            background-color: rgba(133, 135, 150, 0.1);
+            color: #858796;
             font-weight: 600;
             padding: 5px 10px;
             border-radius: 6px;
-            border: 1px solid #dee2e6;
         }
 
-        /* Calendar Grid */
+        .nav-pills .nav-link {
+            color: #5a5c69;
+            border-radius: 8px;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #4e73df;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(78, 115, 223, 0.3);
+        }
+
         .calendar-container {
-            border: 1px solid #e3e6f0;
-            border-radius: 12px;
-            overflow: hidden;
             background: #fff;
+            border-radius: 15px;
+            border: 1px solid #e3e6f0;
+            overflow: hidden;
         }
 
         .calendar-header {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
             background: #f8f9fc;
+            padding: 15px 0;
             border-bottom: 1px solid #e3e6f0;
         }
 
-        .calendar-header div {
-            padding: 15px;
-            text-align: center;
-            font-weight: 700;
-            color: #4e73df;
-            font-size: 0.85rem;
-        }
-
-        .calendar-body {
+        .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e3e6f0;
         }
 
         .calendar-day {
+            background: #fff;
             min-height: 120px;
             padding: 10px;
-            border-right: 1px solid #e3e6f0;
-            border-bottom: 1px solid #e3e6f0;
-            background: #fff;
+            transition: all 0.2s;
         }
 
-        .calendar-day:nth-child(7n) {
-            border-right: none;
+        .calendar-day:hover {
+            background: #f8f9fc;
+        }
+
+        .calendar-day.other-month {
+            background: #fafafa;
+            color: #b7b9cc;
         }
 
         .calendar-day.today {
-            background: #f0f8ff;
-            box-shadow: inset 0 0 0 2px #4e73df;
-        }
-
-        .calendar-day.empty {
-            background: #fcfcfc;
+            background: rgba(78, 115, 223, 0.05);
         }
 
         .day-number {
-            font-weight: 600;
+            font-weight: bold;
             color: #5a5c69;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            text-align: center;
+            border-radius: 50%;
         }
 
-        .event-pill {
-            display: block;
-            font-size: 0.75rem;
-            padding: 4px 8px;
+        .calendar-day.today .day-number {
+            background: #4e73df;
+            color: #fff;
+        }
+
+        .task-indicator {
+            font-size: 0.7rem;
+            padding: 4px 6px;
             border-radius: 4px;
             margin-bottom: 4px;
-            color: #fff;
-            text-decoration: none;
+            display: block;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-weight: 600;
+            cursor: pointer;
+            border-left: 3px solid transparent;
         }
 
-        .event-pill:hover {
-            opacity: 0.9;
-            color: #fff;
-            text-decoration: none;
+        .task-indicator.pending {
+            background: rgba(78, 115, 223, 0.1);
+            color: #4e73df;
+            border-left-color: #4e73df;
         }
 
-        .event-periodic {
-            background-color: #3b82f6;
+        .task-indicator.in_progress {
+            background: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+            border-left-color: #f6c23e;
         }
 
-        /* Blue */
-        .event-repair {
-            background-color: #10b981;
+        .task-indicator.completed {
+            background: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+            border-left-color: #1cc88a;
         }
 
-        /* Green */
-        .event-pending {
-            opacity: 0.7;
+        .task-indicator.overdue {
+            background: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+            border-left-color: #e74a3b;
         }
 
-        /* Dashboard Stylings */
+        .stat-card-modern {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card-modern:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .bg-gradient-primary-soft {
+            background: linear-gradient(135deg, rgba(78, 115, 223, 0.1) 0%, rgba(34, 74, 190, 0.1) 100%);
+            color: #4e73df;
+        }
+
+        .bg-gradient-success-soft {
+            background: linear-gradient(135deg, rgba(28, 200, 138, 0.1) 0%, rgba(19, 133, 92, 0.1) 100%);
+            color: #1cc88a;
+        }
+
+        .bg-gradient-warning-soft {
+            background: linear-gradient(135deg, rgba(246, 194, 62, 0.1) 0%, rgba(218, 165, 32, 0.1) 100%);
+            color: #f6c23e;
+        }
+
+        .bg-gradient-danger-soft {
+            background: linear-gradient(135deg, rgba(231, 74, 59, 0.1) 0%, rgba(190, 38, 23, 0.1) 100%);
+            color: #e74a3b;
+        }
+
+        /* Thêm style cho thanh thống kê bar */
         .stat-bar-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
-            gap: 12px;
+            justify-content: flex-end;
+            height: 150px;
         }
 
         .stat-bar {
-            width: 100%;
-            max-width: 80px;
-            min-height: 8px;
-            border-radius: 6px;
-            transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .completion-rate-card {
-            background: #f0fdf4;
-            border-radius: 20px;
-            padding: 30px;
+            width: 40px;
+            border-radius: 8px;
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
         }
 
-        .completion-rate-card::before {
-            content: '';
+        .stat-bar::after {
+            content: attr(data-value);
             position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 150px;
-            height: 150px;
-            background: rgba(16, 185, 129, 0.05);
-            border-radius: 50%;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+        
+        .table-responsive {
+            border-radius: 0 0 12px 12px;
+        }
+        .table thead th {
+            letter-spacing: 0.5px;
+            background: #f8f9fc;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        .table tbody td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f1f3f9;
         }
     </style>
 @endsection
@@ -209,7 +277,7 @@
 
                     @can('create_maintenance_schedule')
                         <a href="{{ route('admin.maintenance.create') }}" class="btn btn-tech-success rounded-3 px-4 shadow-sm">
-                            <i class="fas fa-plus me-2"></i> Tạo phiếu bảo trì
+                            <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Tạo phiếu bảo trì</span>
                         </a>
                     @endcan
                 </div>
@@ -228,25 +296,29 @@
         <div class="col-lg-8">
             <div class="tech-card h-100 p-4 shadow-sm border-0" style="border-radius: 20px; background: white;">
                 <h6 class="text-uppercase small fw-bold text-muted mb-5 d-flex align-items-center"
-                    style="letter-spacing: 0.5px;">
-                    <i class="fas fa-chart-bar me-2 text-primary"></i> Trạng thái công việc tháng này
+                    style="letter-spacing: 1px;">
+                    <i class="fas fa-chart-bar me-2 text-primary"></i> Tổng quan tháng này
                 </h6>
-                <div class="d-flex align-items-end justify-content-around px-2 px-md-4" style="height: 160px;">
+                <div class="d-flex justify-content-around align-items-end" style="height: 180px;">
+                    <!-- Đã hoàn thành -->
                     <div class="stat-bar-container">
                         <div class="stat-bar shadow-sm"
                             style="height: {{ $getBarHeight($stats['completed']) }}px; background: #10b981;"></div>
                         <span class="small fw-bold text-muted mt-2">Hoàn thành</span>
                     </div>
+                    <!-- Đang thực hiện -->
                     <div class="stat-bar-container">
                         <div class="stat-bar shadow-sm"
                             style="height: {{ $getBarHeight($stats['in_progress']) }}px; background: #f59e0b;"></div>
                         <span class="small fw-bold text-muted mt-2">Đang làm</span>
                     </div>
+                    <!-- Chờ xử lý -->
                     <div class="stat-bar-container">
                         <div class="stat-bar shadow-sm"
                             style="height: {{ $getBarHeight($stats['pending']) }}px; background: #3b82f6;"></div>
-                        <span class="small fw-bold text-muted mt-2">Chưa làm</span>
+                        <span class="small fw-bold text-muted mt-2">Chờ xử lý</span>
                     </div>
+                    <!-- Quá hạn -->
                     <div class="stat-bar-container">
                         <div class="stat-bar shadow-sm"
                             style="height: {{ $getBarHeight($stats['overdue']) }}px; background: #ef4444;"></div>
@@ -282,113 +354,141 @@
         {{-- LIST VIEW --}}
         <div class="tab-pane fade show active" id="list" role="tabpanel">
             <h5 class="fw-bold mb-4">Công việc sắp tới & Đang thực hiện</h5>
-            <div class="row g-4">
-                <div class="col-lg-12">
-                    @forelse($upcomingTasks as $task)
-                        <div class="schedule-card p-4 mb-3">
-                            <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row gap-3">
-                                <div>
-                                    <div class="d-flex align-items-center gap-3 mb-2">
-                                        <h5 class="mb-0 fw-bold text-primary">{{ $task->elevator->code ?? 'N/A' }}</h5>
-                                        <span class="badge-soft-secondary border-0">
+            <div class="tech-card overflow-hidden">
+                <div class="table-responsive" style="border-radius: 0 0 12px 12px; min-height: 300px;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">MÃ THANG</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="width: 150px;">LOẠI BẢO TRÌ</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">TRẠNG THÁI</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">THỜI GIAN</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 150px;">NHÂN VIÊN</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 250px;">ĐỊA ĐIỂM</th>
+                                <th class="pe-4 border-0 text-end small fw-bold text-muted text-nowrap" style="width: 180px;">THAO TÁC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($upcomingTasks as $task)
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary text-nowrap">{{ $task->elevator->code ?? 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge-soft-secondary border-0 text-nowrap">
                                             {{ $task->task_type == 'repair' ? 'Sửa chữa' : 'Bảo dưỡng định kỳ' }}
                                         </span>
+                                    </td>
+                                    <td>
                                         @if ($task->status == 'completed')
-                                            <span class="badge-soft-success">Hoàn thành</span>
+                                            <span class="badge-soft-success text-nowrap">Hoàn thành</span>
                                         @elseif($task->status == 'in_progress')
-                                            <span class="badge-soft-warning">Đang thực hiện</span>
+                                            <span class="badge-soft-warning text-nowrap">Đang thực hiện</span>
                                         @elseif($task->status == 'overdue')
-                                            <span class="badge-soft-secondary text-danger border-danger">Quá hạn</span>
+                                            <span class="badge-soft-secondary text-danger border-danger text-nowrap">Quá hạn</span>
                                         @else
-                                            <span class="badge-soft-primary bg-light text-muted border">Chờ xử lý</span>
+                                            <span class="badge-soft-primary bg-light text-muted border text-nowrap">Chờ xử lý</span>
                                         @endif
-                                    </div>
-                                    <div class="d-flex align-items-center gap-4 text-muted small mt-3">
-                                        <div><i
-                                                class="fas fa-map-marker-alt me-2"></i>{{ $task->elevator->building->name ?? 'N/A' }}
-                                        </div>
+                                    </td>
+                                    <td>
                                         @php
                                             $displayDate = $task->check_date;
                                         @endphp
-                                        <div><i
-                                                class="far fa-calendar me-2"></i>{{ $displayDate ? $displayDate->format('Y-m-d') : 'N/A' }}
+                                        <div class="fw-bold text-dark text-nowrap">
+                                            <i class="far fa-calendar text-muted me-1"></i> {{ $displayDate ? $displayDate->format('d/m/Y') : 'N/A' }}
                                         </div>
                                         @if ($task->start_time)
-                                            <div><i class="far fa-clock me-2"></i>{{ $task->start_time }} -
-                                                {{ $task->end_time ?? '...' }}</div>
+                                            <div class="small text-muted text-nowrap">
+                                                <i class="far fa-clock me-1"></i> {{ date('H:i', strtotime($task->start_time)) }} - {{ $task->end_time ? date('H:i', strtotime($task->end_time)) : '...' }}
+                                            </div>
                                         @endif
-                                        <div><i class="far fa-user me-2"></i>{{ $task->staff_names ?? 'Chưa phân công' }}
+                                    </td>
+                                    <td>
+                                        <div class="text-nowrap fw-bold text-dark small">
+                                            <i class="far fa-user text-muted me-1"></i> {{ $task->staff_names ?? 'Chưa phân công' }}
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-2 align-items-center">
-                                    @can('view_maintenance_schedule')
-                                        <a href="{{ route('admin.maintenance.show', $task->id) }}"
-                                            class="btn btn-outline-secondary fw-bold px-4 rounded-3">Chi tiết</a>
-                                    @endcan
-                                    @if ($task->status != 'completed')
-                                        @can('update_maintenance_schedule')
-                                            <a href="{{ route('admin.maintenance.edit', $task->id) }}"
-                                                class="btn btn-success fw-bold px-3 rounded-3 shadow-sm">
-                                                <i class="fas fa-check-square me-1"></i> Hoàn thành
-                                            </a>
-                                        @endcan
-                                    @endif
-
-                                    <div class="dropdown">
-                                        <button class="btn btn-link text-muted p-0 shadow-none border-0 px-2"
-                                            data-bs-toggle="dropdown">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            @can('view_maintenance_schedule')
-                                                <li>
-                                                    <a class="dropdown-item small"
-                                                        href="{{ route('admin.maintenance.export', $task->id) }}"
-                                                        target="_blank">
-                                                        <i class="fas fa-print me-2 text-info"></i>
-                                                        Xuất phiếu (PDF)
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                            @can('update_maintenance_schedule')
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item small"
-                                                        href="{{ route('admin.maintenance.edit', $task->id) }}">
-                                                        <i class="fas fa-edit me-2 text-primary"></i>
-                                                        {{ $task->status == 'completed' ? 'Chỉnh sửa kết quả' : 'Chỉnh sửa' }}
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                            @can('delete_maintenance_schedule')
-                                                <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li>
-                                                    <form action="{{ route('admin.maintenance.destroy', $task->id) }}"
-                                                        method="POST"
-                                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?')">
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 250px;" title="{{ $task->elevator->building->name ?? 'N/A' }}">
+                                            {{ $task->elevator->building->name ?? 'N/A' }}
+                                        </div>
+                                        <div class="small text-muted text-truncate" style="max-width: 250px;" title="{{ $task->elevator->building->address ?? 'N/A' }}">
+                                            <i class="fas fa-map-marker-alt me-1"></i> {{ $task->elevator->building->address ?? 'N/A' }}
+                                        </div>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-flex justify-content-end align-items-center gap-2">
+                                            @if ($task->status == 'pending' || $task->status == 'overdue')
+                                                @can('update_maintenance_schedule')
+                                                    <form action="{{ route('admin.maintenance.start', $task->id) }}" method="POST" class="d-inline">
                                                         @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="dropdown-item small text-danger"><i
-                                                                class="fas fa-trash-alt me-2"></i> Xóa lịch</button>
+                                                        <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 rounded-pill shadow-sm">
+                                                            <i class="fas fa-play me-1"></i> Thực hiện
+                                                        </button>
                                                     </form>
-                                                </li>
-                                            @endcan
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-5 text-muted border rounded-4 bg-white">
-                            <i class="far fa-calendar-check fa-3x mb-3 opacity-25"></i>
-                            <p class="mb-0">Không có công việc nào sắp tới.</p>
-                        </div>
-                    @endforelse
+                                                @endcan
+                                            @elseif($task->status == 'in_progress')
+                                                @can('update_maintenance_schedule')
+                                                    <a href="{{ route('admin.maintenance.edit', $task->id) }}"
+                                                        class="btn btn-sm btn-success fw-bold px-3 rounded-pill shadow-sm">
+                                                        <i class="fas fa-check-square me-1"></i> Hoàn thành
+                                                    </a>
+                                                @endcan
+                                            @endif
+
+                                            <div class="dropdown {{ $loop->last ? 'dropup' : '' }}">
+                                                <button class="btn btn-link text-muted p-0 shadow-none px-2" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-strategy="fixed">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                    @can('view_maintenance_schedule')
+                                                        <li>
+                                                            <a class="dropdown-item small" href="{{ route('admin.maintenance.show', $task->id) }}">
+                                                                <i class="far fa-eye me-2 text-secondary"></i> Chi tiết
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item small"
+                                                                href="{{ route('admin.maintenance.export', $task->id) }}"
+                                                                target="_blank">
+                                                                <i class="fas fa-print me-2 text-info"></i> Xuất phiếu (PDF)
+                                                            </a>
+                                                        </li>
+                                                    @endcan
+                                                    @can('update_maintenance_schedule')
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <a class="dropdown-item small" href="{{ route('admin.maintenance.edit', $task->id) }}">
+                                                                <i class="fas fa-edit me-2 text-primary"></i>
+                                                                {{ $task->status == 'completed' ? 'Chỉnh sửa kết quả' : 'Chỉnh sửa' }}
+                                                            </a>
+                                                        </li>
+                                                    @endcan
+                                                    @can('delete_maintenance_schedule')
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <form action="{{ route('admin.maintenance.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item small text-danger">
+                                                                    <i class="fas fa-trash-alt me-2"></i> Xóa lịch
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endcan
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted border-0">
+                                        <i class="far fa-calendar-check fa-3x mb-3 opacity-25"></i>
+                                        <p class="mb-0">Không có công việc nào sắp tới.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -428,7 +528,8 @@
                 </div>
             </div>
 
-            <div class="calendar-container shadow-sm">
+            <div class="table-responsive border-0">
+                <div class="calendar-container shadow-sm" style="min-width: 800px;">
                 <div class="calendar-header">
                     <div>T2</div>
                     <div>T3</div>
@@ -438,74 +539,66 @@
                     <div>T7</div>
                     <div>CN</div>
                 </div>
-                <div class="calendar-body">
+
+                <div class="calendar-grid">
                     @php
-                        $day = $startOfCalendar->copy();
+                        $currentDay = $startOfCalendar->copy();
                     @endphp
-                    @while ($day <= $endOfCalendar)
+
+                    @while ($currentDay <= $endOfCalendar)
                         @php
-                            $isToday = $day->isToday();
-                            $isCurrentMonth = $day->month == $date->month;
-                            $dateStr = $day->format('Y-m-d');
+                            $isOtherMonth = $currentDay->month != $month;
+                            $isToday = $currentDay->isToday();
+                            $dateStr = $currentDay->format('Y-m-d');
                             $dayTasks = $groupedTasks[$dateStr] ?? [];
                         @endphp
-                        <div class="calendar-day {{ $isToday ? 'today' : '' }} {{ !$isCurrentMonth ? 'empty' : '' }}">
-                            <div class="day-number" style="opacity: {{ $isCurrentMonth ? '1' : '0.3' }}">
-                                {{ $day->day }}</div>
-                            @foreach ($dayTasks as $t)
-                                @php
-                                    // Default colors based on type
-                                    $pillClass = $t->task_type == 'repair' ? 'event-repair' : 'event-periodic';
+                        <div
+                            class="calendar-day {{ $isOtherMonth ? 'other-month' : '' }} {{ $isToday ? 'today' : '' }}">
+                            <span class="day-number">{{ $currentDay->day }}</span>
 
-                                    // Modifier based on status
-                                    if ($t->status == 'pending') {
-                                        $pillClass .= ' event-pending';
-                                    }
-                                    if ($t->status == 'overdue') {
-                                        $pillClass = 'bg-danger text-white event-pending';
-                                    } // Red for overdue
-                                @endphp
-                                <a href="{{ route('admin.maintenance.show', $t->id) }}"
-                                    class="event-pill {{ $pillClass }}" title="{{ $t->elevator->code }}">
-                                    {{ $t->elevator->code }}
-                                </a>
-                            @endforeach
+                            <div class="tasks mt-1">
+                                @foreach ($dayTasks as $task)
+                                    <div class="task-indicator {{ $task->status }} shadow-sm"
+                                        title="{{ $task->elevator->code ?? 'N/A' }} - {{ $task->status == 'completed' ? 'Hoàn thành' : 'Chưa xong' }}"
+                                        onclick="window.location='{{ route('admin.maintenance.show', $task->id) }}'">
+                                        <i class="fas fa-circle" style="font-size: 0.4rem;"></i>
+                                        {{ $task->start_time ? date('H:i', strtotime($task->start_time)) : '' }}
+                                        {{ $task->elevator->code ?? 'N/A' }}
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         @php
-                            $day->addDay();
+                            $currentDay->addDay();
                         @endphp
                     @endwhile
+                </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
 
-    @section('scripts')
-        <script>
-            // Tab persistence via URL hash
-            document.addEventListener('DOMContentLoaded', function() {
-                let hash = window.location.hash;
-                if (hash) {
-                    let tabTrigger = document.querySelector('button[data-bs-target="' + hash + '"]');
-                    if (tabTrigger) {
-                        let tab = new bootstrap.Tab(tabTrigger);
-                        tab.show();
-                    }
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore active tab from hash
+            let hash = window.location.hash;
+            if (hash) {
+                let triggerEl = document.querySelector('button[data-bs-target="' + hash + '"]');
+                if (triggerEl) {
+                    let tab = new bootstrap.Tab(triggerEl);
+                    tab.show();
                 }
+            }
 
-                // Update URL hash when a tab is clicked
-                let tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
-                tabEls.forEach(function(tabEl) {
-                    tabEl.addEventListener('shown.bs.tab', function(event) {
-                        let targetId = event.target.getAttribute('data-bs-target');
-                        if (history.replaceState) {
-                            history.replaceState(null, null, targetId);
-                        } else {
-                            window.location.hash = targetId;
-                        }
-                    });
+            // Update hash when tab changes
+            var tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabEls.forEach(function(el) {
+                el.addEventListener('shown.bs.tab', function(event) {
+                    window.location.hash = event.target.getAttribute('data-bs-target');
                 });
             });
-        </script>
-    @endsection
+        });
+    </script>
 @endsection

@@ -156,6 +156,7 @@
                 </div>
 
                 {{-- Checklist Items Section --}}
+                @if($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
                 <div class="mb-4">
                     @php 
                         $currentResults = is_array($maintenance->results) ? $maintenance->results : [];
@@ -191,6 +192,17 @@
                         </div>
                     @endforeach
                 </div>
+                @else
+                <div class="alert alert-info rounded-4 border-0 shadow-sm p-4 mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3 text-info"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Chưa thể nhập hạng mục bảo trì</h6>
+                            <p class="small mb-0">Bạn cần nhấn "Bắt đầu thực hiện" ở danh sách để mở phần checklist kiểm tra.</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 {{-- Evaluation & Signatures --}}
                 <div class="tech-card mb-4">
@@ -325,21 +337,42 @@
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-dark text-uppercase"><i class="fas fa-tag me-1 text-primary"></i> Trạng thái bảo trì</label>
-                                <select name="status" class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold" style="background-color: #f8f9fc;">
-                                    <option value="pending" {{ $maintenance->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
-                                    <option value="overdue" {{ $maintenance->status == 'overdue' ? 'selected' : '' }}>Quá hạn</option>
-                                    <option value="in_progress" {{ $maintenance->status == 'in_progress' ? 'selected' : '' }}>Đang thực hiện</option>
-                                    <option value="completed" {{ $maintenance->status == 'completed' ? 'selected' : '' }}>Hoàn thành & Đi vào sử dụng</option>
-                                </select>
+                                @if($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
+                                    <select class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold" style="background-color: #f8f9fc;" disabled>
+                                        <option value="in_progress" {{ $maintenance->status == 'in_progress' ? 'selected' : '' }}>Đang thực hiện</option>
+                                        <option value="completed" {{ $maintenance->status == 'completed' ? 'selected' : '' }}>Hoàn thành & Đi vào sử dụng</option>
+                                    </select>
+                                    {{-- Status will be updated by button 'action' --}}
+                                @else
+                                    <select name="status" class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold" style="background-color: #f8f9fc;">
+                                        <option value="pending" {{ $maintenance->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                        <option value="overdue" {{ $maintenance->status == 'overdue' ? 'selected' : '' }}>Quá hạn</option>
+                                    </select>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-5">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
-                        <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI LỊCH / PHIẾU BẢO TRÌ
-                    </button>
+                    @if($maintenance->status == 'in_progress')
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="submit" name="action" value="save" class="btn btn-info btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3 text-white">
+                                    <i class="fas fa-save me-2"></i> LƯU TẠM
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" name="action" value="complete" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
+                                    <i class="fas fa-check-circle me-2"></i> HOÀN THÀNH PHIẾU
+                                </button>
+                            </div>
+                        </div>
+                    @else
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
+                            <i class="fas fa-save me-2"></i> {{ $maintenance->status == 'completed' ? 'CẬP NHẬT PHIẾU BẢO TRÌ' : 'LƯU THAY ĐỔI' }}
+                        </button>
+                    @endif
                 </div>
             </div>
 

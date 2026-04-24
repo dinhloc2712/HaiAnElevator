@@ -123,7 +123,7 @@
                     @can('create_user')
                         <a href="{{ route('admin.users.create') }}"
                             class="text-white fw-bold px-2 text-decoration-none d-flex align-items-center">
-                            <i class="fas fa-plus me-1"></i> Thêm mới
+                            <i class="fas fa-plus me-md-1"></i><span class="d-none d-md-inline"> Thêm mới</span>
                         </a>
                     @endcan
                 </form>

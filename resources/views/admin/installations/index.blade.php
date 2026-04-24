@@ -5,7 +5,32 @@
 @section('styles')
 <style>
     .table-responsive {
-        min-height: 350px; /* Đảm bảo đủ khoảng trống cho dropdown ở dòng cuối */
+        min-height: 350px; 
+        border-radius: 0 0 12px 12px;
+    }
+    .table thead th {
+        letter-spacing: 0.5px;
+        background: #f8f9fc;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    .table tbody td {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f1f3f9;
+    }
+    .staff-avatar-circle {
+        width: 32px;
+        height: 32px;
+        background: #e3f2fd;
+        color: #0d6efd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin-right: 10px;
     }
 </style>
 @endsection
@@ -19,7 +44,7 @@
             </div>
             @can('create_installation')
                 <a href="{{ route('admin.installations.create') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-                    <i class="fas fa-plus me-2"></i> Tạo đơn lắp đặt
+                    <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Tạo đơn lắp đặt</span>
                 </a>
             @endcan
         </div>
@@ -93,22 +118,22 @@
             </div>
         </div>
 
-        <div class="pb-5">
+        <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 border-0 small fw-bold text-muted">MÃ ĐƠN</th>
-                        <th class="border-0 small fw-bold text-muted">KHÁCH HÀNG / ĐỊA CHỈ</th>
-                        <th class="border-0 small fw-bold text-muted">NHÂN VIÊN PHỤ TRÁCH</th>
-                        <th class="border-0 small fw-bold text-muted">THỜI GIAN DỰ KIẾN</th>
-                        <th class="border-0 small fw-bold text-muted">TRẠNG THÁI</th>
-                        <th class="pe-4 border-0 text-end small fw-bold text-muted">THAO TÁC</th>
+                        <th class="ps-4 border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">MÃ ĐƠN</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 250px;">KHÁCH HÀNG / ĐỊA CHỈ</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">NHÂN VIÊN PHỤ TRÁCH</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 160px;">THỜI GIAN DỰ KIẾN</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap">TRẠNG THÁI</th>
+                        <th class="pe-4 border-0 text-end small fw-bold text-muted text-nowrap" style="width: 150px;">THAO TÁC</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($installations as $inst)
                         <tr>
-                            <td class="ps-4 fw-bold text-primary">{{ $inst->code }}</td>
+                            <td class="ps-4 fw-bold text-primary text-nowrap">{{ $inst->code }}</td>
                             <td>
                                 <div class="fw-bold text-dark">{{ $inst->building->name ?? 'N/A' }}</div>
                                 <div class="small text-muted"><i class="fas fa-map-marker-alt me-1"></i> {{ $inst->building->address ?? 'N/A' }}</div>
@@ -118,12 +143,12 @@
                                     <div class="staff-avatar-circle">
                                         {{ strtoupper(substr($inst->staff->name ?? 'A', 0, 1)) }}
                                     </div>
-                                    <span class="small fw-bold">{{ $inst->staff->name ?? 'Chưa giao' }}</span>
+                                    <span class="small fw-bold text-nowrap">{{ $inst->staff->name ?? 'Chưa giao' }}</span>
                                 </div>
                             </td>
                             <td class="small">
-                                <div>Bắt đầu: <span class="text-dark fw-bold">{{ $inst->start_date ? $inst->start_date->format('Y-m-d') : '---' }}</span></div>
-                                <div class="text-muted">Dự kiến: {{ $inst->due_date ? $inst->due_date->format('Y-m-d') : '---' }}</div>
+                                <div class="text-nowrap">Bắt đầu: <span class="text-dark fw-bold">{{ $inst->start_date ? $inst->start_date->format('Y-m-d') : '---' }}</span></div>
+                                <div class="text-muted text-nowrap">Dự kiến: {{ $inst->due_date ? $inst->due_date->format('Y-m-d') : '---' }}</div>
                             </td>
                             <td>
                                 @if($inst->status == 'in_progress')

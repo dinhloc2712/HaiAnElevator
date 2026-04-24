@@ -41,7 +41,7 @@
                 {{-- Add Button --}}
                 @can('create_role')
                 <a href="{{ route('admin.roles.create') }}" class="btn-add">
-                    <i class="fas fa-plus me-1"></i> Thêm chức vụ
+                    <i class="fas fa-plus me-md-1"></i><span class="d-none d-md-inline"> Thêm chức vụ</span>
                 </a>
                 @endcan
             </form>

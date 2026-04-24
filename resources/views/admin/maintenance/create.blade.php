@@ -165,36 +165,6 @@
                     </div>
                 </div>
 
-                {{-- Checklist Items Section --}}
-                <div class="mb-4">
-                    @foreach($sections as $sectionName => $items)
-                        <div class="checklist-section-title">
-                            <div class="section-pill"></div>
-                            <h5>{{ $sectionName }}</h5>
-                        </div>
-                        <div class="row">
-                            @foreach($items as $id => $name)
-                                <div class="col-md-6">
-                                    <div class="checklist-item-card">
-                                        <div class="item-name-row">
-                                            <div class="item-dot"></div>
-                                            <div class="item-label">{{ $name }}</div>
-                                        </div>
-                                        <div class="status-selector mt-2">
-                                            <select name="results[{{ $id }}]" class="form-select modern-select w-100">
-                                                @foreach($symbols as $statusId => $statusName)
-                                                    <option value="{{ $statusId }}" {{ $loop->first ? 'selected' : '' }}>
-                                                        {{ $statusName }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>
 
                 {{-- Evaluation & Signatures --}}
                 <div class="tech-card mb-4">

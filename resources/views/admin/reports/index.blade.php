@@ -193,10 +193,13 @@
     <!-- TAB 2: DANH SÁCH BẢO TRÌ -->
     <div class="tab-pane fade" id="maintenance" role="tabpanel">
         <div class="report-card p-0 overflow-hidden">
-            <div class="p-4 border-bottom">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="fw-bold text-dark mb-0 d-flex align-items-center">
                     <i class="far fa-calendar-alt text-primary me-2"></i> Danh sách thang máy cần bảo trì {{ $strMonthYear }}
                 </h5>
+                <a href="{{ route('admin.reports.export_maintenance', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-outline-success fw-bold px-3 shadow-sm">
+                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                </a>
             </div>
             <div class="table-responsive">
                 <table class="table table-report">
@@ -254,10 +257,13 @@
     <!-- TAB 3: CÔNG VIỆC NHÂN VIÊN -->
     <div class="tab-pane fade" id="staff" role="tabpanel">
         <div class="report-card p-0 overflow-hidden">
-            <div class="p-4 border-bottom">
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="fw-bold text-dark mb-0 d-flex align-items-center">
                     <i class="fas fa-users text-primary me-2"></i> Tổng hợp công việc nhân viên {{ $strMonthYear }}
                 </h5>
+                <a href="{{ route('admin.reports.export_staff', ['month' => $month, 'year' => $year]) }}" class="btn btn-sm btn-outline-success fw-bold px-3 shadow-sm">
+                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                </a>
             </div>
             <div class="table-responsive">
                 <table class="table table-report text-center" style="vertical-align: middle;">

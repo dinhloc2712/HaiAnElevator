@@ -231,7 +231,7 @@
         </div>
         @can('create_incident')
             <a href="{{ route('admin.incidents.create') }}" class="btn btn-danger fw-bold rounded-3 px-4 py-2 shadow-sm">
-                <i class="fas fa-plus me-2"></i> Báo sự cố mới
+                <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Báo sự cố mới</span>
             </a>
         @endcan
     </div>

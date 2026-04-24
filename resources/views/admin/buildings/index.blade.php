@@ -15,7 +15,7 @@
             <i class="fas fa-file-import me-2"></i>Import Excel
         </button>
         <a href="{{ route('admin.buildings.create') }}" class="btn btn-add">
-            <i class="fas fa-plus me-2"></i>Thêm tòa nhà
+            <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Thêm tòa nhà</span>
         </a>
     </div>
 </div>

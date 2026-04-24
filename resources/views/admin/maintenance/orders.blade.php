@@ -11,7 +11,7 @@
     </div>
     @can('create_maintenance_order')
         <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#createOrderModal">
-            <i class="fas fa-plus me-2"></i>Tạo đơn mới
+            <i class="fas fa-plus me-md-2"></i><span class="d-none d-md-inline"> Tạo đơn mới</span>
         </button>
     @endcan
 </div>

@@ -17,17 +17,23 @@ class Elevator extends Model
         'customer_phone',
         'province',
         'district',
+        'address',
         'manufacturer',
         'model',
         'type',
         'capacity',
+        'floors',
         'cycle_days',
         'status',
+        'note',
+        'map',
         'maintenance_deadline',
+        'maintenance_end_date',
     ];
 
     protected $casts = [
         'maintenance_deadline' => 'date',
+        'maintenance_end_date' => 'date',
     ];
 
     public function building()
