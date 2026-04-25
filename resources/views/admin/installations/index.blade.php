@@ -3,36 +3,39 @@
 @section('title', 'Lắp đặt thang máy')
 
 @section('styles')
-<style>
-    .table-responsive {
-        min-height: 350px; 
-        border-radius: 0 0 12px 12px;
-    }
-    .table thead th {
-        letter-spacing: 0.5px;
-        background: #f8f9fc;
-        padding-top: 15px;
-        padding-bottom: 15px;
-    }
-    .table tbody td {
-        padding-top: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #f1f3f9;
-    }
-    .staff-avatar-circle {
-        width: 32px;
-        height: 32px;
-        background: #e3f2fd;
-        color: #0d6efd;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.75rem;
-        margin-right: 10px;
-    }
-</style>
+    <style>
+        .table-responsive {
+            min-height: 350px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .table thead th {
+            letter-spacing: 0.5px;
+            background: #f8f9fc;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .table tbody td {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f1f3f9;
+        }
+
+        .staff-avatar-circle {
+            width: 32px;
+            height: 32px;
+            background: #e3f2fd;
+            color: #0d6efd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -103,18 +106,37 @@
                     <span>Danh sách đơn lắp đặt</span>
                 </h6>
 
-                <div class="d-flex align-items-center flex-wrap gap-2 w-100 w-sm-auto justify-content-md-end">
+                <form action="{{ route('admin.installations.index') }}" method="GET"
+                    class="d-flex align-items-center flex-wrap gap-2 w-100 w-sm-auto justify-content-md-end">
                     {{-- Quick Search --}}
-                    <div class="bg-light rounded-pill px-3 py-1 d-flex align-items-center flex-grow-1" style="min-width: 250px;">
+                    <div class="bg-light rounded-pill px-3 py-1 d-flex align-items-center flex-grow-1"
+                        style="min-width: 250px;">
                         <i class="fas fa-search text-muted me-2"></i>
-                        <input type="text" class="form-control border-0 bg-transparent shadow-none small" 
-                               placeholder="Tìm kiếm khách hàng, mã..." style="font-size: 0.85rem;">
+                        <input type="text" name="search" class="form-control border-0 bg-transparent shadow-none small"
+                            placeholder="Tìm kiếm khách hàng, mã..." style="font-size: 0.85rem;"
+                            value="{{ request('search') }}">
                     </div>
-                    <button class="btn btn-outline-secondary rounded-pill px-3 fw-bold flex-shrink-0 shadow-sm d-flex align-items-center" 
-                            style="font-size: 0.8rem; background: white;">
+                    <select name="status" class="form-select border-0 bg-light rounded-pill px-3 py-1 small shadow-none"
+                        style="width: 140px; font-size: 0.85rem;">
+                        <option value="">Tất cả</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Chờ giao</option>
+                        <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Đang lắp
+                        </option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Đã xong</option>
+                    </select>
+                    <button type="submit"
+                        class="btn btn-primary rounded-pill px-3 fw-bold flex-shrink-0 shadow-sm d-flex align-items-center"
+                        style="font-size: 0.8rem;">
                         <i class="fas fa-filter me-1"></i> Lọc
                     </button>
-                </div>
+                    @if (request()->anyFilled(['search', 'status']))
+                        <a href="{{ route('admin.installations.index') }}"
+                            class="btn btn-light rounded-pill px-3 fw-bold flex-shrink-0 shadow-sm text-muted"
+                            style="font-size: 0.8rem;">
+                            Xóa lọc
+                        </a>
+                    @endif
+                </form>
             </div>
         </div>
 
@@ -123,11 +145,15 @@
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4 border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">MÃ ĐƠN</th>
-                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 250px;">KHÁCH HÀNG / ĐỊA CHỈ</th>
-                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">NHÂN VIÊN PHỤ TRÁCH</th>
-                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 160px;">THỜI GIAN DỰ KIẾN</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 250px;">KHÁCH HÀNG / ĐỊA
+                            CHỈ</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">NHÂN VIÊN PHỤ
+                            TRÁCH</th>
+                        <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 160px;">THỜI GIAN DỰ
+                            KIẾN</th>
                         <th class="border-0 small fw-bold text-muted text-nowrap">TRẠNG THÁI</th>
-                        <th class="pe-4 border-0 text-end small fw-bold text-muted text-nowrap" style="width: 150px;">THAO TÁC</th>
+                        <th class="pe-4 border-0 text-end small fw-bold text-muted text-nowrap" style="width: 150px;">THAO
+                            TÁC</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -136,7 +162,8 @@
                             <td class="ps-4 fw-bold text-primary text-nowrap">{{ $inst->code }}</td>
                             <td>
                                 <div class="fw-bold text-dark">{{ $inst->building->name ?? 'N/A' }}</div>
-                                <div class="small text-muted"><i class="fas fa-map-marker-alt me-1"></i> {{ $inst->building->address ?? 'N/A' }}</div>
+                                <div class="small text-muted"><i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ $inst->building->address ?? 'N/A' }}</div>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -147,11 +174,14 @@
                                 </div>
                             </td>
                             <td class="small">
-                                <div class="text-nowrap">Bắt đầu: <span class="text-dark fw-bold">{{ $inst->start_date ? $inst->start_date->format('Y-m-d') : '---' }}</span></div>
-                                <div class="text-muted text-nowrap">Dự kiến: {{ $inst->due_date ? $inst->due_date->format('Y-m-d') : '---' }}</div>
+                                <div class="text-nowrap">Bắt đầu: <span
+                                        class="text-dark fw-bold">{{ $inst->start_date ? $inst->start_date->format('Y-m-d') : '---' }}</span>
+                                </div>
+                                <div class="text-muted text-nowrap">Dự kiến:
+                                    {{ $inst->due_date ? $inst->due_date->format('Y-m-d') : '---' }}</div>
                             </td>
                             <td>
-                                @if($inst->status == 'in_progress')
+                                @if ($inst->status == 'in_progress')
                                     <span class="badge-pill-modern badge-status-in-progress">Đang lắp</span>
                                 @elseif($inst->status == 'pending')
                                     <span class="badge-pill-modern badge-status-pending">Chờ giao</span>
@@ -161,20 +191,21 @@
                             </td>
                             <td class="pe-4 text-end">
                                 <div class="d-flex justify-content-end align-items-center gap-2">
-                                    @if($inst->status == 'pending')
+                                    @if ($inst->status == 'pending')
                                         @can('update_installation')
                                             <form action="{{ route('admin.installations.start', $inst->id) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" style="font-size: 0.75rem;">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold"
+                                                    style="font-size: 0.75rem;">
                                                     <i class="fas fa-play me-1"></i> Bắt đầu lắp đặt
                                                 </button>
                                             </form>
                                         @endcan
                                     @elseif($inst->status == 'in_progress')
                                         @can('update_installation')
-                                            <button type="button" class="btn-ghost-complete open-complete-modal" 
-                                                data-id="{{ $inst->id }}"
-                                                data-code="{{ $inst->code }}"
+                                            <button type="button" class="btn-ghost-complete open-complete-modal"
+                                                data-id="{{ $inst->id }}" data-code="{{ $inst->code }}"
                                                 data-building="{{ $inst->building->name ?? '' }}"
                                                 data-branch="{{ $inst->branch->name ?? 'N/A' }}">
                                                 <i class="far fa-check-circle me-1"></i> Hoàn thành
@@ -182,20 +213,28 @@
                                         @endcan
                                     @endif
                                     <div class="dropdown {{ $loop->last ? 'dropup' : '' }}">
-                                        <button class="btn btn-link text-muted p-0 shadow-none" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-strategy="fixed">
+                                        <button class="btn btn-link text-muted p-0 shadow-none" data-bs-toggle="dropdown"
+                                            data-bs-boundary="viewport" data-bs-strategy="fixed">
                                             <i class="fas fa-ellipsis-h"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                             @can('update_installation')
-                                                <li><a class="dropdown-item small" href="{{ route('admin.installations.edit', $inst->id) }}"><i class="fas fa-edit me-2"></i> Chỉnh sửa</a></li>
+                                                <li><a class="dropdown-item small"
+                                                        href="{{ route('admin.installations.edit', $inst->id) }}"><i
+                                                            class="fas fa-edit me-2"></i> Chỉnh sửa</a></li>
                                             @endcan
                                             @can('delete_installation')
-                                                <li><hr class="dropdown-divider"></li>
                                                 <li>
-                                                    <form action="{{ route('admin.installations.destroy', $inst->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('admin.installations.destroy', $inst->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="dropdown-item small text-danger"><i class="fas fa-trash-alt me-2"></i> Xóa</button>
+                                                        <button type="submit" class="dropdown-item small text-danger"><i
+                                                                class="fas fa-trash-alt me-2"></i> Xóa</button>
                                                     </form>
                                                 </li>
                                             @endcan
@@ -209,7 +248,8 @@
                             <td colspan="6" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fa-3x mb-3 opacity-25"></i>
                                 <p class="mb-0">Chưa có đơn lắp đặt nào.</p>
-                                <a href="{{ route('admin.installations.create') }}" class="btn btn-primary btn-sm mt-3 rounded-pill px-4">Tạo đơn ngay</a>
+                                <a href="{{ route('admin.installations.create') }}"
+                                    class="btn btn-primary btn-sm mt-3 rounded-pill px-4">Tạo đơn ngay</a>
                             </td>
                         </tr>
                     @endforelse
@@ -217,7 +257,7 @@
             </table>
         </div>
 
-        @if($installations->hasPages())
+        @if ($installations->hasPages())
             <div class="card-footer bg-white border-0 py-3">
                 {{ $installations->links() }}
             </div>
@@ -232,57 +272,71 @@
                     <h5 class="modal-title fw-bold">
                         <i class="fas fa-elevator me-2"></i> Đăng ký thang máy & Hoàn thành lắp đặt
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <form id="completeForm" method="POST">
                     @csrf
                     <div class="modal-body p-4">
                         <div class="alert alert-info border-0 rounded-4 mb-4 small">
-                            <i class="fas fa-info-circle me-2"></i> 
-                            Đơn lắp đặt <strong id="modal_inst_code"></strong> cho <strong id="modal_building"></strong> sẽ được đánh dấu là 
+                            <i class="fas fa-info-circle me-2"></i>
+                            Đơn lắp đặt <strong id="modal_inst_code"></strong> cho <strong id="modal_building"></strong>
+                            sẽ được đánh dấu là
                             <strong>Đã xong</strong> sau khi bạn đăng ký thông tin thang máy dưới đây.
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Mã thang máy</label>
-                                <input type="text" name="elevator_code" class="form-control bg-light border-0 p-3 rounded-4 fw-bold" placeholder="Ví dụ: TH-001" required>
+                                <input type="text" name="elevator_code"
+                                    class="form-control bg-light border-0 p-3 rounded-4 fw-bold"
+                                    placeholder="Ví dụ: TH-001" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Hãng sản xuất</label>
-                                <input type="text" name="manufacturer" class="form-control bg-light border-0 p-3 rounded-4" placeholder="Ví dụ: Mitsubishi, Fuji...">
+                                <input type="text" name="manufacturer"
+                                    class="form-control bg-light border-0 p-3 rounded-4"
+                                    placeholder="Ví dụ: Mitsubishi, Fuji...">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Model</label>
-                                <input type="text" name="model" class="form-control bg-light border-0 p-3 rounded-4">
+                                <input type="text" name="model"
+                                    class="form-control bg-light border-0 p-3 rounded-4">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Loại thang</label>
-                                <input type="text" name="type" class="form-control bg-light border-0 p-3 rounded-4">
+                                <input type="text" name="type"
+                                    class="form-control bg-light border-0 p-3 rounded-4">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Tải trọng (kg)</label>
-                                <input type="text" name="capacity" class="form-control bg-light border-0 p-3 rounded-4">
+                                <input type="text" name="capacity"
+                                    class="form-control bg-light border-0 p-3 rounded-4">
                             </div>
-                            
+
                             <hr class="my-4 opacity-5">
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Tỉnh / Thành phố</label>
-                                <input type="text" name="province" class="form-control bg-light border-0 p-3 rounded-4" required>
+                                <input type="text" name="province"
+                                    class="form-control bg-light border-0 p-3 rounded-4" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Quận / Huyện</label>
-                                <input type="text" name="district" class="form-control bg-light border-0 p-3 rounded-4" required>
+                                <input type="text" name="district"
+                                    class="form-control bg-light border-0 p-3 rounded-4" required>
                             </div>
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Chu kỳ bảo trì (Ngày)</label>
-                                <input type="number" name="cycle_days" class="form-control bg-light border-0 p-3 rounded-4" value="30" required>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Chu kỳ bảo trì
+                                    (Ngày)</label>
+                                <input type="number" name="cycle_days"
+                                    class="form-control bg-light border-0 p-3 rounded-4" value="30" required>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer p-4 bg-light border-0">
-                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none"
+                            data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
                             <i class="fas fa-check-circle me-2"></i> Lưu & Hoàn thành
                         </button>
@@ -307,16 +361,18 @@
                     const id = this.getAttribute('data-id');
                     const code = this.getAttribute('data-code');
                     const building = this.getAttribute('data-building');
-                    
+
                     // Set form action
                     completeForm.action = `/admin/installations/${id}/complete`;
-                    
+
                     // Set display info
                     instCodeSpan.textContent = code;
                     buildingSpan.textContent = building;
-                    
+
                     // Clear previous inputs if any (except cycle_days)
-                    completeForm.querySelectorAll('input:not([name="_token"]):not([name="cycle_days"])').forEach(input => {
+                    completeForm.querySelectorAll(
+                        'input:not([name="_token"]):not([name="cycle_days"])').forEach(
+                    input => {
                         input.value = '';
                     });
 

@@ -44,12 +44,7 @@
                     <input type="text" name="contact_phone" class="form-control"
                            value="{{ old('contact_phone', $building->contact_phone) }}">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Số lượng thang máy</label>
-                    <input type="number" name="elevator_count" class="form-control"
-                           value="{{ old('elevator_count', $building->elevator_count) }}" min="0">
-                </div>
-                <div class="col-md-8 d-flex align-items-end">
+                <div class="col-md-12 d-flex align-items-end">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
                                value="1" {{ $building->is_active ? 'checked' : '' }}>

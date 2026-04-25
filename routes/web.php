@@ -75,9 +75,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateOrder'])->name('maintenance.orders.update');
     Route::get('maintenance/{maintenance}/export', [\App\Http\Controllers\Admin\MaintenanceController::class, 'export'])->name('maintenance.export');
     Route::post('maintenance/{maintenance}/start', [\App\Http\Controllers\Admin\MaintenanceController::class, 'start'])->name('maintenance.start');
+    Route::get('maintenance/due', [\App\Http\Controllers\Admin\MaintenanceController::class, 'due'])->name('maintenance.due');
+    Route::post('maintenance/bulk-store', [\App\Http\Controllers\Admin\MaintenanceController::class, 'bulkStore'])->name('maintenance.bulk_store');
     Route::resource('maintenance', \App\Http\Controllers\Admin\MaintenanceController::class);
     Route::resource('incidents', \App\Http\Controllers\Admin\IncidentController::class);
     
+    // Trash Management
+    Route::get('trash', [\App\Http\Controllers\Admin\TrashController::class, 'index'])->name('trash.index');
+    Route::post('trash/{type}/{id}/restore', [\App\Http\Controllers\Admin\TrashController::class, 'restore'])->name('trash.restore');
+    Route::delete('trash/{type}/{id}/force-delete', [\App\Http\Controllers\Admin\TrashController::class, 'forceDelete'])->name('trash.force_delete');
+
     // Maintenance Settings
     Route::get('maintenance-settings', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'index'])->name('maintenance.settings');
     Route::post('maintenance-settings/categories', [\App\Http\Controllers\Admin\MaintenanceSettingController::class, 'storeCategory'])->name('maintenance.categories.store');

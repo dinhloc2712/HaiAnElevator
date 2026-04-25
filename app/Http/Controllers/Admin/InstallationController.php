@@ -14,17 +14,45 @@ class InstallationController extends Controller
     /**
      * Display a listing of the installation orders.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('view_installation');
-        $installations = Installation::with(['building', 'staff', 'branch'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = Installation::with(['building', 'staff', 'branch']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                  ->orWhereHas('building', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%")
+                         ->orWhere('customer_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Check permissions: if user cannot create, they only see assigned tasks
+        if (!auth()->user()->can('create_installation')) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $installations = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        // Stats Query
+        $statsQuery = Installation::query();
+        if (!auth()->user()->can('create_installation')) {
+            $statsQuery->where('user_id', auth()->id());
+        }
 
         $stats = [
-            'in_progress' => Installation::where('status', 'in_progress')->count(),
-            'pending' => Installation::where('status', 'pending')->count(),
-            'completed' => Installation::where('status', 'completed')->count(),
+            'in_progress' => (clone $statsQuery)->where('status', 'in_progress')->count(),
+            'pending' => (clone $statsQuery)->where('status', 'pending')->count(),
+            'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
         ];
 
         return view('admin.installations.index', compact('installations', 'stats'));

@@ -33,6 +33,10 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
+        .container-fluid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
     </style>
     @yield('styles')
 </head>
@@ -150,14 +154,14 @@
                 <!-- System Admin -->
                 @if (auth()->user()->can('view_user') || auth()->user()->can('view_role') || auth()->user()->can('view_branch'))
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') ? 'active' : '' }}"
+                        <a class="nav-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'active' : '' }}"
                             data-bs-toggle="collapse" href="#adminSubmenu" role="button"
-                            aria-expanded="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') ? 'true' : 'false' }}">
+                            aria-expanded="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'true' : 'false' }}">
                             <i class="fas fa-user-shield"></i>
                             <span>Quản trị hệ thống</span>
                             <i class="fas fa-chevron-down ms-auto arrow" style="font-size: 0.8rem; width: auto;"></i>
                         </a>
-                        <div class="collapse {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') ? 'show' : '' }}"
+                        <div class="collapse {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'show' : '' }}"
                             id="adminSubmenu" data-bs-parent="#sidebarAccordion">
                             <ul class="nav flex-column collapse-menu">
                                 @can('view_user')
@@ -184,6 +188,12 @@
                                         </a>
                                     </li>
                                 @endcan
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('admin.trash.*') ? 'active' : '' }}"
+                                        href="{{ route('admin.trash.index') }}">
+                                        <i class="fas fa-trash-alt"></i> <span>Thùng rác</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -347,7 +357,7 @@
             </div>
         </nav>
 
-        <div class="container-fluid px-4">
+        <div class="container-fluid px-0">
             @yield('content')
         </div>
     </div>

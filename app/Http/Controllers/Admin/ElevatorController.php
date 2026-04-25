@@ -267,7 +267,15 @@ class ElevatorController extends Controller
     public function destroy(Elevator $elevator)
     {
         $this->authorize('delete_elevator');
+        
+        $buildingId = $elevator->building_id;
+        
         $elevator->delete();
+
+        if ($buildingId) {
+            Building::find($buildingId)?->decrement('elevator_count');
+        }
+
         return redirect()->route('admin.elevators.index')->with('success', 'Đã xóa thang máy.');
     }
 

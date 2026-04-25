@@ -8,12 +8,30 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
+use App\Models\MaintenanceCheck;
+
 class ProfileController extends Controller
 {
     public function show()
     {
         $user = auth()->user();
-        return view('admin.profile.show', compact('user'));
+        
+        $staffUpcomingMaintenance = collect();
+        if ($user->role?->name !== 'admin') {
+            $staffUpcomingMaintenance = MaintenanceCheck::with('elevator.building')
+                ->where(function($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->orWhereJsonContains('staff_ids', (string) $user->id)
+                      ->orWhereJsonContains('staff_ids', $user->id);
+                })
+                ->whereBetween('check_date', [now()->startOfDay(), now()->addDays(7)->endOfDay()])
+                ->whereIn('status', ['pending', 'in_progress'])
+                ->orderBy('check_date', 'asc')
+                ->take(5)
+                ->get();
+        }
+
+        return view('admin.profile.show', compact('user', 'staffUpcomingMaintenance'));
     }
 
     public function edit()

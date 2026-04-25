@@ -362,7 +362,16 @@
                                 <th class="ps-4 border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">MÃ THANG</th>
                                 <th class="border-0 small fw-bold text-muted text-nowrap" style="width: 150px;">LOẠI BẢO TRÌ</th>
                                 <th class="border-0 small fw-bold text-muted text-nowrap" style="width: 120px;">TRẠNG THÁI</th>
-                                <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">THỜI GIAN</th>
+                                <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 180px;">
+                                    <a href="{{ route('admin.maintenance.index', ['sort' => $sort == 'asc' ? 'desc' : 'asc']) }}" class="text-muted text-decoration-none">
+                                        THỜI GIAN 
+                                        @if($sort == 'asc')
+                                            <i class="fas fa-sort-amount-down-alt ms-1"></i>
+                                        @else
+                                            <i class="fas fa-sort-amount-up ms-1"></i>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 150px;">NHÂN VIÊN</th>
                                 <th class="border-0 small fw-bold text-muted text-nowrap" style="min-width: 250px;">ĐỊA ĐIỂM</th>
                                 <th class="pe-4 border-0 text-end small fw-bold text-muted text-nowrap" style="width: 180px;">THAO TÁC</th>

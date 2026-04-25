@@ -141,9 +141,7 @@
                 </a>
             </div>
             
-            <button class="btn btn-primary fw-bold rounded-3 px-4 shadow-sm" onclick="window.print()">
-                <i class="fas fa-file-download me-2"></i> Xuất dữ liệu
-            </button>
+            </div>
         </div>
     </div>
 </div>

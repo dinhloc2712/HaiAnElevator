@@ -49,7 +49,9 @@ class BuildingController extends Controller
         ]);
 
         $validated['is_active']      = $request->boolean('is_active', true);
-        $validated['elevator_count'] = $request->input('elevator_count', 0);
+        if (!isset($validated['elevator_count'])) {
+            $validated['elevator_count'] = 0;
+        }
 
         Building::create($validated);
 
@@ -77,7 +79,8 @@ class BuildingController extends Controller
         ]);
 
         $validated['is_active']      = $request->boolean('is_active', true);
-        $validated['elevator_count'] = $request->input('elevator_count', 0);
+        // Do not update elevator_count here as it is managed automatically
+        unset($validated['elevator_count']);
 
         $building->update($validated);
 
@@ -117,8 +120,7 @@ class BuildingController extends Controller
                     'address'        => $row[2] ?? null,
                     'contact_name'   => $row[3] ?? null,
                     'contact_phone'  => $row[4] ?? null,
-                    'elevator_count' => is_numeric($row[5]) ? intval($row[5]) : 0,
-                    'notes'          => $row[6] ?? null,
+                    'notes'          => $row[5] ?? null,
                     'is_active'      => true,
                 ]);
                 $count++;

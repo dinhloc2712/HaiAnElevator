@@ -28,20 +28,43 @@ class MaintenanceController extends Controller
         return \App\Models\MaintenanceStatus::orderBy('sort_order')->pluck('name', 'id')->toArray();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('view_maintenance_schedule');
+        
         // Automatically mark pending tasks as overdue if their scheduled date (or check date) has passed
         MaintenanceCheck::where('status', 'pending')
             ->where('check_date', '<', now()->startOfDay())
             ->whereNotNull('check_date')
             ->update(['status' => 'overdue']);
 
+        // Base Query
+        $query = MaintenanceCheck::with('elevator.building', 'staff');
+
+        // Check permissions: if user cannot create schedule, they only see their own assigned tasks
+        if (!auth()->user()->can('create_maintenance_schedule')) {
+            $query->where(function($q) {
+                $q->where('user_id', auth()->id())
+                  ->orWhereJsonContains('staff_ids', (string)auth()->id());
+            });
+        }
+
+        // Sorting
+        $sort = $request->input('sort', 'asc');
+
         // DASHBOARD STATISTICS
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
-        $monthTasks = MaintenanceCheck::whereBetween('check_date', [$startOfMonth, $endOfMonth])->get();
+        // Stats Query should also be filtered by permission
+        $statsQuery = MaintenanceCheck::whereBetween('check_date', [$startOfMonth, $endOfMonth]);
+        if (!auth()->user()->can('create_maintenance_schedule')) {
+            $statsQuery->where(function($q) {
+                $q->where('user_id', auth()->id())
+                  ->orWhereJsonContains('staff_ids', (string)auth()->id());
+            });
+        }
+        $monthTasks = $statsQuery->get();
 
         $stats = [
             'completed' => $monthTasks->where('status', 'completed')->count(),
@@ -57,23 +80,27 @@ class MaintenanceController extends Controller
         $startOfLastMonth = now()->subMonth()->startOfMonth();
         $endOfLastMonth = now()->subMonth()->endOfMonth();
         
-        $lastMonthTotal = MaintenanceCheck::whereBetween('check_date', [$startOfLastMonth, $endOfLastMonth])->count();
+        $trendQuery = MaintenanceCheck::whereBetween('check_date', [$startOfLastMonth, $endOfLastMonth]);
+        if (!auth()->user()->can('create_maintenance_schedule')) {
+            $trendQuery->where(function($q) {
+                $q->where('user_id', auth()->id())
+                  ->orWhereJsonContains('staff_ids', (string)auth()->id());
+            });
+        }
+        $lastMonthTotal = $trendQuery->count();
             
-        $lastMonthCompleted = MaintenanceCheck::where('status', 'completed')
-            ->whereBetween('check_date', [$startOfLastMonth, $endOfLastMonth])
-            ->count();
+        $lastMonthCompleted = (clone $trendQuery)->where('status', 'completed')->count();
 
         $lastMonthRate = $lastMonthTotal > 0 ? round(($lastMonthCompleted / $lastMonthTotal) * 100) : 0;
         $trend = $stats['completion_rate'] - $lastMonthRate;
 
         $elevators = Elevator::all();
         
-        $upcomingTasks = MaintenanceCheck::with('elevator.building', 'staff')
-            ->orderBy('check_date', 'asc')
-            ->orderBy('start_time', 'asc')
+        $upcomingTasks = $query->orderBy('check_date', $sort)
+            ->orderBy('start_time', $sort)
             ->get();
 
-        return view('admin.maintenance.index', compact('upcomingTasks', 'elevators', 'stats', 'trend'));
+        return view('admin.maintenance.index', compact('upcomingTasks', 'elevators', 'stats', 'trend', 'sort'));
     }
 
     public function orders()
@@ -427,5 +454,54 @@ class MaintenanceController extends Controller
         $this->authorize('delete_maintenance_schedule');
         $maintenance->delete();
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã xóa công việc / lịch bảo trì.');
+    }
+    public function due()
+    {
+        $this->authorize('create_maintenance_schedule');
+        
+        $dueElevators = Elevator::with('building', 'branch')
+            ->whereNotNull('maintenance_deadline')
+            ->whereDate('maintenance_deadline', '<=', now()->addDays(15))
+            ->whereDoesntHave('maintenanceChecks', function($q) {
+                $q->whereIn('status', ['pending', 'in_progress']); 
+            })
+            ->orderBy('maintenance_deadline', 'asc')
+            ->get();
+
+        $staffs = User::all();
+        
+        return view('admin.maintenance.due', compact('dueElevators', 'staffs'));
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $this->authorize('create_maintenance_schedule');
+        $request->validate([
+            'elevator_ids' => 'required|array|min:1',
+            'elevator_ids.*' => 'exists:elevators,id',
+            'check_date' => 'required|date',
+            'staff_ids' => 'nullable|array',
+        ]);
+
+        $staffNamesStr = null;
+        if ($request->staff_ids) {
+            $staffNamesStr = User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+        }
+
+        foreach ($request->elevator_ids as $elevatorId) {
+            MaintenanceCheck::create([
+                'elevator_id'     => $elevatorId,
+                'user_id'         => auth()->id(),
+                'status'          => 'pending',
+                'task_type'       => 'periodic',
+                'check_date'      => $request->check_date,
+                'staff_ids'       => $request->staff_ids,
+                'staff_names'     => $staffNamesStr,
+                'performer_count' => count($request->staff_ids ?? []) ?: 1,
+            ]);
+        }
+
+        return redirect()->route('admin.maintenance.index')
+            ->with('success', 'Đã tạo lịch bảo trì hàng loạt cho ' . count($request->elevator_ids) . ' thang máy.');
     }
 }
