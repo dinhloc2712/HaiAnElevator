@@ -193,7 +193,11 @@ class ElevatorController extends Controller
             }
         }
 
-        Elevator::create($validated);
+        $elevator = Elevator::create($validated);
+
+        if ($elevator->building_id) {
+            Building::find($elevator->building_id)?->increment('elevator_count');
+        }
 
         return redirect()->route('admin.elevators.index')->with('success', 'Thang máy đã được thêm thành công.');
     }

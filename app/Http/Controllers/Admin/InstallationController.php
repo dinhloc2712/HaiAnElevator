@@ -185,6 +185,11 @@ class InstallationController extends Controller
 
             // Update Installation Status
             $installation->update(['status' => 'completed']);
+
+            // Update Building elevator count
+            if ($installation->building) {
+                $installation->building->increment('elevator_count');
+            }
         });
 
         return redirect()->route('admin.installations.index')
