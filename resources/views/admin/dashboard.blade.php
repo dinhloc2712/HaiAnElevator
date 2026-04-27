@@ -166,9 +166,9 @@
 
     {{-- Banner cho Admin: Thang máy đến hạn/quá hạn bảo trì --}}
     @if ($isAdmin && $overdueElevators->count() > 0)
-        <div class="mb-4"
-            style="background:#fff5f5;border:1px solid #fed7d7;border-left:4px solid #e53e3e;border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;animation:slideInBanner 0.4s ease;">
-            <div style="display:flex;align-items:center;gap:14px;">
+        <div class="mb-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3"
+            style="background:#fff5f5;border:1px solid #fed7d7;border-left:4px solid #e53e3e;border-radius:12px;padding:14px 20px;animation:slideInBanner 0.4s ease;">
+            <div class="d-flex align-items-center gap-3">
                 <div
                     style="width:40px;height:40px;background:#fed7d7;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                     <i class="fas fa-bell" style="color:#e53e3e;font-size:1.1rem;"></i>
@@ -180,11 +180,13 @@
                     </div>
                 </div>
             </div>
-            <a href="{{ route('admin.maintenance.due') }}"
-                style="background:#e53e3e;color:#fff;border-radius:8px;padding:7px 18px;font-size:0.85rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:opacity 0.2s;"
-                onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-                Xem tất cả
-            </a>
+            <div class="ms-auto ms-md-0">
+                <a href="{{ route('admin.maintenance.due') }}"
+                    style="background:#e53e3e;color:#fff;border-radius:8px;padding:7px 18px;font-size:0.85rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:opacity 0.2s;"
+                    onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                    Xem tất cả
+                </a>
+            </div>
         </div>
     @endif
 

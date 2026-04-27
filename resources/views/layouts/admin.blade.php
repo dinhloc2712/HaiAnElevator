@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
+    
+    <!-- PWA & iOS Notification Support -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hải An">
+    <link rel="apple-touch-icon" href="/logo.png">
+
     <title>@yield('title', 'Quản trị hệ thống') - Hải An Elevator</title>
 
     <!-- Fonts -->
@@ -213,9 +221,9 @@
                 </div>
             </a>
 
-            <form action="{{ route('logout') }}" method="POST" class="mt-2">
+            <form action="{{ route('logout') }}" method="POST" class="mt-1">
                 @csrf
-                <button type="submit" class="nav-link w-100 bg-transparent border-0 text-start">
+                <button type="submit" class="nav-link w-100 bg-transparent border-0 text-start py-2">
                     <i class="fas fa-sign-out-alt text-danger"></i>
                     <span>Đăng xuất</span>
                 </button>

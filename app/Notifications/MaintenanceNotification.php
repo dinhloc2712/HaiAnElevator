@@ -62,9 +62,12 @@ class MaintenanceNotification extends Notification
     {
         return (new WebPushMessage)
             ->title($this->title)
-            ->icon(url('/logo.png')) // Use absolute URL for icons
+            ->icon(url('/logo.png'))
+            ->badge(url('/logo.png'))
             ->body($this->body)
+            ->tag('maintenance-notif-' . $this->type)
+            ->renotify()
             ->action('Xem chi tiết', 'view_action')
-            ->data(['url' => $this->url]); // Use data() instead of options()
+            ->data(['url' => $this->url]);
     }
 }

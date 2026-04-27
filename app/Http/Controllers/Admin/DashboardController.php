@@ -149,7 +149,7 @@ class DashboardController extends Controller
             ->whereNotNull('maintenance_deadline')
             ->whereDate('maintenance_deadline', '<=', now()->addDays(15))
             ->whereDoesntHave('maintenanceChecks', function($q) {
-                $q->whereIn('status', ['pending', 'in_progress']); 
+                $q->whereIn('status', ['pending', 'in_progress', 'overdue']); 
             })
             ->orderBy('maintenance_deadline', 'asc')
             ->get();

@@ -179,6 +179,18 @@ class ElevatorController extends Controller
             'maintenance_end_date' => 'nullable|date',
         ]);
 
+        // Tự động tạo tòa nhà nếu chưa chọn nhưng có thông tin khách hàng
+        if (empty($validated['building_id']) && !empty($validated['customer_name'])) {
+            $building = Building::create([
+                'name'           => $validated['customer_name'],
+                'customer_name'  => $validated['customer_name'],
+                'contact_phone'  => $validated['customer_phone'],
+                'address'        => $validated['address'] ?? '',
+                'is_active'      => true,
+            ]);
+            $validated['building_id'] = $building->id;
+        }
+
         // Custom Validation Logic
         if ($request->filled('maintenance_deadline') && $request->filled('maintenance_end_date')) {
             $deadline = Carbon::parse($request->maintenance_deadline);
