@@ -6,13 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}">
-    
-    <!-- PWA & iOS Notification Support -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Hải An">
-    <link rel="apple-touch-icon" href="/logo.png">
 
     <title>@yield('title', 'Quản trị hệ thống') - Hải An Elevator</title>
 
@@ -34,6 +27,15 @@
     <link href="{{ asset('css/admin-pro-tech.css') }}" rel="stylesheet">
     <!-- Admin Shared Components CSS -->
     <link href="{{ asset('css/admin-shared.css') }}" rel="stylesheet">
+    <!-- PWA / Add to Home Screen -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4e73df">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hải An">
+    <link rel="apple-touch-icon" href="{{ asset('logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
 
     <style>
         /* Only Critical Initial Load CSS if needed, otherwise empty as we moved to admin-pro-tech.css */
@@ -41,6 +43,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
+
         .container-fluid {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -256,20 +259,37 @@
 
                             // Merge news and notifications for display
                             $displayLimit = 10;
-                            $mergedNotifications = $unreadSysCount > 0 
-                                ? auth()->user()->unreadNotifications->take($displayLimit)->map(function ($item) {
-                                    return (object) [
-                                        'id' => $item->id,
-                                        'title' => $item->data['title'] ?? 'Thông báo hệ thống',
-                                        'body' => $item->data['body'] ?? '',
-                                        'url' => route('admin.notifications.mark-as-read', $item->id),
-                                        'time' => $item->created_at,
-                                        'icon' => $item->data['icon'] ?? 'fas fa-info-circle',
-                                        'color' => 'info',
-                                    ];
-                                })
-                                : collect();
+                            $mergedNotifications =
+                                $unreadSysCount > 0
+                                    ? auth()
+                                        ->user()
+                                        ->unreadNotifications->take($displayLimit)
+                                        ->map(function ($item) {
+                                            return (object) [
+                                                'id' => $item->id,
+                                                'title' => $item->data['title'] ?? 'Thông báo hệ thống',
+                                                'body' => $item->data['body'] ?? '',
+                                                'url' => route('admin.notifications.mark-as-read', $item->id),
+                                                'time' => $item->created_at,
+                                                'icon' => $item->data['icon'] ?? 'fas fa-info-circle',
+                                                'color' => 'info',
+                                            ];
+                                        })
+                                    : collect();
                         @endphp
+                        {{-- Push Notification Toggle --}}
+                        <li class="nav-item mx-1">
+                            <label class="form-switch-tech" title="Thông báo đẩy">
+                                <input type="checkbox" id="push-toggle-input">
+                                <span class="slider"></span>
+                                <script>
+                                    if (localStorage.getItem('push_subscribed') === 'true') {
+                                        document.getElementById('push-toggle-input').checked = true;
+                                    }
+                                </script>
+                            </label>
+                        </li>
+
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle p-2" href="#" id="alertsDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"

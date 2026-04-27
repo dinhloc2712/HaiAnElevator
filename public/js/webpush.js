@@ -3,64 +3,140 @@
  */
 
 const WebPush = {
+    input: null,
+    isSubscribed: false,
+    swRegistration: null,
+
     init() {
+        this.input = document.getElementById('push-toggle-input');
+
+        if (this.input) {
+            // Sync with the state set by the inline script in admin.blade.php
+            this.isSubscribed = this.input.checked;
+        }
+
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
             console.warn('Push messaging is not supported by your browser');
+            if (this.input) this.input.parentElement.style.display = 'none';
             return;
         }
 
         this.registerServiceWorker();
+
+        if (this.input) {
+            this.input.addEventListener('change', () => {
+                this.toggleSubscription();
+            });
+        }
     },
 
     registerServiceWorker() {
         navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
-                console.log('Service Worker registered with scope:', registration.scope);
-                this.checkSubscription(registration);
+                this.swRegistration = registration;
+                this.checkSubscription();
             })
             .catch((error) => {
                 console.error('Service Worker registration failed:', error);
             });
     },
 
-    checkSubscription(registration) {
-        registration.pushManager.getSubscription()
+    checkSubscription() {
+        this.swRegistration.pushManager.getSubscription()
             .then((subscription) => {
-                if (subscription) {
-                    // Already subscribed, send to server to keep it fresh
+                const status = !!subscription;
+                
+                // Only update and save if status changed
+                if (this.isSubscribed !== status) {
+                    this.isSubscribed = status;
+                    this.updateUI();
+                }
+                
+                if (this.isSubscribed) {
                     this.sendSubscriptionToServer(subscription);
-                } else {
-                    // Not subscribed, ask for permission
-                    this.askPermission(registration);
                 }
             });
     },
 
-    askPermission(registration) {
+    updateUI() {
+        if (!this.input) return;
+        this.input.checked = this.isSubscribed;
+        localStorage.setItem('push_subscribed', this.isSubscribed);
+    },
+
+    toggleSubscription() {
+        // Since checkbox already changed state, we check its new state
+        if (this.input.checked) {
+            this.askPermission();
+        } else {
+            this.unsubscribeUser();
+        }
+    },
+
+    askPermission() {
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted') {
-                this.subscribeUser(registration);
+                this.subscribeUser();
             } else {
-                console.log('Notification permission denied');
+                this.isSubscribed = false;
+                this.updateUI();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Quyền thông báo bị chặn',
+                    text: 'Vui lòng cho phép thông báo trong cài đặt trình duyệt để nhận tin tức mới nhất.',
+                    confirmButtonColor: '#3085d6',
+                });
             }
         });
     },
 
-    subscribeUser(registration) {
+    subscribeUser() {
         const vapidPublicKey = document.querySelector('meta[name="vapid-public-key"]').content;
         const applicationServerKey = this.urlBase64ToUint8Array(vapidPublicKey);
 
-        registration.pushManager.subscribe({
+        this.swRegistration.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: applicationServerKey
         })
         .then((subscription) => {
-            console.log('User successfully subscribed:', subscription);
+            this.isSubscribed = true;
+            this.updateUI();
             this.sendSubscriptionToServer(subscription);
+            
+            Toast.fire({
+                icon: 'success',
+                title: 'Đã bật thông báo thành công!'
+            });
         })
         .catch((err) => {
             console.error('Failed to subscribe the user: ', err);
+            this.isSubscribed = false;
+            this.updateUI();
         });
+    },
+
+    unsubscribeUser() {
+        this.swRegistration.pushManager.getSubscription()
+            .then((subscription) => {
+                if (subscription) {
+                    return subscription.unsubscribe();
+                }
+            })
+            .then(() => {
+                this.deleteSubscriptionFromServer();
+                this.isSubscribed = false;
+                this.updateUI();
+                
+                Toast.fire({
+                    icon: 'info',
+                    title: 'Đã tắt thông báo.'
+                });
+            })
+            .catch((error) => {
+                console.error('Error unsubscribing', error);
+                this.isSubscribed = true;
+                this.updateUI();
+            });
     },
 
     sendSubscriptionToServer(subscription) {
@@ -74,17 +150,23 @@ const WebPush = {
             },
             body: JSON.stringify(subscription)
         })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log('Subscription saved on server:', data);
-        })
         .catch((error) => {
             console.error('Error sending subscription to server:', error);
+        });
+    },
+
+    deleteSubscriptionFromServer() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        fetch('/admin/push-subscriptions', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .catch((error) => {
+            console.error('Error deleting subscription from server:', error);
         });
     },
 
