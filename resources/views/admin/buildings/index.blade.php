@@ -46,14 +46,16 @@
                 </thead>
                 <tbody>
                     @forelse($buildings as $building)
-                        <tr>
+                        <tr class="clickable-row" data-href="{{ route('admin.buildings.edit', $building) }}" style="cursor: pointer;">
                             <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="building-icon">
-                                        <i class="fas fa-building"></i>
+                                <a href="{{ route('admin.buildings.edit', $building) }}" class="text-decoration-none">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="building-icon">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <span class="building-name">{{ $building->name }}</span>
                                     </div>
-                                    <span class="building-name">{{ $building->name }}</span>
-                                </div>
+                                </a>
                             </td>
                             <td>
                                 <span class="customer-name">{{ $building->customer_name ?? '—' }}</span>
@@ -174,3 +176,11 @@
         </div>
     </div>
 @endpush
+
+@section('scripts')
+<style>
+    .clickable-row:hover {
+        background-color: rgba(78, 115, 223, 0.05) !important;
+    }
+</style>
+@endsection

@@ -23,6 +23,10 @@
             background-color: #f9fafb;
             color: #2563eb;
         }
+
+        .clickable-row:hover {
+            background-color: rgba(78, 115, 223, 0.05) !important;
+        }
     </style>
 @endsection
 
@@ -308,10 +312,10 @@
                                     </td>
                                 </tr>
                                 @foreach ($elevators as $elevator)
-                                    <tr>
+                                    <tr class="clickable-row" data-href="{{ route('admin.elevators.show', $elevator) }}" style="cursor: pointer;">
                                         <td class="ps-4 text-muted small">{{ $elevator->id }}</td>
                                         <td>
-                                            <a href="{{ route('admin.elevators.edit', $elevator) }}"
+                                            <a href="{{ route('admin.elevators.show', $elevator) }}"
                                                 class="fw-bold text-primary text-decoration-none">{{ $elevator->code }}</a>
                                             @if ($elevator->map)
                                                 <a href="https://www.google.com/maps/search/?api=1&query={{ $elevator->map }}"
@@ -324,9 +328,11 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-dark">
-                                                {{ $elevator->customer_name ?? ($elevator->building->name ?? 'N/A') }}
-                                            </div>
+                                            <a href="{{ route('admin.elevators.show', $elevator) }}" class="text-decoration-none">
+                                                <div class="fw-bold text-dark">
+                                                    {{ $elevator->customer_name ?? ($elevator->building->name ?? 'N/A') }}
+                                                </div>
+                                            </a>
                                             <div class="text-muted small">
                                                 {{ $elevator->customer_phone ?? ($elevator->building->contact_phone ?? '') }}
                                             </div>

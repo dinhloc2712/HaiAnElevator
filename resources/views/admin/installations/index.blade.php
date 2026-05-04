@@ -35,6 +35,10 @@
             font-size: 0.75rem;
             margin-right: 10px;
         }
+
+        .clickable-row:hover {
+            background-color: rgba(78, 115, 223, 0.05) !important;
+        }
     </style>
 @endsection
 
@@ -158,8 +162,12 @@
                 </thead>
                 <tbody>
                     @forelse($installations as $inst)
-                        <tr>
-                            <td class="ps-4 fw-bold text-primary text-nowrap">{{ $inst->code }}</td>
+                        <tr class="clickable-row" data-href="{{ route('admin.installations.edit', $inst->id) }}" style="cursor: pointer;">
+                            <td class="ps-4 fw-bold text-nowrap">
+                                <a href="{{ route('admin.installations.edit', $inst->id) }}" class="text-primary text-decoration-none">
+                                    {{ $inst->code }}
+                                </a>
+                            </td>
                             <td>
                                 <div class="fw-bold text-dark">{{ $inst->building->name ?? 'N/A' }}</div>
                                 <div class="small text-muted"><i class="fas fa-map-marker-alt me-1"></i>

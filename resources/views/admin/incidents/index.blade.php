@@ -220,6 +220,10 @@
         .stat-card-processing .stat-card-value {
             color: #2563eb;
         }
+
+        .clickable-row:hover {
+            background-color: rgba(78, 115, 223, 0.05) !important;
+        }
     </style>
 @endsection
 
@@ -333,8 +337,12 @@
                 </thead>
                 <tbody>
                     @forelse($incidents as $incident)
-                        <tr>
-                            <td class="fw-bold text-dark" style="font-size: 0.9rem;">{{ $incident->code }}</td>
+                        <tr class="clickable-row" data-href="{{ route('admin.incidents.show', $incident->id) }}" style="cursor: pointer;">
+                            <td class="fw-bold" style="font-size: 0.9rem;">
+                                <a href="{{ route('admin.incidents.show', $incident->id) }}" class="text-dark text-decoration-none">
+                                    {{ $incident->code }}
+                                </a>
+                            </td>
                             <td>
                                 <div class="fw-bold text-primary mb-1" style="font-size: 0.85rem;">
                                     {{ $incident->elevator->code ?? 'N/A' }}</div>

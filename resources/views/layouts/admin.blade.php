@@ -554,6 +554,27 @@
                 title: "Vui lòng kiểm tra lại dữ liệu nhập vào."
             });
         @endif
+
+        // Global Clickable Row Handler
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.clickable-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Ignore if clicking on interactive elements or inside modals
+                    if (['A', 'BUTTON', 'INPUT', 'LABEL', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || 
+                        e.target.closest('a') || 
+                        e.target.closest('button') || 
+                        e.target.closest('.modal') ||
+                        e.target.closest('.dropdown-menu') ||
+                        e.target.closest('.fancybox__container')) {
+                        return;
+                    }
+                    const url = this.dataset.href;
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        });
     </script>
     <script src="{{ asset('js/webpush.js') }}"></script>
     @yield('scripts')

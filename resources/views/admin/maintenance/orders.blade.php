@@ -78,12 +78,14 @@
             </thead>
             <tbody>
                 @forelse($orders as $order)
-                <tr>
+                <tr class="clickable-row" data-href="{{ route('admin.maintenance.orders.edit', $order->id) }}" style="cursor: pointer;">
                     <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="far fa-file-alt text-muted"></i>
-                            <span class="fw-bold">{{ $order->code }}</span>
-                        </div>
+                        <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="text-decoration-none">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="far fa-file-alt text-muted"></i>
+                                <span class="fw-bold text-primary">{{ $order->code }}</span>
+                            </div>
+                        </a>
                     </td>
                     <td>
                         <span class="customer-name">{{ $order->building->name ?? '' }}</span>
@@ -358,6 +360,10 @@
     @media (max-width: 576px) {
         .w-sm-100 { width: 100%; margin-bottom: 0.5rem; }
         .mx-2.w-sm-100 { margin-left: 0 !important; margin-right: 0 !important; }
+    }
+
+    .clickable-row:hover {
+        background-color: rgba(78, 115, 223, 0.05) !important;
     }
 </style>
 <script>
