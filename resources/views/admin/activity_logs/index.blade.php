@@ -56,10 +56,60 @@
         'role_id' => 'ID Phân quyền',
         'email' => 'Email',
         'phone' => 'Số điện thoại',
+        'payment_status' => 'Trạng thái thanh toán',
+        'payment_history' => 'Lịch sử thanh toán',
+        'paid_amount' => 'Số tiền đã thanh toán',
+        'remaining_amount' => 'Số tiền còn lại',
         'created_at' => 'Ngày tạo',
         'updated_at' => 'Ngày cập nhật',
         'deleted_at' => 'Ngày xóa',
     ];
+
+    $formatValue = function($val, $key) {
+        if (is_array($val) || is_object($val)) {
+            // Special handling for payment_history
+            if ($key === 'payment_history') {
+                $items = is_object($val) ? [$val] : $val;
+                $output = '';
+                foreach ($items as $item) {
+                    $item = (array)$item;
+                    $date = isset($item['date']) ? date('d/m/Y', strtotime($item['date'])) : 'N/A';
+                    $amount = isset($item['amount']) ? number_format($item['amount']) . 'đ' : '0đ';
+                    $user = $item['user_name'] ?? 'N/A';
+                    $output .= "• {$date}: {$amount} ({$user})\n";
+                }
+                return trim($output) ?: '(Trống)';
+            }
+            return json_encode($val, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        }
+        
+        // Try to decode if it's a JSON string
+        if (is_string($val) && (str_starts_with($val, '[') || str_starts_with($val, '{'))) {
+            $decoded = json_decode($val, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Recursive call for decoded value
+                if (is_array($decoded) || is_object($decoded)) {
+                     // We need to refer to $formatValue inside itself, but in PHP closures we use 'use'
+                     // For Blade simplicity, we can just do a limited version here
+                     if ($key === 'payment_history') {
+                        $items = is_object($decoded) ? [$decoded] : $decoded;
+                        $output = '';
+                        foreach ($items as $item) {
+                            $item = (array)$item;
+                            $date = isset($item['date']) ? date('d/m/Y', strtotime($item['date'])) : 'N/A';
+                            $amount = isset($item['amount']) ? number_format($item['amount']) . 'đ' : '0đ';
+                            $user = $item['user_name'] ?? 'N/A';
+                            $output .= "• {$date}: {$amount} ({$user})\n";
+                        }
+                        return trim($output) ?: '(Trống)';
+                     }
+                     return json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                }
+            }
+        }
+        
+        return $val;
+    };
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -157,6 +207,18 @@
                                         $oldData = $activity->properties['old'] ?? [];
                                         $subjectIdentifier = ($oldData['name'] ?? '') ?: (($oldData['code'] ?? '') ?: (($oldData['customer_name'] ?? '') ?: ('ID: ' . $activity->subject_id . ' - Đã bị xóa')));
                                     }
+
+                                    // Add Elevator code for relevant models (MaintenanceCheck, Incident, etc.)
+                                    $elevatorId = ($activity->subject && isset($activity->subject->elevator_id)) 
+                                        ? $activity->subject->elevator_id 
+                                        : ($activity->properties['attributes']['elevator_id'] ?? ($activity->properties['old']['elevator_id'] ?? null));
+                                    
+                                    if ($elevatorId && $activity->subject_type !== 'App\Models\Elevator') {
+                                        $elevator = \App\Models\Elevator::find($elevatorId);
+                                        if ($elevator) {
+                                            $subjectIdentifier .= " - " . $elevator->code;
+                                        }
+                                    }
                                 @endphp
                                 <strong>{{ $modelNames[$activity->subject_type] ?? class_basename($activity->subject_type) }}</strong>
                                 <div class="text-muted mt-1 small">
@@ -201,14 +263,8 @@
                                                                     @php
                                                                         $oldVal = $old[$key] ?? '';
                                                                         $newVal = $new[$key] ?? '';
-                                                                        
-                                                                        // Format arrays/objects
-                                                                        if (is_array($oldVal) || is_object($oldVal)) {
-                                                                            $oldVal = json_encode($oldVal, JSON_UNESCAPED_UNICODE);
-                                                                        }
-                                                                        if (is_array($newVal) || is_object($newVal)) {
-                                                                            $newVal = json_encode($newVal, JSON_UNESCAPED_UNICODE);
-                                                                        }
+                                                                        $oldVal = $formatValue($oldVal, $key);
+                                                                        $newVal = $formatValue($newVal, $key);
 
                                                                         // Check if changed
                                                                         $isChanged = ($activity->event == 'updated' && $oldVal != $newVal);
@@ -221,18 +277,26 @@
                                                                             @endif
                                                                         </td>
                                                                         <td class="text-danger" style="word-break: break-all;">
-                                                                            @if($activity->event == 'created')
-                                                                                <span class="text-muted fst-italic">-</span>
-                                                                            @else
-                                                                                {{ $oldVal === '' || $oldVal === null ? '(Trống)' : (strlen($oldVal) > 100 ? substr($oldVal, 0, 100) . '...' : $oldVal) }}
-                                                                            @endif
+                                                                             @if($activity->event == 'created')
+                                                                                 <span class="text-muted fst-italic">-</span>
+                                                                             @else
+                                                                                 @if($oldVal === '' || $oldVal === null)
+                                                                                     (Trống)
+                                                                                 @else
+                                                                                     {!! nl2br(e($oldVal)) !!}
+                                                                                 @endif
+                                                                             @endif
                                                                         </td>
                                                                         <td class="text-success" style="word-break: break-all;">
-                                                                            @if($activity->event == 'deleted')
-                                                                                <span class="text-muted fst-italic">-</span>
-                                                                            @else
-                                                                                {{ $newVal === '' || $newVal === null ? '(Trống)' : (strlen($newVal) > 100 ? substr($newVal, 0, 100) . '...' : $newVal) }}
-                                                                            @endif
+                                                                             @if($activity->event == 'deleted')
+                                                                                 <span class="text-muted fst-italic">-</span>
+                                                                             @else
+                                                                                 @if($newVal === '' || $newVal === null)
+                                                                                     (Trống)
+                                                                                 @else
+                                                                                     {!! nl2br(e($newVal)) !!}
+                                                                                 @endif
+                                                                             @endif
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach

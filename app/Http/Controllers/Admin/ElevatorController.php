@@ -195,14 +195,23 @@ class ElevatorController extends Controller
 
         // Tự động tạo tòa nhà nếu chưa chọn nhưng có thông tin khách hàng
         if (empty($validated['building_id']) && !empty($validated['customer_name'])) {
-            $building = Building::create([
-                'name'           => $validated['customer_name'],
-                'customer_name'  => $validated['customer_name'],
-                'contact_phone'  => $validated['customer_phone'],
-                'address'        => $validated['address'] ?? '',
-                'is_active'      => true,
-            ]);
-            $validated['building_id'] = $building->id;
+            // Kiểm tra xem đã có tòa nhà với tên khách hàng và số điện thoại này chưa
+            $existingBuilding = Building::where('customer_name', $validated['customer_name'])
+                ->where('contact_phone', $validated['customer_phone'])
+                ->first();
+
+            if ($existingBuilding) {
+                $validated['building_id'] = $existingBuilding->id;
+            } else {
+                $building = Building::create([
+                    'name'           => $validated['customer_name'],
+                    'customer_name'  => $validated['customer_name'],
+                    'contact_phone'  => $validated['customer_phone'],
+                    'address'        => $validated['address'] ?? '',
+                    'is_active'      => true,
+                ]);
+                $validated['building_id'] = $building->id;
+            }
         }
 
         // Custom Validation Logic
