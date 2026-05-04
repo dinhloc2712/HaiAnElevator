@@ -61,6 +61,7 @@
                                 <tr>
                                     <th class="ps-4">Thông tin</th>
                                     <th>Ngày xóa</th>
+                                    <th>Người xóa</th>
                                     <th class="text-end pe-4">Thao tác</th>
                                 </tr>
                             </thead>
@@ -76,6 +77,17 @@
                                         <td>
                                             <div class="text-dark small">{{ $item->deleted_at->format('d/m/Y H:i') }}</div>
                                             <div class="text-muted smaller">{{ $item->deleted_at->diffForHumans() }}</div>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $modelClass = $modelsMap[$type] ?? null;
+                                                $deleter = $modelClass && isset($deleters[$modelClass][$item->id]) ? $deleters[$modelClass][$item->id] : null;
+                                            @endphp
+                                            @if($deleter)
+                                                <div class="text-dark small"><i class="fas fa-user-times text-danger me-1"></i> {{ $deleter->name }}</div>
+                                            @else
+                                                <div class="text-muted small fst-italic">Không rõ</div>
+                                            @endif
                                         </td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex justify-content-end gap-2">
@@ -97,7 +109,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="text-center py-5">
+                                        <td colspan="4" class="text-center py-5">
                                             <div class="text-muted">
                                                 <i class="fas fa-trash-restore fa-3x mb-3 opacity-25"></i>
                                                 <p class="mb-0">Thùng rác trống</p>

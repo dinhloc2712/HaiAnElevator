@@ -71,7 +71,7 @@
                     <th>Khách hàng</th>
                     <th>Thang máy</th>
                     <th>Ngày tạo</th>
-                    <th class="text-end">Tổng tiền</th>
+                    <th class="text-end">Thanh toán</th>
                     <th class="text-center">Trạng thái</th>
                     <th class="text-end">Thao tác</th>
                 </tr>
@@ -94,24 +94,42 @@
                     <td>
                         {{ $order->created_at->format('Y-m-d') }}
                     </td>
-                    <td class="text-end fw-bold">
-                        {{ number_format($order->total_amount, 0, ',', '.') }} đ
+                    <td class="text-end">
+                        <div class="fw-bold text-dark" title="Tổng tiền">{{ number_format($order->total_amount, 0, ',', '.') }} đ</div>
+                        @if($order->paid_amount > 0)
+                            <div class="small text-success mt-1 fw-semibold" title="Đã thanh toán">
+                                <i class="fas fa-arrow-down me-1"></i>{{ number_format($order->paid_amount, 0, ',', '.') }} đ
+                            </div>
+                            @if($order->total_amount > $order->paid_amount)
+                                <div class="small text-danger fw-semibold" title="Còn nợ">
+                                    <i class="fas fa-exclamation-circle me-1"></i>{{ number_format($order->total_amount - $order->paid_amount, 0, ',', '.') }} đ
+                                </div>
+                            @endif
+                        @endif
                     </td>
                     <td class="text-center">
-                        @if($order->status == 'paid')
-                            <span class="badge-active">Đã thanh toán</span>
-                        @elseif($order->status == 'pending')
-                            <span class="badge-inactive" style="background: #fff4e5; color: #ff9800;">Chờ thanh toán</span>
+                        @if($order->paid_amount >= $order->total_amount && $order->total_amount > 0)
+                            <span class="badge-active bg-success text-white px-3 py-2" style="border-radius: 8px;">Đã thanh toán</span>
+                        @elseif($order->paid_amount > 0)
+                            <span class="badge-inactive px-3 py-2" style="background: #fff4e5; color: #ff9800; border-radius: 8px;">Còn nợ</span>
                         @else
-                            <span class="badge-inactive">{{ $order->status }}</span>
+                            <span class="badge-inactive px-3 py-2" style="background: #f1f5f9; color: #64748b; border-radius: 8px;">Chờ thanh toán</span>
                         @endif
                     </td>
                     <td class="text-end">
-                        @can('update_maintenance_order')
-                            <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
-                        @elsecan('view_maintenance_order')
-                            <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
-                        @endcan
+                        <div class="d-flex justify-content-end gap-2">
+                            @if($order->paid_amount < $order->total_amount)
+                                <button type="button" class="btn btn-sm btn-success rounded-pill fw-bold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#paymentModalIndex{{ $order->id }}">
+                                    <i class="fas fa-money-bill-wave me-1"></i> Thanh toán
+                                </button>
+                            @endif
+
+                            @can('update_maintenance_order')
+                                <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
+                            @elsecan('view_maintenance_order')
+                                <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -245,6 +263,52 @@
         </div>
     </div>
 </div>
+
+{{-- Payment Modals outside the table loop to prevent flickering --}}
+@foreach($orders as $order)
+    @if($order->paid_amount < $order->total_amount)
+        <div class="modal fade text-start" id="paymentModalIndex{{ $order->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header bg-light p-4 border-bottom">
+                        <h5 class="modal-title fw-bold text-dark"><i class="fas fa-money-bill-wave text-success me-2"></i>Thanh toán đơn {{ $order->code }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('admin.maintenance.orders.payment', $order->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="alert alert-info mb-4 rounded-3 border-0">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-bold">Số tiền cần thanh toán nốt:</span>
+                                    <span class="fs-5 fw-bold text-danger">{{ number_format($order->total_amount - $order->paid_amount, 0, ',', '.') }} đ</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Số tiền khách thanh toán (VNĐ) <span class="text-danger">*</span></label>
+                                <input type="number" name="amount" class="form-control bg-light border-0 py-2" required min="1" max="{{ $order->total_amount - $order->paid_amount }}" value="{{ $order->total_amount - $order->paid_amount }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Ngày thanh toán <span class="text-danger">*</span></label>
+                                <input type="date" name="payment_date" class="form-control bg-light border-0 py-2" required value="{{ date('Y-m-d') }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Ghi chú / Số tham chiếu</label>
+                                <textarea name="note" class="form-control bg-light border-0 py-2" rows="2" placeholder="Ví dụ: Chuyển khoản Vietcombank..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light p-3 border-top">
+                            <button type="button" class="btn btn-outline-secondary px-4 fw-bold shadow-sm border-0" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">Xác nhận thanh toán</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
 
 @endsection
 

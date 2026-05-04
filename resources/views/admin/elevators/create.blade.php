@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         #map {
             height: 350px;
@@ -11,6 +12,75 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             z-index: 1;
+        }
+
+        /* Select2 Premium Styles */
+        .select2-container--default .select2-selection--single {
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            background-color: #f8fafc;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 10px;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: #4e73df;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.1);
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 50px;
+            padding-left: 10px;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 50px;
+            right: 15px;
+        }
+        
+        .select2-dropdown {
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            z-index: 9999;
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+        .select2-results__option {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #4e73df;
+        }
+
+        .select2-container--default .select2-results__option--selected {
+            background-color: #f1f5f9;
+            color: #4e73df;
+            font-weight: 600;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
         }
 
         .map-search-wrapper {
@@ -97,12 +167,12 @@
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="form-label fw-bold small text-uppercase text-muted">Tòa nhà</label>
-                                <select name="building_id" class="form-select modern-form-control">
-                                    <option value="">-- Chọn tòa nhà (Không bắt buộc) --</option>
+                                <select name="building_id" id="building_select" class="form-select modern-form-control select2">
+                                    <option value="">-- Tìm kiếm tòa nhà / khách hàng --</option>
                                     @foreach ($buildings as $building)
                                         <option value="{{ $building->id }}"
                                             {{ old('building_id') == $building->id ? 'selected' : '' }}>
-                                            {{ $building->name }}</option>
+                                            {{ $building->name }} {{ $building->address ? '- ' . $building->address : '' }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -279,9 +349,17 @@
 @endsection
 
 @section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2
+            $('.select2').select2({
+                placeholder: "-- Chọn tòa nhà --",
+                allowClear: true,
+                width: '100%'
+            });
             // Default location: Hanoi, Vietnam
             const defaultLat = 21.0285;
             const defaultLng = 105.8542;

@@ -58,16 +58,29 @@ class DashboardController extends Controller
         }
 
         // 5. Lịch nhắc bảo trì chu kỳ (Top 10 sắp đến hạn)
-        $maintenanceReminders = Elevator::with('building')
+        $maintenanceReminders = Elevator::with(['building', 'maintenanceChecks' => function($q) {
+                $q->whereIn('status', ['pending', 'in_progress', 'overdue'])
+                  ->latest('created_at');
+            }])
             ->orderBy('maintenance_deadline', 'asc')
             ->whereNotNull('maintenance_deadline')
             ->take(10)
             ->get()
             ->map(function($item) {
                 $isUpcoming = $item->maintenance_deadline->isFuture();
+                
+                $activeCheck = $item->maintenanceChecks->first();
+                $staffNames = 'Chưa phân công';
+                if ($activeCheck && !empty($activeCheck->staff_names)) {
+                    $staffNames = is_array($activeCheck->staff_names) 
+                        ? implode(', ', $activeCheck->staff_names) 
+                        : $activeCheck->staff_names;
+                }
+
                 return [
                     'code' => $item->code,
                     'contact' => $item->building->contact_name ?? $item->customer_name ?? 'Chưa xác định',
+                    'staff' => $staffNames,
                     'deadline' => $item->maintenance_deadline->format('d/m/Y'),
                     'cycle' => $item->cycle_days ?? 30,
                     'label' => $isUpcoming ? 'Sắp đến hạn:' : 'Đến hạn:',

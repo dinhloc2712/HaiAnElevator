@@ -73,6 +73,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('maintenance/orders', [\App\Http\Controllers\Admin\MaintenanceController::class, 'storeOrder'])->name('maintenance.orders.store');
     Route::get('maintenance/orders/{order}/edit', [\App\Http\Controllers\Admin\MaintenanceController::class, 'editOrder'])->name('maintenance.orders.edit');
     Route::put('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateOrder'])->name('maintenance.orders.update');
+    Route::post('maintenance/orders/{order}/payment', [\App\Http\Controllers\Admin\MaintenanceController::class, 'addPayment'])->name('maintenance.orders.payment');
     Route::get('maintenance/{maintenance}/export', [\App\Http\Controllers\Admin\MaintenanceController::class, 'export'])->name('maintenance.export');
     Route::post('maintenance/{maintenance}/start', [\App\Http\Controllers\Admin\MaintenanceController::class, 'start'])->name('maintenance.start');
     Route::get('maintenance/due', [\App\Http\Controllers\Admin\MaintenanceController::class, 'due'])->name('maintenance.due');
@@ -80,6 +81,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('maintenance', \App\Http\Controllers\Admin\MaintenanceController::class);
     Route::resource('incidents', \App\Http\Controllers\Admin\IncidentController::class);
     
+    // Activity Logs
+    Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+
     // Trash Management
     Route::get('trash', [\App\Http\Controllers\Admin\TrashController::class, 'index'])->name('trash.index');
     Route::post('trash/{type}/{id}/restore', [\App\Http\Controllers\Admin\TrashController::class, 'restore'])->name('trash.restore');

@@ -165,14 +165,14 @@
                 <!-- System Admin -->
                 @if (auth()->user()->can('view_user') || auth()->user()->can('view_role') || auth()->user()->can('view_branch'))
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'active' : '' }}"
+                        <a class="nav-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') || request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}"
                             data-bs-toggle="collapse" href="#adminSubmenu" role="button"
-                            aria-expanded="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'true' : 'false' }}">
+                            aria-expanded="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') || request()->routeIs('admin.activity-logs.*') ? 'true' : 'false' }}">
                             <i class="fas fa-user-shield"></i>
                             <span>Quản trị hệ thống</span>
                             <i class="fas fa-chevron-down ms-auto arrow" style="font-size: 0.8rem; width: auto;"></i>
                         </a>
-                        <div class="collapse {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') ? 'show' : '' }}"
+                        <div class="collapse {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') || request()->routeIs('admin.activity-logs.*') ? 'show' : '' }}"
                             id="adminSubmenu" data-bs-parent="#sidebarAccordion">
                             <ul class="nav flex-column collapse-menu">
                                 @can('view_user')
@@ -199,6 +199,12 @@
                                         </a>
                                     </li>
                                 @endcan
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}"
+                                        href="{{ route('admin.activity-logs.index') }}">
+                                        <i class="fas fa-history"></i> <span>Lịch sử hệ thống</span>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('admin.trash.*') ? 'active' : '' }}"
                                         href="{{ route('admin.trash.index') }}">

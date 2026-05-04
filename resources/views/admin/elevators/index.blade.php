@@ -99,6 +99,19 @@
                 </h6>
 
                 <div class="d-flex align-items-center flex-wrap gap-2 justify-content-end">
+                    {{-- Maintenance Filter Buttons --}}
+                    <div class="btn-group rounded-pill overflow-hidden shadow-sm me-md-2" style="border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); padding: 2px;">
+                        <a href="{{ request()->fullUrlWithQuery(['maintenance_filter' => null]) }}" 
+                           class="btn btn-sm px-3 rounded-pill fw-bold border-0 {{ !request('maintenance_filter') ? 'btn-white shadow-sm' : 'text-white' }}" 
+                           style="font-size: 0.75rem; height: 32px; display: flex; align-items: center;">Tất cả</a>
+                        <a href="{{ request()->fullUrlWithQuery(['maintenance_filter' => 'has_deadline']) }}" 
+                           class="btn btn-sm px-3 rounded-pill fw-bold border-0 {{ request('maintenance_filter') === 'has_deadline' ? 'btn-white shadow-sm' : 'text-white' }}" 
+                           style="font-size: 0.75rem; height: 32px; display: flex; align-items: center;">Có hạn BT</a>
+                        <a href="{{ request()->fullUrlWithQuery(['maintenance_filter' => 'no_deadline']) }}" 
+                           class="btn btn-sm px-3 rounded-pill fw-bold border-0 {{ request('maintenance_filter') === 'no_deadline' ? 'btn-white shadow-sm' : 'text-white' }}" 
+                           style="font-size: 0.75rem; height: 32px; display: flex; align-items: center;">Không hạn BT</a>
+                    </div>
+
                     {{-- Quick Search --}}
                     <form method="GET" action="{{ route('admin.elevators.index') }}"
                         class="d-flex align-items-center flex-nowrap gap-2 flex-grow-1 flex-md-grow-0">
@@ -145,7 +158,7 @@
         </div>
 
         {{-- Advanced Filter Section --}}
-        <div class="collapse {{ request()->except(['sort', 'direction', 'search']) ? 'show' : '' }}" id="advancedFilter">
+        <div class="collapse {{ request()->except(['sort', 'direction', 'search', 'maintenance_filter']) ? 'show' : '' }}" id="advancedFilter">
             <div class="card-body bg-light border-bottom p-4">
                 <h6 class="fw-bold text-primary mb-4 d-flex align-items-center">
                     <i class="fas fa-filter me-2"></i> BỘ LỌC NÂNG CAO

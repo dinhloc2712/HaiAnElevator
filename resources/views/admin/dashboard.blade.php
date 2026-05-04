@@ -533,6 +533,9 @@
                             <div class="flex-grow-1">
                                 <div class="fw-bold text-dark">{{ $reminder['code'] }}</div>
                                 <div class="text-muted small">{{ $reminder['contact'] }}</div>
+                                <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                                    <i class="fas fa-user-hard-hat me-1" style="color: #4a5568;"></i> {{ $reminder['staff'] }}
+                                </div>
                             </div>
                             <div class="text-end">
                                 <div class="small fw-bold" style="color: {{ $reminder['color'] }}">

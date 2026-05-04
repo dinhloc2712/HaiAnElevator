@@ -265,6 +265,45 @@ class MaintenanceController extends Controller
         return redirect()->route('admin.maintenance.orders')->with('success', 'Cập nhật đơn bảo trì/báo giá thành công.');
     }
 
+    public function addPayment(Request $request, Order $order)
+    {
+        $this->authorize('update_maintenance_order');
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
+            'note' => 'nullable|string',
+        ]);
+
+        $amount = $request->amount;
+        $history = $order->payment_history ?? [];
+
+        $history[] = [
+            'amount' => $amount,
+            'date' => $request->payment_date,
+            'note' => $request->note,
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user()->name,
+            'created_at' => now()->toDateTimeString(),
+        ];
+
+        $newPaidAmount = $order->paid_amount + $amount;
+        
+        $status = $order->status;
+        if ($newPaidAmount >= $order->total_amount) {
+            $status = 'paid';
+        } elseif ($status == 'draft') {
+            $status = 'pending';
+        }
+
+        $order->update([
+            'paid_amount' => $newPaidAmount,
+            'payment_history' => $history,
+            'status' => $status,
+        ]);
+
+        return redirect()->back()->with('success', 'Đã thêm lượt thanh toán thành công.');
+    }
+
 
 
     public function create(Request $request)

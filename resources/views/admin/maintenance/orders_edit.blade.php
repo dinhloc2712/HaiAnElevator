@@ -122,6 +122,120 @@
                 </button>
             </div>
         </form>
+
+        {{-- Lịch sử thanh toán Card --}}
+        <div class="data-card mb-4">
+            <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-money-check-alt me-2 text-primary"></i>Lịch sử thanh toán</h5>
+                @if($order->paid_amount < $order->total_amount)
+                    <button type="button" class="btn btn-success btn-sm px-3 rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                        <i class="fas fa-plus me-1"></i> Thêm thanh toán
+                    </button>
+                @endif
+            </div>
+            
+            <div class="p-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="text-center px-4">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Tổng tiền</p>
+                    <h4 class="text-dark fw-bold mb-0">{{ number_format($order->total_amount, 0, ',', '.') }} đ</h4>
+                </div>
+                <div class="text-center px-4 border-start border-end">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Đã thanh toán</p>
+                    <h4 class="text-success fw-bold mb-0">{{ number_format($order->paid_amount, 0, ',', '.') }} đ</h4>
+                </div>
+                <div class="text-center px-4">
+                    <p class="text-muted small fw-bold text-uppercase mb-1">Còn nợ</p>
+                    <h4 class="text-danger fw-bold mb-0">{{ number_format($order->total_amount - $order->paid_amount, 0, ',', '.') }} đ</h4>
+                </div>
+            </div>
+
+            <div class="p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0 text-nowrap align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-bottom small fw-bold text-muted ps-4 py-3 text-uppercase">Ngày thanh toán</th>
+                                <th class="border-bottom small fw-bold text-muted py-3 text-uppercase">Số tiền (VNĐ)</th>
+                                <th class="border-bottom small fw-bold text-muted py-3 text-uppercase">Người thu</th>
+                                <th class="border-bottom small fw-bold text-muted py-3 pe-4 text-uppercase">Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $paymentHistory = $order->payment_history ?? [];
+                            @endphp
+                            @forelse($paymentHistory as $payment)
+                                <tr>
+                                    <td class="ps-4 py-3 border-bottom-0">
+                                        <i class="far fa-calendar-alt text-muted me-2"></i>
+                                        {{ \Carbon\Carbon::parse($payment['date'])->format('d/m/Y') }}
+                                        <div class="small text-muted mt-1">Ghi nhận lúc: {{ \Carbon\Carbon::parse($payment['created_at'])->format('H:i d/m/Y') }}</div>
+                                    </td>
+                                    <td class="py-3 border-bottom-0 text-success fw-bold">
+                                        + {{ number_format($payment['amount'], 0, ',', '.') }} đ
+                                    </td>
+                                    <td class="py-3 border-bottom-0">
+                                        <i class="far fa-user text-muted me-1"></i> {{ $payment['user_name'] ?? 'N/A' }}
+                                    </td>
+                                    <td class="pe-4 py-3 border-bottom-0 text-muted">
+                                        {{ $payment['note'] ?? '' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-file-invoice-dollar fs-4 mb-2 opacity-50"></i>
+                                        <p class="mb-0">Chưa có lịch sử thanh toán nào.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- Payment Modal --}}
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header bg-light p-4 border-bottom">
+                        <h5 class="modal-title fw-bold text-dark"><i class="fas fa-money-bill-wave text-success me-2"></i>Thêm lượt thanh toán mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('admin.maintenance.orders.payment', $order->id) }}" method="POST">
+                        @csrf
+                        <div class="modal-body p-4">
+                            <div class="alert alert-info mb-4 rounded-3 border-0">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="fw-bold">Số tiền cần thanh toán nốt:</span>
+                                    <span class="fs-5 fw-bold text-danger">{{ number_format($order->total_amount - $order->paid_amount, 0, ',', '.') }} đ</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Số tiền khách thanh toán (VNĐ) <span class="text-danger">*</span></label>
+                                <input type="number" name="amount" class="form-control bg-light border-0 py-2" required min="1" max="{{ $order->total_amount - $order->paid_amount }}" value="{{ $order->total_amount - $order->paid_amount }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Ngày thanh toán <span class="text-danger">*</span></label>
+                                <input type="date" name="payment_date" class="form-control bg-light border-0 py-2" required value="{{ date('Y-m-d') }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Ghi chú / Số tham chiếu</label>
+                                <textarea name="note" class="form-control bg-light border-0 py-2" rows="2" placeholder="Ví dụ: Chuyển khoản Vietcombank..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light p-3 border-top">
+                            <button type="button" class="btn btn-outline-secondary px-4 fw-bold shadow-sm border-0" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">Xác nhận thanh toán</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

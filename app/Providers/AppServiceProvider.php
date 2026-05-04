@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Spatie\Activitylog\Models\Activity;
+use App\Observers\ActivityObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && env('OPENSSL_CONF')) {
             putenv("OPENSSL_CONF=" . env('OPENSSL_CONF'));
         }
+
+        // Register Activity Observer
+        Activity::observe(ActivityObserver::class);
     }
 }

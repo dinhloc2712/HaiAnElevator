@@ -29,11 +29,28 @@ class TrashController extends Controller
         $this->authorize('view_user'); // Assuming admin/manager level
 
         $trashedData = [];
+        $deleters = [];
         foreach ($this->models as $key => $modelClass) {
-            $trashedData[$key] = $modelClass::onlyTrashed()->latest('deleted_at')->get();
+            $items = $modelClass::onlyTrashed()->latest('deleted_at')->get();
+            $trashedData[$key] = $items;
+
+            $itemIds = $items->pluck('id')->toArray();
+            if (!empty($itemIds)) {
+                $activities = \Spatie\Activitylog\Models\Activity::where('subject_type', $modelClass)
+                    ->whereIn('subject_id', $itemIds)
+                    ->where('event', 'deleted')
+                    ->with('causer')
+                    ->get()
+                    ->keyBy('subject_id');
+                
+                foreach ($items as $item) {
+                    $deleters[$modelClass][$item->id] = $activities->has($item->id) ? $activities[$item->id]->causer : null;
+                }
+            }
         }
 
-        return view('admin.trash.index', compact('trashedData'));
+        $modelsMap = $this->models;
+        return view('admin.trash.index', compact('trashedData', 'deleters', 'modelsMap'));
     }
 
     public function restore($type, $id)

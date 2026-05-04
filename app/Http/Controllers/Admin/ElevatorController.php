@@ -89,6 +89,20 @@ class ElevatorController extends Controller
             $query->whereDate('created_at', '<=', $request->created_to);
         }
 
+        // Maintenance Status Filter (Quick filter buttons)
+        if ($request->filled('maintenance_filter')) {
+            $filter = $request->maintenance_filter;
+            if ($filter === 'has_deadline') {
+                $query->where(function ($q) {
+                    $q->whereNotNull('maintenance_deadline')
+                      ->orWhereNotNull('maintenance_end_date');
+                });
+            } elseif ($filter === 'no_deadline') {
+                $query->whereNull('maintenance_deadline')
+                      ->whereNull('maintenance_end_date');
+            }
+        }
+
         // Maintenance Deadline Range
         if ($request->filled('deadline_from')) {
             $query->whereDate('maintenance_deadline', '>=', $request->deadline_from);
