@@ -18,22 +18,22 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PushSubscriptionController;
 use App\Http\Controllers\Admin\NotificationController;
 
+Route::get('/zalo_verifierVTQH5gB49nbNr8mDfU0F323Fh5hCkNa7DpCq.html', function () {
+    return file_get_contents(base_path('zalo_verifierVTQH5gB49nbNr8mDfU0F323Fh5hCkNa7DpCq.html'));
+});
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
 
 // Universal Fallback Route for Missing Storage Symlink on Shared Hosting (handles all files in storage/app/public)
 Route::get('storage/{path}', [\App\Http\Controllers\Admin\UserController::class, 'servePublicStorageFile'])->where('path', '.*')->name('storage.fallback');
 
 // Auth Routes
-@include('auth.php'); // Note: if auth.php doesn't exist, this might be a problem, but original file had it inline. I'll stick to original inline style for safety.
-Route::get('login', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('login.post');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -74,6 +74,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('maintenance/orders/{order}/edit', [\App\Http\Controllers\Admin\MaintenanceController::class, 'editOrder'])->name('maintenance.orders.edit');
     Route::put('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'updateOrder'])->name('maintenance.orders.update');
     Route::post('maintenance/orders/{order}/payment', [\App\Http\Controllers\Admin\MaintenanceController::class, 'addPayment'])->name('maintenance.orders.payment');
+    Route::delete('maintenance/orders/{order}', [\App\Http\Controllers\Admin\MaintenanceController::class, 'destroyOrder'])->name('maintenance.orders.destroy');
     Route::get('maintenance/{maintenance}/export', [\App\Http\Controllers\Admin\MaintenanceController::class, 'export'])->name('maintenance.export');
     Route::post('maintenance/{maintenance}/start', [\App\Http\Controllers\Admin\MaintenanceController::class, 'start'])->name('maintenance.start');
     Route::get('maintenance/due', [\App\Http\Controllers\Admin\MaintenanceController::class, 'due'])->name('maintenance.due');
@@ -120,4 +121,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+
+    // Zalo Settings
+    Route::get('zalo-settings', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'index'])->name('zalo.settings');
+    Route::post('zalo-settings', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'update'])->name('zalo.settings.update');
+    Route::post('zalo-settings/test', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'testSend'])->name('zalo.settings.test');
+    Route::post('zalo-settings/exchange', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'exchangeCode'])->name('zalo.settings.exchange');
+    Route::get('zalo-settings/redirect', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'redirect'])->name('zalo.settings.redirect');
+    Route::get('zalo-settings/callback', [\App\Http\Controllers\Admin\ZaloSettingController::class, 'callback'])->name('zalo.settings.callback');
 });

@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
 use NotificationChannels\WebPush\WebPushChannel;
+use App\Notifications\Channels\ZaloChannel;
 
 class MaintenanceNotification extends Notification
 {
@@ -37,6 +38,22 @@ class MaintenanceNotification extends Notification
     public function via(object $notifiable): array
     {
         return [WebPushChannel::class, 'database'];
+    }
+
+    /**
+     * Get the Zalo representation of the notification.
+     */
+    public function toZalo(object $notifiable): array
+    {
+        return [
+            'template_id' => config('services.zalo.template_id', '574418'),
+            'template_data' => [
+                '1'   => $this->title,
+                '2' => $this->body,
+                '3'    => now()->format('d/m/Y H:i'),
+                '4'    => url($this->url)
+            ]
+        ];
     }
 
     /**

@@ -163,7 +163,7 @@
 
 
                 <!-- System Admin -->
-                @if (auth()->user()->can('view_user') || auth()->user()->can('view_role') || auth()->user()->can('view_branch'))
+                @canany(['view_user', 'view_role', 'view_branch'])
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.roles.*') || request()->routeIs('admin.branches.*') || request()->routeIs('admin.trash.*') || request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}"
                             data-bs-toggle="collapse" href="#adminSubmenu" role="button"
@@ -206,6 +206,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('admin.zalo.*') ? 'active' : '' }}"
+                                        href="{{ route('admin.zalo.settings') }}">
+                                        <i class="fas fa-comment-dots"></i> <span>Cấu hình ZBS</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('admin.trash.*') ? 'active' : '' }}"
                                         href="{{ route('admin.trash.index') }}">
                                         <i class="fas fa-trash-alt"></i> <span>Thùng rác</span>
@@ -214,29 +220,31 @@
                             </ul>
                         </div>
                     </li>
-                @endif
+                @endcanany
             </ul>
         </div>{{-- end sidebar-scroll-area --}}
 
         <!-- Footer -->
         <div class="sidebar-footer">
-            <a href="{{ route('admin.profile.show') }}" class="user-profile">
-                <div class="user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
-                <div class="user-info">
-                    <span class="user-name">{{ auth()->user()->name }}</span>
-                    <span class="user-role">{{ auth()->user()->role->display_name ?? 'N/A' }}</span>
-                </div>
-            </a>
+            @if(auth()->check())
+                <a href="{{ route('admin.profile.show') }}" class="user-profile">
+                    <div class="user-avatar">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ auth()->user()->name }}</span>
+                        <span class="user-role">{{ auth()->user()->role->display_name ?? 'N/A' }}</span>
+                    </div>
+                </a>
 
-            <form action="{{ route('logout') }}" method="POST" class="mt-1">
-                @csrf
-                <button type="submit" class="nav-link w-100 bg-transparent border-0 text-start py-2">
-                    <i class="fas fa-sign-out-alt text-danger"></i>
-                    <span>Đăng xuất</span>
-                </button>
-            </form>
+                <form action="{{ route('logout') }}" method="POST" class="mt-1">
+                    @csrf
+                    <button type="submit" class="nav-link w-100 bg-transparent border-0 text-start py-2">
+                        <i class="fas fa-sign-out-alt text-danger"></i>
+                        <span>Đăng xuất</span>
+                    </button>
+                </form>
+            @endif
         </div>
     </nav>
 
@@ -392,6 +400,37 @@
         </nav>
 
         <div class="container-fluid px-0">
+            {{-- Global Alerts --}}
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show mx-4 mt-3 border-0 shadow-sm" role="alert" style="border-radius: 12px; background: #ecfdf5; color: #065f46;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-3 fa-lg"></i>
+                        <div>{{ session('success') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mx-4 mt-3 border-0 shadow-sm" role="alert" style="border-radius: 12px; background: #fef2f2; color: #991b1b;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle me-3 fa-lg"></i>
+                        <div>{{ session('error') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show mx-4 mt-3 border-0 shadow-sm" role="alert" style="border-radius: 12px; background: #fffbeb; color: #92400e;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                        <div>{{ session('warning') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @yield('content')
         </div>
     </div>
@@ -404,6 +443,38 @@
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
     <script>
+        // Global Notifications using SweetAlert2
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi hệ thống',
+                text: '{{ session('error') }}',
+                confirmButtonText: 'Đóng',
+                confirmButtonColor: '#e53e3e'
+            });
+        @endif
+
+        @if (session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cảnh báo',
+                text: '{{ session('warning') }}',
+                confirmButtonText: 'Đóng'
+            });
+        @endif
+
         // Sidebar Search Logic
         document.getElementById('sidebarSearch')?.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase().trim();

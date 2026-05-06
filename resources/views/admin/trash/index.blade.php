@@ -31,6 +31,7 @@
                                 'users' => 'Tài khoản',
                                 'branches' => 'Chi nhánh',
                                 'maintenance_checks' => 'Bảo trì',
+                                'orders' => 'Đơn hàng',
                             ];
                             $icons = [
                                 'buildings' => 'fa-building',
@@ -40,6 +41,7 @@
                                 'users' => 'fa-users',
                                 'branches' => 'fa-code-branch',
                                 'maintenance_checks' => 'fa-clipboard-check',
+                                'orders' => 'fa-file-invoice-dollar',
                             ];
                         @endphp
                         <i class="fas {{ $icons[$type] }} me-1"></i> {{ $labels[$type] }}

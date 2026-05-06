@@ -77,11 +77,22 @@
                                 <select name="building_id" id="building_select" class="form-select select2-tag-enable" required style="width: 100%;">
                                     <option value="">-- Chọn tòa nhà hoặc nhập tên để tạo mới --</option>
                                     @foreach($buildings as $building)
-                                        <option value="{{ $building->id }}" {{ old('building_id') == $building->id ? 'selected' : '' }}>{{ $building->name }} - {{ $building->address }}</option>
+                                        <option value="{{ $building->id }}" data-phone="{{ $building->contact_phone }}" {{ old('building_id') == $building->id ? 'selected' : '' }}>{{ $building->name }} - {{ $building->address }}</option>
                                     @endforeach
                                 </select>
                                 <div class="form-text small text-muted">Mẹo: Nếu không tìm thấy, bạn có thể gõ trực tiếp tên tòa nhà mới vào ô trên và ấn Enter.</div>
                                 @error('building_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+
+                            {{-- Số điện thoại --}}
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Số điện thoại liên hệ</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="fas fa-phone text-primary"></i></span>
+                                    <input type="text" name="phone" class="form-control bg-light border-0 p-3 rounded-end-4 fw-bold" 
+                                           placeholder="Ví dụ: 0912..." value="{{ old('phone') }}">
+                                </div>
+                                @error('phone') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
 
                             {{-- Nhân viên phụ trách --}}
@@ -150,6 +161,15 @@
                     noResults: function() {
                         return "Không tìm thấy. Gõ phím bất kỳ và ấn Enter để tạo mới";
                     }
+                }
+            });
+
+            // Auto-populate phone number
+            $('#building_select').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const phone = selectedOption.data('phone');
+                if (phone) {
+                    $('input[name="phone"]').val(phone);
                 }
             });
         });

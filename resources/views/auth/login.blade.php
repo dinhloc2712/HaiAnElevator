@@ -14,6 +14,22 @@
     <link rel="icon" type="image/png" href="{{ asset('logo.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập - Hải An Elevator</title>
+
+    <!-- Open Graph / Social Media Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:title" content="Hải An Elevator - CÔNG TY CỔ PHẦN THANG MÁY VÀ THIẾT BỊ HẢI AN">
+    <meta property="og:description" content="Hải An Elevator - Giải pháp thang máy toàn diện, lắp đặt, bảo trì và sửa chữa chuyên nghiệp.">
+    <meta property="og:image" content="{{ asset('logo.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url('/') }}">
+    <meta property="twitter:title" content="Hải An Elevator - CÔNG TY CỔ PHẦN THANG MÁY VÀ THIẾT BỊ HẢI AN">
+    <meta property="twitter:description" content="Hải An Elevator - Giải pháp thang máy toàn diện, lắp đặt, bảo trì và sửa chữa chuyên nghiệp.">
+    <meta property="twitter:image" content="{{ asset('logo.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>

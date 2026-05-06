@@ -22,6 +22,7 @@ class TrashController extends Controller
         'users' => User::class,
         'branches' => Branch::class,
         'maintenance_checks' => MaintenanceCheck::class,
+        'orders' => \App\Models\Order::class,
     ];
 
     public function index(Request $request)

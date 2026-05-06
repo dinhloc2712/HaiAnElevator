@@ -172,8 +172,12 @@
                                     <option value="">-- Tìm kiếm tòa nhà / khách hàng --</option>
                                     @foreach ($buildings as $building)
                                         <option value="{{ $building->id }}"
+                                            data-customer-name="{{ $building->customer_name }}"
+                                            data-contact-phone="{{ $building->contact_phone }}"
+                                            data-address="{{ $building->address }}"
                                             {{ old('building_id', $elevator->building_id) == $building->id ? 'selected' : '' }}>
-                                            {{ $building->name }} {{ $building->address ? '- ' . $building->address : '' }}</option>
+                                            {{ $building->name }} {{ $building->address ? '- ' . $building->address : '' }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -362,6 +366,24 @@
                 placeholder: "-- Chọn tòa nhà --",
                 allowClear: true,
                 width: '100%'
+            });
+
+            // Auto-fill building info
+            $('#building_select').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const customerName = selectedOption.data('customer-name');
+                const contactPhone = selectedOption.data('contact-phone');
+                const address = selectedOption.data('address');
+
+                if (customerName) {
+                    $('input[name="customer_name"]').val(customerName);
+                }
+                if (contactPhone) {
+                    $('input[name="customer_phone"]').val(contactPhone);
+                }
+                if (address) {
+                    $('input[name="address"]').val(address);
+                }
             });
             // Default location: Hanoi, Vietnam
             let defaultLat = 21.0285;

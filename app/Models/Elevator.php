@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Elevator extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity, Notifiable;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -60,5 +61,13 @@ class Elevator extends Model
     public function maintenanceChecks()
     {
         return $this->hasMany(MaintenanceCheck::class);
+    }
+
+    /**
+     * Alias for customer_phone to work with notification channels
+     */
+    public function getPhoneAttribute()
+    {
+        return $this->customer_phone;
     }
 }

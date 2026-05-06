@@ -22,6 +22,7 @@ class Installation extends Model
 
     protected $fillable = [
         'code',
+        'phone',
         'branch_id',
         'building_id',
         'user_id',

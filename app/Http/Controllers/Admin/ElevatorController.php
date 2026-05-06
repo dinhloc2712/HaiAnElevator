@@ -26,12 +26,12 @@ class ElevatorController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%")
-                  ->orWhere('province', 'like', "%{$search}%")
-                  ->orWhere('district', 'like', "%{$search}%")
+                $q->whereRaw("code COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("customer_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("province COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("district COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
                   ->orWhereHas('building', function ($q2) use ($search) {
-                      $q2->where('name', 'like', "%{$search}%");
+                      $q2->whereRaw("name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"]);
                   });
             });
         }

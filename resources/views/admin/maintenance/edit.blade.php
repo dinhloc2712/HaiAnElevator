@@ -36,7 +36,7 @@
             padding: 20px;
             margin-bottom: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .checklist-item-card:hover {
@@ -101,7 +101,7 @@
             align-items: center;
             gap: 12px;
         }
-        
+
         .item-dot-legend {
             width: 8px;
             height: 8px;
@@ -117,7 +117,8 @@
             <div>
                 <h1 class="h3 mb-1 text-gray-800 fw-bold">Thực hiện kiểm tra & Hoàn thành phiếu</h1>
                 <p class="mb-0 text-muted small">
-                    Thang máy: <span class="fw-bold text-primary">{{ $selectedElevator->code }}</span> - {{ $selectedElevator->building->name ?? 'N/A' }}
+                    Thang máy: <span class="fw-bold text-primary">{{ $selectedElevator->code ?? 'N/A' }}</span> -
+                    {{ optional(optional($selectedElevator)->building)->name ?? 'N/A' }}
                 </p>
             </div>
             <a href="{{ route('admin.maintenance.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
@@ -136,19 +137,28 @@
                     <div class="card-body p-0">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Thang máy đang chọn</label>
-                                <input type="hidden" name="elevator_id" value="{{ $selectedElevator->id }}">
-                                <input type="text" class="form-control bg-white border-0 p-3 shadow-sm fw-bold text-primary" style="border-radius: 12px;" value="{{ $selectedElevator->code }}" readonly>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Thang máy đang
+                                    chọn</label>
+                                <input type="hidden" name="elevator_id" value="{{ $selectedElevator->id ?? '' }}">
+                                <input type="text"
+                                    class="form-control bg-white border-0 p-3 shadow-sm fw-bold text-primary"
+                                    style="border-radius: 12px;" value="{{ $selectedElevator->code ?? 'N/A' }}" readonly>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Ngày thực hiện *</label>
-                                <input type="date" name="check_date" class="form-control bg-white border-0 p-3 shadow-sm" style="border-radius: 12px;" value="{{ old('check_date', $maintenance->check_date ? $maintenance->check_date->format('Y-m-d') : date('Y-m-d')) }}" required>
+                                <input type="date" name="check_date" class="form-control bg-white border-0 p-3 shadow-sm"
+                                    style="border-radius: 12px;"
+                                    value="{{ old('check_date', $maintenance->check_date ? $maintenance->check_date->format('Y-m-d') : date('Y-m-d')) }}"
+                                    required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Loại hình *</label>
-                                <select name="task_type" class="form-select bg-white border-0 p-3 shadow-sm" style="border-radius: 12px;" required>
-                                    <option value="periodic" {{ $maintenance->task_type == 'periodic' ? 'selected' : '' }}>Bảo dưỡng định kỳ</option>
-                                    <option value="repair" {{ $maintenance->task_type == 'repair' ? 'selected' : '' }}>Sửa chữa</option>
+                                <select name="task_type" class="form-select bg-white border-0 p-3 shadow-sm"
+                                    style="border-radius: 12px;" required>
+                                    <option value="periodic" {{ $maintenance->task_type == 'periodic' ? 'selected' : '' }}>
+                                        Bảo dưỡng định kỳ</option>
+                                    <option value="repair" {{ $maintenance->task_type == 'repair' ? 'selected' : '' }}>Sửa
+                                        chữa</option>
                                 </select>
                             </div>
                         </div>
@@ -156,52 +166,53 @@
                 </div>
 
                 {{-- Checklist Items Section --}}
-                @if($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
-                <div class="mb-4">
-                    @php 
-                        $currentResults = is_array($maintenance->results) ? $maintenance->results : [];
-                    @endphp
-                    @foreach($sections as $sectionName => $items)
-                        <div class="checklist-section-title">
-                            <div class="section-pill"></div>
-                            <h5>{{ $sectionName }}</h5>
-                        </div>
-                        <div class="row">
-                            @foreach($items as $id => $name)
-                                @php
-                                    $savedValue = $currentResults[$id] ?? '';
-                                @endphp
-                                <div class="col-md-6">
-                                    <div class="checklist-item-card">
-                                        <div class="item-name-row">
-                                            <div class="item-dot"></div>
-                                            <div class="item-label">{{ $name }}</div>
-                                        </div>
-                                        <div class="status-selector mt-2">
-                                            <select name="results[{{ $id }}]" class="form-select modern-select w-100">
-                                                @foreach($symbols as $statusId => $statusName)
-                                                    <option value="{{ $statusId }}" {{ $savedValue == $statusId ? 'selected' : '' }}>
-                                                        {{ $statusName }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                @if ($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
+                    <div class="mb-4">
+                        @php
+                            $currentResults = is_array($maintenance->results) ? $maintenance->results : [];
+                        @endphp
+                        @foreach ($sections as $sectionName => $items)
+                            <div class="checklist-section-title">
+                                <div class="section-pill"></div>
+                                <h5>{{ $sectionName }}</h5>
+                            </div>
+                            <div class="row">
+                                @foreach ($items as $id => $name)
+                                    @php
+                                        $savedValue = $currentResults[$id] ?? '';
+                                    @endphp
+                                    <div class="col-md-6">
+                                        <div class="checklist-item-card">
+                                            <div class="item-name-row">
+                                                <div class="item-dot"></div>
+                                                <div class="item-label">{{ $name }}</div>
+                                            </div>
+                                            <div class="status-selector mt-2">
+                                                <select name="results[{{ $id }}]"
+                                                    class="form-select modern-select w-100">
+                                                    @foreach ($symbols as $statusId => $statusName)
+                                                        <option value="{{ $statusId }}"
+                                                            {{ $savedValue == $statusId ? 'selected' : '' }}>
+                                                            {{ $statusName }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endforeach
-                </div>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
                 @else
-                <div class="alert alert-info rounded-4 border-0 shadow-sm p-4 mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-info-circle fa-2x me-3 text-info"></i>
-                        <div>
-                            <h6 class="fw-bold mb-1">Chưa thể nhập hạng mục bảo trì</h6>
-                            <p class="small mb-0">Bạn cần nhấn "Bắt đầu thực hiện" ở danh sách để mở phần checklist kiểm tra.</p>
+                    <div class="alert alert-info rounded-4 border-0 shadow-sm p-4 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3 text-info"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Chưa thể nhập hạng mục bảo trì</h6>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endif
 
                 {{-- Evaluation & Signatures --}}
@@ -209,56 +220,95 @@
                     <div class="card-body p-4">
                         <div class="row g-4">
                             <div class="col-md-12 mb-2">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Phân loại lỗi / Sự cố (Nếu có)</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Phân loại lỗi / Sự cố (Nếu
+                                    có)</label>
                                 <div class="d-flex flex-wrap gap-4 mt-2">
                                     @php
                                         $savedFaults = is_array($maintenance->fault_category) ? $maintenance->fault_category : [];
+                                        $standardFaults = ['Cơ khí', 'Hệ điều khiển', 'Điện'];
+                                        $otherFault = null;
+                                        foreach ($savedFaults as $fault) {
+                                            if (!in_array($fault, $standardFaults)) {
+                                                $otherFault = $fault;
+                                                break;
+                                            }
+                                        }
                                     @endphp
                                     <div class="form-check form-check-inline custom-checkbox">
-                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]" value="Cơ khí" id="faultMec" {{ in_array('Cơ khí', $savedFaults) ? 'checked' : '' }} style="transform: scale(1.2); outline: none;">
+                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]"
+                                            value="Cơ khí" id="faultMec"
+                                            {{ in_array('Cơ khí', $savedFaults) ? 'checked' : '' }}
+                                            style="transform: scale(1.2); outline: none;">
                                         <label class="form-check-label ms-1 fw-bold text-dark" for="faultMec">Cơ khí</label>
                                     </div>
                                     <div class="form-check form-check-inline custom-checkbox">
-                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]" value="Hệ điều khiển" id="faultCtrl" {{ in_array('Hệ điều khiển', $savedFaults) ? 'checked' : '' }} style="transform: scale(1.2); outline: none;">
-                                        <label class="form-check-label ms-1 fw-bold text-dark" for="faultCtrl">Hệ điều khiển</label>
+                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]"
+                                            value="Hệ điều khiển" id="faultCtrl"
+                                            {{ in_array('Hệ điều khiển', $savedFaults) ? 'checked' : '' }}
+                                            style="transform: scale(1.2); outline: none;">
+                                        <label class="form-check-label ms-1 fw-bold text-dark" for="faultCtrl">Hệ điều
+                                            khiển</label>
                                     </div>
                                     <div class="form-check form-check-inline custom-checkbox">
-                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]" value="Điện" id="faultElec" {{ in_array('Điện', $savedFaults) ? 'checked' : '' }} style="transform: scale(1.2); outline: none;">
+                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]"
+                                            value="Điện" id="faultElec"
+                                            {{ in_array('Điện', $savedFaults) ? 'checked' : '' }}
+                                            style="transform: scale(1.2); outline: none;">
                                         <label class="form-check-label ms-1 fw-bold text-dark" for="faultElec">Điện</label>
                                     </div>
                                     <div class="form-check form-check-inline custom-checkbox">
-                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]" value="Khác" id="faultOtros" {{ in_array('Khác', $savedFaults) ? 'checked' : '' }} style="transform: scale(1.2); outline: none;">
+                                        <input class="form-check-input shadow-sm" type="checkbox" name="fault_category[]"
+                                            value="{{ $otherFault ?? 'Khác' }}" id="faultOtros"
+                                            {{ $otherFault ? 'checked' : '' }}
+                                            style="transform: scale(1.2); outline: none;">
                                         <label class="form-check-label ms-1 fw-bold text-dark" for="faultOtros">Khác</label>
+                                    </div>
+
+                                    <div id="otherFaultContainer" class="mt-2 w-100 {{ $otherFault ? '' : 'd-none' }}">
+                                        <input type="text" id="faultOtrosInput"
+                                            class="form-control bg-light border-0 p-3 rounded-4 shadow-sm"
+                                            placeholder="Nhập lỗi khác..." value="{{ $otherFault }}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Đánh giá, nhận xét</label>
-                                <textarea name="evaluation" class="form-control bg-light border-0 p-3 rounded-4" rows="3" placeholder="Ghi nhận tình trạng tổng quát sau bảo trì...">{{ old('evaluation', $maintenance->evaluation) }}</textarea>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Đánh giá, nhận
+                                    xét</label>
+                                <textarea name="evaluation" class="form-control bg-light border-0 p-3 rounded-4" rows="3"
+                                    placeholder="Ghi nhận tình trạng tổng quát sau bảo trì...">{{ old('evaluation', $maintenance->evaluation) }}</textarea>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Cán bộ kỹ thuật</label>
                                 <div id="staff-container">
                                     @php
-                                        $selectedStaffIds = is_array($maintenance->staff_ids) ? $maintenance->staff_ids : [];
-                                        if (empty($selectedStaffIds)) $selectedStaffIds = ['']; // At least one empty row
+                                        $selectedStaffIds = is_array($maintenance->staff_ids)
+                                            ? $maintenance->staff_ids
+                                            : [];
+                                        if (empty($selectedStaffIds)) {
+                                            $selectedStaffIds = [''];
+                                        } // At least one empty row
                                     @endphp
-                                    @foreach($selectedStaffIds as $index => $selectedId)
+                                    @foreach ($selectedStaffIds as $index => $selectedId)
                                         <div class="d-flex mb-2 staff-row">
-                                            <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4" onchange="updateStaffOptionsEdit()">
+                                            <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4"
+                                                onchange="updateStaffOptionsEdit()">
                                                 <option value="">-- Chọn nhân viên --</option>
-                                                @foreach($staffs as $staff)
-                                                    <option value="{{ $staff->id }}" {{ $staff->id == $selectedId ? 'selected' : '' }}>
+                                                @foreach ($staffs as $staff)
+                                                    <option value="{{ $staff->id }}"
+                                                        {{ $staff->id == $selectedId ? 'selected' : '' }}>
                                                         {{ $staff->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @if($index == 0)
-                                                <button type="button" class="btn btn-primary rounded-4 ms-2 px-3 fw-bold" onclick="addStaffRow(this)">+</button>
+                                            @if ($index == 0)
+                                                <button type="button" class="btn btn-primary rounded-4 ms-2 px-3 fw-bold"
+                                                    onclick="addStaffRow(this)">+</button>
                                             @else
-                                                <button type="button" class="btn btn-outline-danger rounded-4 ms-2 px-3 fw-bold" onclick="removeStaffRow(this)">-</button>
+                                                <button type="button"
+                                                    class="btn btn-outline-danger rounded-4 ms-2 px-3 fw-bold"
+                                                    onclick="removeStaffRow(this)">-</button>
                                             @endif
                                         </div>
                                     @endforeach
@@ -290,63 +340,112 @@
                                     const container = document.getElementById('staff-container');
                                     const firstRow = container.querySelector('.staff-row');
                                     const newRow = firstRow.cloneNode(true);
-                                    
+
                                     // Reset value
                                     newRow.querySelector('select').value = '';
-                                    
+
                                     // Change button to minus
                                     const actionBtn = newRow.querySelector('button');
                                     actionBtn.className = 'btn btn-outline-danger rounded-4 ms-2 px-3 fw-bold';
                                     actionBtn.textContent = '-';
                                     actionBtn.setAttribute('onclick', 'removeStaffRow(this)');
-                                    
+
                                     container.appendChild(newRow);
                                     updateStaffOptionsEdit();
                                 }
+
                                 function removeStaffRow(btn) {
                                     btn.closest('.staff-row').remove();
                                     updateStaffOptionsEdit();
                                 }
-                                
+
                                 // Initialize on load
-                                document.addEventListener('DOMContentLoaded', updateStaffOptionsEdit);
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    updateStaffOptionsEdit();
+
+                                    const otherCheck = document.getElementById('faultOtros');
+                                    const otherContainer = document.getElementById('otherFaultContainer');
+                                    const otherInput = document.getElementById('faultOtrosInput');
+
+                                    otherCheck.addEventListener('change', function() {
+                                        if (this.checked) {
+                                            otherContainer.classList.remove('d-none');
+                                        } else {
+                                            otherContainer.classList.add('d-none');
+                                            otherInput.value = '';
+                                            this.value = 'Khác';
+                                        }
+                                    });
+
+                                    otherInput.addEventListener('input', function() {
+                                        otherCheck.value = this.value.trim() || 'Khác';
+                                    });
+
+                                    // Ensure value is set correctly before submit if check is on but input is empty
+                                    document.querySelector('form').addEventListener('submit', function() {
+                                        if (otherCheck.checked && !otherInput.value.trim()) {
+                                            otherCheck.value = 'Khác';
+                                        }
+                                    });
+                                });
                             </script>
 
                             <div class="col-md-6">
                                 <div class="row g-3">
                                     <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted text-uppercase">Số người thực hiện</label>
-                                        <input type="number" name="performer_count" class="form-control bg-light border-0 p-3 rounded-4" value="{{ old('performer_count', $maintenance->performer_count ?? 1) }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Số người thực
+                                            hiện</label>
+                                        <input type="number" name="performer_count"
+                                            class="form-control bg-light border-0 p-3 rounded-4"
+                                            value="{{ old('performer_count', $maintenance->performer_count ?? 1) }}">
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted text-uppercase">Ghi chú khác</label>
-                                        <input type="text" name="notes" class="form-control bg-light border-0 p-3 rounded-4" value="{{ old('notes', $maintenance->notes) }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Ghi chú
+                                            khác</label>
+                                        <input type="text" name="notes"
+                                            class="form-control bg-light border-0 p-3 rounded-4"
+                                            value="{{ old('notes', $maintenance->notes) }}">
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted text-uppercase">Bắt đầu lúc</label>
-                                        <input type="time" name="start_time" class="form-control bg-light border-0 p-3 rounded-4" value="{{ old('start_time', $maintenance->start_time) }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Bắt đầu
+                                            lúc</label>
+                                        <input type="time" name="start_time"
+                                            class="form-control bg-light border-0 p-3 rounded-4"
+                                            value="{{ old('start_time', $maintenance->start_time) }}">
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label small fw-bold text-muted text-uppercase">Kết thúc lúc</label>
-                                        <input type="time" name="end_time" class="form-control bg-light border-0 p-3 rounded-4" value="{{ old('end_time', $maintenance->end_time) }}">
+                                        <label class="form-label small fw-bold text-muted text-uppercase">Kết thúc
+                                            lúc</label>
+                                        <input type="time" name="end_time"
+                                            class="form-control bg-light border-0 p-3 rounded-4"
+                                            value="{{ old('end_time', $maintenance->end_time) }}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <hr class="my-4 opacity-50 w-100">
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-dark text-uppercase"><i class="fas fa-tag me-1 text-primary"></i> Trạng thái bảo trì</label>
-                                @if($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
-                                    <select class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold" style="background-color: #f8f9fc;" disabled>
-                                        <option value="in_progress" {{ $maintenance->status == 'in_progress' ? 'selected' : '' }}>Đang thực hiện</option>
-                                        <option value="completed" {{ $maintenance->status == 'completed' ? 'selected' : '' }}>Hoàn thành & Đi vào sử dụng</option>
+                                <label class="form-label small fw-bold text-dark text-uppercase"><i
+                                        class="fas fa-tag me-1 text-primary"></i> Trạng thái bảo trì</label>
+                                @if ($maintenance->status == 'in_progress' || $maintenance->status == 'completed')
+                                    <select class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold"
+                                        style="background-color: #f8f9fc;" disabled>
+                                        <option value="in_progress"
+                                            {{ $maintenance->status == 'in_progress' ? 'selected' : '' }}>Đang thực hiện
+                                        </option>
+                                        <option value="completed"
+                                            {{ $maintenance->status == 'completed' ? 'selected' : '' }}>Hoàn thành & Đi vào
+                                            sử dụng</option>
                                     </select>
                                     {{-- Status will be updated by button 'action' --}}
                                 @else
-                                    <select name="status" class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold" style="background-color: #f8f9fc;">
-                                        <option value="pending" {{ $maintenance->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
-                                        <option value="overdue" {{ $maintenance->status == 'overdue' ? 'selected' : '' }}>Quá hạn</option>
+                                    <select name="status" class="form-select border-0 p-3 rounded-4 shadow-sm fw-bold"
+                                        style="background-color: #f8f9fc;">
+                                        <option value="pending" {{ $maintenance->status == 'pending' ? 'selected' : '' }}>
+                                            Chờ xử lý</option>
+                                        <option value="overdue" {{ $maintenance->status == 'overdue' ? 'selected' : '' }}>
+                                            Quá hạn</option>
                                     </select>
                                 @endif
                             </div>
@@ -355,22 +454,26 @@
                 </div>
 
                 <div class="mb-5">
-                    @if($maintenance->status == 'in_progress')
+                    @if ($maintenance->status == 'in_progress')
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <button type="submit" name="action" value="save" class="btn btn-info btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3 text-white">
+                                <button type="submit" name="action" value="save"
+                                    class="btn btn-info btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3 text-white">
                                     <i class="fas fa-save me-2"></i> LƯU TẠM
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                <button type="submit" name="action" value="complete" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
+                                <button type="submit" name="action" value="complete"
+                                    class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
                                     <i class="fas fa-check-circle me-2"></i> HOÀN THÀNH PHIẾU
                                 </button>
                             </div>
                         </div>
                     @else
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
-                            <i class="fas fa-save me-2"></i> {{ $maintenance->status == 'completed' ? 'CẬP NHẬT PHIẾU BẢO TRÌ' : 'LƯU THAY ĐỔI' }}
+                        <button type="submit"
+                            class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm w-100 py-3">
+                            <i class="fas fa-save me-2"></i>
+                            {{ $maintenance->status == 'completed' ? 'CẬP NHẬT PHIẾU BẢO TRÌ' : 'LƯU THAY ĐỔI' }}
                         </button>
                     @endif
                 </div>
@@ -383,13 +486,13 @@
                         <h6 class="mb-0 fw-bold small"><i class="fas fa-info-circle me-2"></i> TRẠNG THÁI KIỂM TRA</h6>
                     </div>
                     <div class="card-body p-3">
-                        @foreach($symbols as $statusId => $statusName)
+                        @foreach ($symbols as $statusId => $statusName)
                             <div class="legend-item">
                                 <div class="item-dot"></div>
                                 <span class="small text-muted fw-bold">{{ $statusName }}</span>
                             </div>
                         @endforeach
-                        
+
                         <hr class="my-3 opacity-5">
                         <div class="alert alert-info border-0 rounded-3 mb-0 p-2 small">
                             <i class="fas fa-lightbulb me-2"></i>

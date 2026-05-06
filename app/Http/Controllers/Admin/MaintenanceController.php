@@ -113,11 +113,11 @@ class MaintenanceController extends Controller
         $startOfLastMonth = now()->subMonth()->startOfMonth();
         $endOfLastMonth = now()->subMonth()->endOfMonth();
 
-        $currentMonthRevenue = Order::where('status', 'paid')
+        $currentMonthRevenue = Order::whereIn('status', ['paid', 'pending'])
             ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->sum('total_amount');
 
-        $lastMonthRevenue = Order::where('status', 'paid')
+        $lastMonthRevenue = Order::whereIn('status', ['paid', 'pending'])
             ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
             ->sum('total_amount');
 
@@ -137,7 +137,7 @@ class MaintenanceController extends Controller
             $monthStart = now()->subMonths($i)->startOfMonth();
             $monthEnd = now()->subMonths($i)->endOfMonth();
             
-            $monthRevenue = Order::where('status', 'paid')
+            $monthRevenue = Order::whereIn('status', ['paid', 'pending'])
                 ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('total_amount');
 
@@ -397,64 +397,74 @@ class MaintenanceController extends Controller
             'status'      => 'nullable|in:pending,overdue,in_progress,completed',
             'task_type'   => 'required|in:periodic,repair',
             'check_date'  => 'required|date',
-            'results'     => 'nullable|array',
-            'staff_ids'   => 'nullable|array',
+            'results'         => 'nullable|array',
+            'staff_ids'       => 'nullable|array',
+            'fault_category'  => 'nullable|array',
         ]);
 
-        $staffNamesStr = null;
-        if ($request->staff_ids) {
-            $staffNamesStr = User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
-        }
+        try {
+            $staffNamesStr = null;
+            if ($request->staff_ids) {
+                $staffNamesStr = User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+            }
 
-        $status = $request->status ?? $maintenance->status;
-        if ($request->action == 'complete') {
-            $status = 'completed';
-        } elseif ($request->action == 'save') {
-            $status = 'in_progress';
-        }
+            $status = $request->status ?? $maintenance->status;
+            if ($request->action == 'complete') {
+                $status = 'completed';
+            } elseif ($request->action == 'save') {
+                $status = 'in_progress';
+            }
 
-        $maintenance->update([
-            'status'          => $status,
-            'task_type'       => $request->task_type,
-            'check_date'      => $request->check_date,
-            'results'         => $request->results,
-            'evaluation'      => $request->evaluation,
-            'staff_ids'       => $request->staff_ids,
-            'staff_names'     => $staffNamesStr,
-            'performer_count' => $request->performer_count ?? 1,
-            'start_time'      => $request->start_time,
-            'end_time'        => $request->end_time,
-            'notes'           => $request->notes,
-        ]);
+            $maintenance->update([
+                'status'          => $status,
+                'task_type'       => $request->task_type,
+                'check_date'      => $request->check_date,
+                'results'         => $request->results,
+                'fault_category'  => $request->fault_category,
+                'evaluation'      => $request->evaluation,
+                'staff_ids'       => $request->staff_ids,
+                'staff_names'     => $staffNamesStr,
+                'performer_count' => $request->performer_count ?? 1,
+                'start_time'      => $request->start_time,
+                'end_time'        => $request->end_time,
+                'notes'           => $request->notes,
+            ]);
 
-        // If marked as completed, update elevator status to active
-        if ($status == 'completed') {
-            $elevator = $maintenance->elevator;
-            $elevator->status = 'active';
-            
-            // Only update maintenance deadline if it is a periodic maintenance
-            if ($request->task_type == 'periodic') {
-                $newDeadline = now()->addDays($elevator->cycle_days ?? 30);
+            // If marked as completed, update elevator status to active
+            if ($status == 'completed') {
+                $elevator = $maintenance->elevator;
+                if ($elevator) {
+                    $elevator->status = 'active';
                 
-                // Check if new deadline exceeds contract end date
-                if ($elevator->maintenance_end_date && $newDeadline->gt(Carbon::parse($elevator->maintenance_end_date))) {
-                    // CLEAR the deadline if it exceeds the contract end date
-                    $elevator->maintenance_deadline = null;
-                } else {
-                    $elevator->maintenance_deadline = $newDeadline;
+                // Only update maintenance deadline if it is a periodic maintenance
+                if ($request->task_type == 'periodic') {
+                    $newDeadline = now()->addDays($elevator->cycle_days ?? 30);
+                    
+                    // Check if new deadline exceeds contract end date
+                    if ($elevator->maintenance_end_date && $newDeadline->gt(Carbon::parse($elevator->maintenance_end_date))) {
+                        // CLEAR the deadline if it exceeds the contract end date
+                        $elevator->maintenance_deadline = null;
+                    } else {
+                        $elevator->maintenance_deadline = $newDeadline;
+                    }
+                    }
+                    
+                    $elevator->save();
+                }
+            } elseif ($status == 'in_progress') {
+                // If marked as in progress, update elevator status to maintenance
+                $elevator = $maintenance->elevator;
+                if ($elevator) {
+                    $elevator->status = 'maintenance';
+                    $elevator->save();
                 }
             }
-            
-            $elevator->save();
-        } elseif ($status == 'in_progress') {
-            // If marked as in progress, update elevator status to maintenance
-            $elevator = $maintenance->elevator;
-            $elevator->status = 'maintenance';
-            $elevator->save();
-        }
 
-        return redirect()->route('admin.maintenance.index')
-            ->with('success', 'Cập nhật phiếu bảo trì thành công.');
+            return redirect()->route('admin.maintenance.index')
+                ->with('success', 'Cập nhật phiếu bảo trì thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Có lỗi xảy ra khi cập nhật bảo trì: ' . $e->getMessage());
+        }
     }
 
     public function start(MaintenanceCheck $maintenance)
@@ -493,6 +503,19 @@ class MaintenanceController extends Controller
         $this->authorize('delete_maintenance_schedule');
         $maintenance->delete();
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã xóa công việc / lịch bảo trì.');
+    }
+
+    public function destroyOrder(Order $order)
+    {
+        // Kiểm tra quyền xóa đơn hàng
+        $this->authorize('delete_maintenance_order');
+
+        try {
+            $order->delete();
+            return redirect()->route('admin.maintenance.orders')->with('success', 'Đã xóa tạm đơn hàng thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
     }
     public function due()
     {

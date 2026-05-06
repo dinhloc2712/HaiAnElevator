@@ -16,10 +16,10 @@ class BuildingController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('customer_name', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('contact_name', 'like', "%{$search}%");
+                $q->whereRaw("name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("customer_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("address COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("contact_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"]);
             });
         }
 

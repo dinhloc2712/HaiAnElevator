@@ -95,36 +95,41 @@ class IncidentController extends Controller
             'reported_time' => 'required',
         ]);
 
-        // Auto-generate code: INC-YYYY-XXX
-        $year = date('Y');
-        $prefix = "INC-{$year}-";
-        $latest = Incident::where('code', 'like', "{$prefix}%")->latest('id')->first();
-        $sequence = $latest ? intval(substr($latest->code, -3)) + 1 : 1;
-        $code = $prefix . str_pad($sequence, 3, '0', STR_PAD_LEFT);
+        try {
+            // Auto-generate code: INC-YYYY-XXX
+            $year = date('Y');
+            $prefix = "INC-{$year}-";
+            // Check both active and deleted records to avoid duplicate code error
+            $latest = Incident::withTrashed()->where('code', 'like', "{$prefix}%")->latest('id')->first();
+            $sequence = $latest ? intval(substr($latest->code, -3)) + 1 : 1;
+            $code = $prefix . str_pad($sequence, 3, '0', STR_PAD_LEFT);
 
-        // Handle staff assignments
-        $staffNamesStr = null;
-        if ($request->has('staff_ids')) {
-            $staffNamesStr = \App\Models\User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+            // Handle staff assignments
+            $staffNamesStr = null;
+            if ($request->has('staff_ids')) {
+                $staffNamesStr = \App\Models\User::whereIn('id', $request->staff_ids)->pluck('name')->implode(', ');
+            }
+
+            Incident::create([
+                'code' => $code,
+                'elevator_id' => $request->elevator_id,
+                'reporter_name' => $request->reporter_name,
+                'reporter_phone' => $request->reporter_phone,
+                'description' => $request->description,
+                'priority' => $request->priority,
+                'status' => $request->status,
+                'reported_at' => $request->reported_date . ' ' . $request->reported_time,
+                'staff_ids' => $request->staff_ids,
+                'staff_names' => $staffNamesStr,
+            ]);
+
+            // Auto-sync: set elevator status to 'error' when incident created
+            Elevator::where('id', $request->elevator_id)->update(['status' => 'error']);
+
+            return redirect()->route('admin.incidents.index')->with('success', 'Đã báo cáo sự cố mới thành công.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error', 'Có lỗi xảy ra khi lưu sự cố: ' . $e->getMessage());
         }
-
-        Incident::create([
-            'code' => $code,
-            'elevator_id' => $request->elevator_id,
-            'reporter_name' => $request->reporter_name,
-            'reporter_phone' => $request->reporter_phone,
-            'description' => $request->description,
-            'priority' => $request->priority,
-            'status' => $request->status,
-            'reported_at' => $request->reported_date . ' ' . $request->reported_time,
-            'staff_ids' => $request->staff_ids,
-            'staff_names' => $staffNamesStr,
-        ]);
-
-        // Auto-sync: set elevator status to 'error' when incident created
-        Elevator::where('id', $request->elevator_id)->update(['status' => 'error']);
-
-        return redirect()->route('admin.incidents.index')->with('success', 'Đã báo cáo sự cố mới thành công.');
     }
 
     /**

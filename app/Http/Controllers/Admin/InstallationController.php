@@ -84,6 +84,7 @@ class InstallationController extends Controller
             'user_id' => 'required|exists:users,id',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
+            'phone' => 'nullable|string|max:20',
             'status' => 'required|in:pending,in_progress,completed',
         ]);
 
@@ -106,6 +107,7 @@ class InstallationController extends Controller
             'user_id' => $request->user_id,
             'start_date' => $request->start_date,
             'due_date' => $request->due_date,
+            'phone' => $request->phone,
             'status' => $request->status,
             'notes' => $request->notes,
         ]);
@@ -140,12 +142,13 @@ class InstallationController extends Controller
             'user_id' => 'sometimes|required|exists:users,id',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
+            'phone' => 'nullable|string|max:20',
             'status' => 'sometimes|required|in:pending,in_progress,completed',
         ];
 
         $request->validate($rules);
 
-        $data = $request->only(['code', 'branch_id', 'building_id', 'user_id', 'start_date', 'due_date', 'status', 'notes']);
+        $data = $request->only(['code', 'phone', 'branch_id', 'building_id', 'user_id', 'start_date', 'due_date', 'status', 'notes']);
 
         // Auto-creation logic for Buildings (only if building_id is provided and not numeric)
         if ($request->has('building_id') && !is_numeric($request->building_id)) {
@@ -186,8 +189,12 @@ class InstallationController extends Controller
             'model'          => 'nullable|string|max:255',
             'type'           => 'nullable|string|max:255',
             'capacity'       => 'nullable|string|max:255',
-            'province'       => 'required|string|max:255',
-            'district'       => 'required|string|max:255',
+            'floors'         => 'nullable|integer|min:1',
+            'province'       => 'nullable|string|max:255',
+            'district'       => 'nullable|string|max:255',
+            'address'        => 'nullable|string|max:255',
+            'map'            => 'nullable|string|max:500',
+            'note'           => 'nullable|string',
             'cycle_days'     => 'required|integer|min:1',
         ]);
 
@@ -199,15 +206,19 @@ class InstallationController extends Controller
                 'building_id'          => $installation->building_id,
                 'branch_id'            => $installation->branch_id,
                 'customer_name'        => $installation->building->customer_name ?? $installation->building->name,
-                'customer_phone'       => $installation->building->contact_phone,
+                'customer_phone'       => $installation->phone ?? $installation->building->contact_phone,
                 'province'             => $request->province,
                 'district'             => $request->district,
+                'address'              => $request->address,
+                'map'                  => $request->map,
                 'manufacturer'         => $request->manufacturer,
                 'model'                => $request->model,
                 'type'                 => $request->type,
                 'capacity'             => $request->capacity,
+                'floors'               => $request->floors,
                 'cycle_days'           => $request->cycle_days,
                 'status'               => 'active',
+                'note'                 => $request->note,
                 'maintenance_deadline' => now()->addDays($request->cycle_days),
             ]);
 

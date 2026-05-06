@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'zalo' => [
+        'app_id' => env('ZALO_APP_ID'),
+        'app_secret' => env('ZALO_APP_SECRET'),
+        'oa_id' => env('ZALO_OA_ID'),
+        'access_token' => env('ZALO_ACCESS_TOKEN'),
+        'refresh_token' => env('ZALO_REFRESH_TOKEN'),
+        'template_id'   => env('ZALO_TEMPLATE_ID'),
+    ],
+
 ];

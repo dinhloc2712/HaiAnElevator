@@ -32,8 +32,7 @@ class ReportController extends Controller
         // -----------------------------------------------------
         
         // 1. Phân loại lỗi thường gặp (Pie Chart) -> Mọi thời đại hoặc theo tháng (ở đây tính trong tháng)
-        $faultRecords = MaintenanceCheck::where('task_type', 'repair')
-            ->whereNotNull('fault_category')
+        $faultRecords = MaintenanceCheck::whereNotNull('fault_category')
             ->whereBetween('check_date', [$startOfMonth, $endOfMonth])
             ->pluck('fault_category')
             ->toArray();

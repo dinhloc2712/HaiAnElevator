@@ -131,6 +131,16 @@
                             @elsecan('view_maintenance_order')
                                 <a href="{{ route('admin.maintenance.orders.edit', $order->id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">Chi tiết</a>
                             @endcan
+
+                            @can('delete_maintenance_order')
+                                <form action="{{ route('admin.maintenance.orders.destroy', $order->id) }}" method="POST" class="d-inline-block delete-order-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-bold delete-order-btn" style="font-size: 0.75rem;">
+                                        <i class="far fa-trash-alt me-1"></i> Xóa
+                                    </button>
+                                </form>
+                            @endcan
                         </div>
                     </td>
                 </tr>
@@ -428,6 +438,30 @@
                     }
                 }
             }
+        });
+        // Delete Order Confirmation
+        document.querySelectorAll('.delete-order-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const form = this.closest('.delete-order-form');
+
+                Swal.fire({
+                    title: 'Xác nhận xóa?',
+                    text: "Đơn hàng sẽ được đưa vào thùng rác và có thể khôi phục sau.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e53e3e',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Vẫn xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
     });
 </script>

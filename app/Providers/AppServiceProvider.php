@@ -31,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Activity Observer
         Activity::observe(ActivityObserver::class);
+
+        // Register Elevator Observer
+        \App\Models\Elevator::observe(\App\Observers\ElevatorObserver::class);
     }
 }

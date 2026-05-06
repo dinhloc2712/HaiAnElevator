@@ -97,16 +97,16 @@ class DashboardController extends Controller
             ->map(function($item) {
                 $daysDiff = now()->startOfDay()->diffInDays($item->maintenance_deadline->startOfDay(), false);
                 
-                $priority = 'Low';
+                $priority = 'Thấp';
                 $badgeClass = 'bg-secondary';
                 if ($daysDiff <= 0) {
-                    $priority = 'Urgent';
+                    $priority = 'Khẩn cấp';
                     $badgeClass = 'bg-danger text-white';
                 } elseif ($daysDiff <= 5) {
-                    $priority = 'High';
+                    $priority = 'Cao';
                     $badgeClass = 'bg-warning text-dark';
                 } elseif ($daysDiff <= 15) {
-                    $priority = 'Medium';
+                    $priority = 'Trung bình';
                     $badgeClass = 'bg-primary text-white';
                 }
 
