@@ -24,14 +24,14 @@ class ElevatorController extends Controller
 
         // Quick Search
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search, 'UTF-8');
             $query->where(function ($q) use ($search) {
-                $q->whereRaw("code COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                  ->orWhereRaw("customer_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                  ->orWhereRaw("province COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                  ->orWhereRaw("district COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
+                $q->whereRaw("LOWER(code) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("LOWER(customer_name) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("LOWER(province) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("LOWER(district) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
                   ->orWhereHas('building', function ($q2) use ($search) {
-                      $q2->whereRaw("name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"]);
+                      $q2->whereRaw("LOWER(name) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"]);
                   });
             });
         }

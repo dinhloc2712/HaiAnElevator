@@ -14,12 +14,12 @@ class BuildingController extends Controller
         $query = Building::query();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search, 'UTF-8');
             $query->where(function ($q) use ($search) {
-                $q->whereRaw("name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("customer_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("address COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"])
-                    ->orWhereRaw("contact_name COLLATE utf8mb4_0900_as_ci LIKE ?", ["%{$search}%"]);
+                $q->whereRaw("LOWER(name) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("LOWER(customer_name) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("LOWER(address) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"])
+                    ->orWhereRaw("LOWER(contact_name) COLLATE utf8mb4_bin LIKE ?", ["%{$search}%"]);
             });
         }
 
