@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ZaloMessageLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -20,7 +21,9 @@ class ZaloSettingController extends Controller
             'refresh_token' => config('services.zalo.refresh_token'),
         ];
 
-        return view('admin.zalo.settings', compact('settings'));
+        $logs = ZaloMessageLog::latest()->take(15)->get();
+
+        return view('admin.zalo.settings', compact('settings', 'logs'));
     }
 
     public function update(Request $request)

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ZaloMessageLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -76,12 +77,13 @@ class ZaloService
         // Ensure phone starts with 84
         $phone = $this->formatPhone($phone);
 
+        $trackingId = uniqid('zns_');
         $response = Http::withHeaders(['access_token' => $this->accessToken])
             ->post($this->znsUrl, [
                 'phone' => $phone,
                 'template_id' => $templateId,
                 'template_data' => $templateData,
-                'tracking_id' => uniqid('zns_'),
+                'tracking_id' => $trackingId,
             ]);
 
         $data = $response->json();
@@ -92,10 +94,33 @@ class ZaloService
             return $this->sendZNS($phone, $templateId, $templateData);
         }
 
-        if (isset($data['error']) && $data['error'] !== 0) {
+        $status = (!isset($data['error']) || $data['error'] === 0) && $response->successful() ? 'success' : 'failed';
+        $errorCode = $data['error'] ?? $response->status();
+        $errorMessage = $data['error_description'] ?? $data['error_name'] ?? ($response->successful() ? null : 'HTTP request failed with status ' . $response->status());
+        $msgId = data_get($data, 'data.msg_id');
+
+        $this->logMessage([
+            'phone' => $phone,
+            'channel' => 'zns',
+            'template_id' => $templateId,
+            'tracking_id' => $trackingId,
+            'msg_id' => $msgId,
+            'status' => $status,
+            'error_code' => $errorCode,
+            'error_message' => $errorMessage,
+            'response' => [
+                'http_status' => $response->status(),
+                'data' => $data,
+            ],
+            'payload' => [
+                'template_data' => $templateData,
+            ],
+        ]);
+
+        if ($status === 'failed') {
             Log::error('ZNS Send Failed', ['phone' => $phone, 'response' => $data, 'payload' => $templateData]);
         } else {
-            Log::info('ZNS Sent Successfully', ['phone' => $phone, 'msg_id' => $data['data']['msg_id'] ?? 'N/A']);
+            Log::info('ZNS Sent Successfully', ['phone' => $phone, 'msg_id' => $msgId]);
         }
 
         return $data;
@@ -112,7 +137,46 @@ class ZaloService
                 'message' => ['text' => $text],
             ]);
 
-        return $response->json();
+        $data = $response->json();
+        $status = (!isset($data['error']) || $data['error'] === 0) && $response->successful() ? 'success' : 'failed';
+        $errorCode = $data['error'] ?? $response->status();
+        $errorMessage = $data['error_description'] ?? $data['error_name'] ?? ($response->successful() ? null : 'HTTP request failed with status ' . $response->status());
+
+        $this->logMessage([
+            'phone' => $userId,
+            'channel' => 'oa',
+            'template_id' => null,
+            'tracking_id' => null,
+            'msg_id' => data_get($data, 'data.msg_id'),
+            'status' => $status,
+            'error_code' => $errorCode,
+            'error_message' => $errorMessage,
+            'response' => [
+                'http_status' => $response->status(),
+                'data' => $data,
+            ],
+            'payload' => ['text' => $text],
+        ]);
+
+        if ($status === 'failed') {
+            Log::error('OA Message Send Failed', ['user_id' => $userId, 'response' => $data]);
+        } else {
+            Log::info('OA Message Sent Successfully', ['user_id' => $userId, 'msg_id' => data_get($data, 'data.msg_id')]);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Log the Zalo message send attempt with status and error details.
+     */
+    protected function logMessage(array $payload)
+    {
+        try {
+            ZaloMessageLog::create($payload);
+        } catch (Exception $e) {
+            Log::error('Failed to save Zalo message log: ' . $e->getMessage(), ['payload' => $payload]);
+        }
     }
 
     /**
