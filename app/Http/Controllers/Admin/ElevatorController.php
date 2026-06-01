@@ -191,6 +191,7 @@ class ElevatorController extends Controller
             'map'                  => 'nullable|string',
             'maintenance_deadline' => 'nullable|date',
             'maintenance_end_date' => 'nullable|date',
+            'inspection_date'      => 'nullable|date',
         ]);
 
         // Tự động tạo tòa nhà nếu chưa chọn nhưng có thông tin khách hàng
@@ -276,6 +277,7 @@ class ElevatorController extends Controller
             'map'                  => 'nullable|string',
             'maintenance_deadline' => 'nullable|date',
             'maintenance_end_date' => 'nullable|date',
+            'inspection_date'      => 'nullable|date',
         ]);
 
         // Custom Validation Logic
@@ -293,6 +295,7 @@ class ElevatorController extends Controller
                  return back()->withErrors(['maintenance_deadline' => 'Hợp đồng bảo trì đã hết hạn. Không thể cập nhật thêm hạn bảo trì mới.'])->withInput();
             }
         }
+
 
         $elevator->update($validated);
 

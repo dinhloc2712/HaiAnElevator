@@ -41,11 +41,13 @@ class Elevator extends Model
         'map',
         'maintenance_deadline',
         'maintenance_end_date',
+        'inspection_date',
     ];
 
     protected $casts = [
         'maintenance_deadline' => 'date',
         'maintenance_end_date' => 'date',
+        'inspection_date'      => 'date',
     ];
 
     public function building()

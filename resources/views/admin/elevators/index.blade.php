@@ -293,20 +293,21 @@
                                     Hạn bảo trì <i class="fas {{ $sortIcon }} ms-1"></i>
                                 </a>
                             </th>
+                            <th class="text-center">Hạn kiểm định</th>
                             <th class="text-end pe-4">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($groupedElevators as $province => $districts)
                             <tr>
-                                <td colspan="9" class="group-header-province">
+                                <td colspan="10" class="group-header-province">
                                     <i class="fas fa-map-marker-alt me-2 text-primary"></i> TỈNH:
                                     {{ mb_strtoupper($province) }}
                                 </td>
                             </tr>
                             @foreach ($districts as $district => $elevators)
                                 <tr>
-                                    <td colspan="9" class="group-header-district">
+                                    <td colspan="10" class="group-header-district">
                                         <i class="fas fa-street-view me-2 text-muted"></i> HUYỆN:
                                         {{ mb_strtoupper($district) }}
                                     </td>
@@ -381,6 +382,22 @@
                                                 <span class="text-muted small">-</span>
                                             @endif
                                         </td>
+                                        <td class="text-center">
+                                            @if ($elevator->inspection_date)
+                                                @php
+                                                    $inspIsOverdue = $elevator->inspection_date->isPast();
+                                                    $inspIsSoon = !$inspIsOverdue && $elevator->inspection_date->diffInDays(now()) <= 30;
+                                                @endphp
+                                                <span class="badge px-3 py-2 rounded-pill fw-bold
+                                                    {{ $inspIsOverdue ? 'bg-danger bg-opacity-10 text-danger' : ($inspIsSoon ? 'bg-warning bg-opacity-10 text-warning' : 'bg-info bg-opacity-10 text-info') }}"
+                                                    style="font-size: 0.72rem;">
+                                                    {{ $elevator->inspection_date->format('d/m/Y') }}
+                                                    @if($inspIsOverdue) <i class="fas fa-exclamation-circle ms-1"></i> @endif
+                                                </span>
+                                            @else
+                                                <span class="text-muted small">-</span>
+                                            @endif
+                                        </td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex justify-content-end gap-1">
                                                 <a href="{{ route('admin.elevators.show', $elevator) }}"
@@ -412,7 +429,7 @@
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-5">
+                                <td colspan="10" class="text-center py-5">
                                     <div class="d-flex flex-column align-items-center opacity-50">
                                         <i class="fas fa-elevator fa-3x mb-3 text-muted"></i>
                                         <h6 class="fw-bold">Chưa có dữ liệu thang máy</h6>

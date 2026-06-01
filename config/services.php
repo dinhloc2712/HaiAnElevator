@@ -32,12 +32,19 @@ return [
     ],
 
     'zalo' => [
-        'app_id' => env('ZALO_APP_ID'),
-        'app_secret' => env('ZALO_APP_SECRET'),
-        'oa_id' => env('ZALO_OA_ID'),
-        'access_token' => env('ZALO_ACCESS_TOKEN'),
+        'app_id'        => env('ZALO_APP_ID'),
+        'app_secret'    => env('ZALO_APP_SECRET'),
+        'oa_id'         => env('ZALO_OA_ID'),
+        'access_token'  => env('ZALO_ACCESS_TOKEN'),
         'refresh_token' => env('ZALO_REFRESH_TOKEN'),
-        'template_id'   => env('ZALO_TEMPLATE_ID'),
+
+        // Template nhắc hạn bảo trì
+        'maintenance_template_id'   => env('ZALO_MAINTENANCE_TEMPLATE_ID'),
+        'maintenance_days_before'   => env('ZALO_MAINTENANCE_DAYS_BEFORE', '[]'),
+
+        // Template nhắc hạn kiểm định
+        'inspection_template_id'    => env('ZALO_INSPECTION_TEMPLATE_ID'),
+        'inspection_days_before'    => env('ZALO_INSPECTION_DAYS_BEFORE', '[]'),
     ],
 
 ];

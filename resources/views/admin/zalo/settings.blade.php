@@ -77,14 +77,100 @@
                                                 class="form-control bg-light border-0 p-3 rounded-4 shadow-sm"
                                                 value="{{ old('oa_id', $settings['oa_id']) }}" placeholder="Nhập OA ID..." required>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted text-uppercase">ZNS Template ID (Mặc
-                                                định)</label>
-                                            <input type="text" name="template_id"
-                                                class="form-control bg-light border-0 p-3 rounded-4 shadow-sm"
-                                                value="{{ old('template_id', $settings['template_id']) }}"
-                                                placeholder="Ví dụ: 574418">
+
+                                        {{-- Cấu hình Templates Cố Định --}}
+                                        <div class="col-md-12">
+                                            <hr class="my-3 opacity-10">
+                                            <label class="form-label small fw-bold text-muted text-uppercase mb-3">
+                                                <i class="fas fa-layer-group me-1 text-primary"></i> Cấu hình ZNS Templates Theo Lịch
+                                            </label>
+                                            
+                                            <div class="row g-4">
+                                                <!-- Template Bảo trì -->
+                                                <div class="col-md-6">
+                                                    <div class="card border border-light-subtle rounded-4 p-3 bg-white shadow-sm h-100">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="icon-box bg-soft-warning text-warning rounded-3 p-2 me-3" style="background-color: rgba(255, 193, 7, 0.1);">
+                                                                <i class="fas fa-tools"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 text-dark">1. Hạn bảo trì định kỳ</h6>
+                                                                <small class="text-muted" style="font-size: 0.75rem;">Sử dụng biến: <code>maintenance_day</code></small>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-semibold text-muted mb-1">ZNS Template ID</label>
+                                                            <input type="text" name="maintenance_template_id"
+                                                                class="form-control bg-light border-0 p-2 rounded-3 shadow-sm"
+                                                                value="{{ old('maintenance_template_id', $settings['maintenance_template_id'] ?? '') }}"
+                                                                placeholder="Ví dụ: 574418">
+                                                        </div>
+                                                        
+                                                        <div>
+                                                            <label class="form-label small fw-semibold text-muted mb-2 d-block">Gửi thông báo trước (ngày)</label>
+                                                            <div class="d-flex gap-3">
+                                                                @foreach ([7, 3, 1] as $day)
+                                                                    <div class="form-check form-check-inline m-0 d-flex align-items-center gap-2">
+                                                                        <input class="form-check-input" type="checkbox"
+                                                                            name="maintenance_days_before[]"
+                                                                            id="day_maintenance_{{ $day }}"
+                                                                            value="{{ $day }}"
+                                                                            {{ in_array($day, $settings['maintenance_days_before'] ?? []) ? 'checked' : '' }}>
+                                                                        <label class="form-check-label small fw-bold text-dark" for="day_maintenance_{{ $day }}">{{ $day }} Ngày</label>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Template Kiểm định -->
+                                                <div class="col-md-6">
+                                                    <div class="card border border-light-subtle rounded-4 p-3 bg-white shadow-sm h-100">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="icon-box bg-soft-info text-info rounded-3 p-2 me-3" style="background-color: rgba(13, 202, 240, 0.1);">
+                                                                <i class="fas fa-file-signature"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="fw-bold mb-0 text-dark">2. Hạn kiểm định định kỳ</h6>
+                                                                <small class="text-muted" style="font-size: 0.75rem;">Sử dụng biến: <code>inspection_date</code></small>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-semibold text-muted mb-1">ZNS Template ID</label>
+                                                            <input type="text" name="inspection_template_id"
+                                                                class="form-control bg-light border-0 p-2 rounded-3 shadow-sm"
+                                                                value="{{ old('inspection_template_id', $settings['inspection_template_id'] ?? '') }}"
+                                                                placeholder="Ví dụ: 574418">
+                                                        </div>
+                                                        
+                                                        <div>
+                                                            <label class="form-label small fw-semibold text-muted mb-2 d-block">Gửi thông báo trước (ngày)</label>
+                                                            <div class="d-flex gap-3">
+                                                                @foreach ([7, 3, 1] as $day)
+                                                                    <div class="form-check form-check-inline m-0 d-flex align-items-center gap-2">
+                                                                        <input class="form-check-input" type="checkbox"
+                                                                            name="inspection_days_before[]"
+                                                                            id="day_inspection_{{ $day }}"
+                                                                            value="{{ $day }}"
+                                                                            {{ in_array($day, $settings['inspection_days_before'] ?? []) ? 'checked' : '' }}>
+                                                                        <label class="form-check-label small fw-bold text-dark" for="day_inspection_{{ $day }}">{{ $day }} Ngày</label>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="alert alert-light border rounded-3 small mt-3 mb-0 py-2">
+                                                <i class="fas fa-lightbulb text-warning me-1"></i>
+                                                <strong>Mẹo:</strong> Hệ thống sẽ tự động quét và gửi ZNS nhắc lịch trước các mốc <strong>7 Ngày, 3 Ngày, hoặc 1 Ngày</strong> trước hạn bảo trì hoặc ngày kiểm định của thang máy.
+                                            </div>
                                         </div>
+
 
                                         <div class="col-md-12">
                                             <hr class="my-3 opacity-10">
@@ -374,7 +460,7 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Get URL parameters
+            // ==================== Tab URL Logic ====================
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
 
@@ -386,7 +472,6 @@
                 }
             }
 
-            // Listen for tab changes and update the URL query parameter
             const tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
             tabElements.forEach(function (tabEl) {
                 tabEl.addEventListener('shown.bs.tab', function (event) {
@@ -397,6 +482,8 @@
                     window.history.replaceState({}, '', url.pathname + url.search);
                 });
             });
+            // Templates are now static, no dynamic templates list JS needed.
         });
     </script>
 @endsection
+

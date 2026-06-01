@@ -12,13 +12,28 @@ class ZaloSettingController extends Controller
 {
     public function index()
     {
+        $parseDays = function($days) {
+            if (empty($days)) return [];
+            if (is_string($days)) {
+                $days = trim($days);
+                if (str_starts_with($days, '[') && str_ends_with($days, ']')) {
+                    return array_map('intval', json_decode($days, true) ?? []);
+                }
+                return array_filter(array_map('intval', explode(',', $days)));
+            }
+            return array_map('intval', (array)$days);
+        };
+
         $settings = [
-            'app_id' => config('services.zalo.app_id'),
-            'app_secret' => config('services.zalo.app_secret'),
-            'oa_id' => config('services.zalo.oa_id'),
-            'template_id' => config('services.zalo.template_id'),
-            'access_token' => config('services.zalo.access_token'),
-            'refresh_token' => config('services.zalo.refresh_token'),
+            'app_id'                    => config('services.zalo.app_id'),
+            'app_secret'                => config('services.zalo.app_secret'),
+            'oa_id'                     => config('services.zalo.oa_id'),
+            'access_token'              => config('services.zalo.access_token'),
+            'refresh_token'             => config('services.zalo.refresh_token'),
+            'maintenance_template_id'   => config('services.zalo.maintenance_template_id'),
+            'maintenance_days_before'   => $parseDays(config('services.zalo.maintenance_days_before')),
+            'inspection_template_id'    => config('services.zalo.inspection_template_id'),
+            'inspection_days_before'    => $parseDays(config('services.zalo.inspection_days_before')),
         ];
 
         $logs = ZaloMessageLog::latest()->take(15)->get();
@@ -29,21 +44,32 @@ class ZaloSettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'app_id' => 'required|string',
-            'app_secret' => 'required|string',
-            'oa_id' => 'required|string',
-            'template_id' => 'nullable|string',
-            'access_token' => 'nullable|string',
-            'refresh_token' => 'nullable|string',
+            'app_id'                    => 'required|string',
+            'app_secret'                => 'required|string',
+            'oa_id'                     => 'required|string',
+            'access_token'              => 'nullable|string',
+            'refresh_token'             => 'nullable|string',
+            'maintenance_template_id'   => 'nullable|string|max:50',
+            'maintenance_days_before'   => 'nullable|array',
+            'maintenance_days_before.*' => 'nullable|integer|in:1,3,7',
+            'inspection_template_id'    => 'nullable|string|max:50',
+            'inspection_days_before'    => 'nullable|array',
+            'inspection_days_before.*'  => 'nullable|integer|in:1,3,7',
         ]);
 
+        $maintenance_days = array_map('intval', $request->input('maintenance_days_before', []));
+        $inspection_days = array_map('intval', $request->input('inspection_days_before', []));
+
         $data = [
-            'ZALO_APP_ID' => $request->app_id,
-            'ZALO_APP_SECRET' => $request->app_secret,
-            'ZALO_OA_ID' => $request->oa_id,
-            'ZALO_TEMPLATE_ID' => $request->template_id,
-            'ZALO_ACCESS_TOKEN' => $request->access_token,
-            'ZALO_REFRESH_TOKEN' => $request->refresh_token,
+            'ZALO_APP_ID'                   => $request->app_id,
+            'ZALO_APP_SECRET'               => $request->app_secret,
+            'ZALO_OA_ID'                    => $request->oa_id,
+            'ZALO_ACCESS_TOKEN'             => $request->access_token,
+            'ZALO_REFRESH_TOKEN'            => $request->refresh_token,
+            'ZALO_MAINTENANCE_TEMPLATE_ID'  => $request->maintenance_template_id,
+            'ZALO_MAINTENANCE_DAYS_BEFORE'  => implode(',', $maintenance_days),
+            'ZALO_INSPECTION_TEMPLATE_ID'   => $request->inspection_template_id,
+            'ZALO_INSPECTION_DAYS_BEFORE'   => implode(',', $inspection_days),
         ];
 
         $this->updateEnvFile($data);

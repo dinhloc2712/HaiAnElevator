@@ -220,6 +220,7 @@ class InstallationController extends Controller
                 'status'               => 'active',
                 'note'                 => $request->note,
                 'maintenance_deadline' => now()->addDays($request->cycle_days),
+                'inspection_date'      => now()->addYears(2), // Hạn kiểm định = ngày hoàn thành + 2 năm
             ]);
 
             // Update Installation Status

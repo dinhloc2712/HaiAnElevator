@@ -332,6 +332,18 @@
                         </div>
 
                         <div class="mb-3">
+                            <label class="form-label fw-bold small text-uppercase text-muted">
+                                <i class="fas fa-stamp me-1 text-danger"></i> Hạn ngày kiểm định
+                            </label>
+                            <input type="date" name="inspection_date" class="form-control modern-form-control @error('inspection_date') is-invalid @enderror"
+                                value="{{ old('inspection_date') }}">
+                            @error('inspection_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle me-1"></i> Ngày kiểm định an toàn thang máy.</small>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-uppercase text-muted">Trạng thái</label>
                             <select name="status" class="form-select modern-form-control">
                                 <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Hoạt động</option>

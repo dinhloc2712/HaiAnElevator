@@ -248,11 +248,24 @@
                         </div>
                     </div>
                     
-                    <div class="mb-0">
+                    <div class="mb-4">
                         <span class="info-label">Ngày hết hạn bảo trì hợp đồng</span>
                         <div class="info-value d-flex align-items-center">
                             <i class="fas fa-calendar-times text-danger me-2"></i>
                             {{ $elevator->maintenance_end_date ? $elevator->maintenance_end_date->format('d/m/Y') : 'Chưa thiết lập' }}
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <span class="info-label"><i class="fas fa-stamp me-1 text-danger"></i> Hạn ngày kiểm định</span>
+                        <div class="info-value d-flex align-items-center">
+                            <i class="fas fa-clipboard-check text-primary me-2"></i>
+                            {{ $elevator->inspection_date ? $elevator->inspection_date->format('d/m/Y') : 'Chưa thiết lập' }}
+                            @if($elevator->inspection_date && $elevator->inspection_date->isPast())
+                                <span class="badge bg-danger ms-2" style="font-size: 0.65rem;">QUÁ HẠN</span>
+                            @elseif($elevator->inspection_date && $elevator->inspection_date->diffInDays(now()) <= 30 && !$elevator->inspection_date->isPast())
+                                <span class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem;">SẮP HẾT HẠN</span>
+                            @endif
                         </div>
                     </div>
                 </div>
