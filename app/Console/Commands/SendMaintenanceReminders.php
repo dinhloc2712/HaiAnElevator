@@ -41,9 +41,11 @@ class SendMaintenanceReminders extends Command
             return array_map('intval', (array)$days);
         };
 
+        $zalo = app(\App\Services\ZaloService::class);
+
         // 1. Gửi thông báo BẢO TRÌ
-        $maintTemplateId = config('services.zalo.maintenance_template_id');
-        $maintDays = $parseDays(config('services.zalo.maintenance_days_before'));
+        $maintTemplateId = $zalo->readEnvValue('ZALO_MAINTENANCE_TEMPLATE_ID') ?: config('services.zalo.maintenance_template_id');
+        $maintDays = $parseDays($zalo->readEnvValue('ZALO_MAINTENANCE_DAYS_BEFORE') ?: config('services.zalo.maintenance_days_before'));
 
         $this->info("--- BẮT ĐẦU QUÉT LỊCH BẢO TRÌ ---");
         if ($maintTemplateId && !empty($maintDays)) {
@@ -81,8 +83,8 @@ class SendMaintenanceReminders extends Command
         }
 
         // 2. Gửi thông báo KIỂM ĐỊNH
-        $inspTemplateId = config('services.zalo.inspection_template_id');
-        $inspDays = $parseDays(config('services.zalo.inspection_days_before'));
+        $inspTemplateId = $zalo->readEnvValue('ZALO_INSPECTION_TEMPLATE_ID') ?: config('services.zalo.inspection_template_id');
+        $inspDays = $parseDays($zalo->readEnvValue('ZALO_INSPECTION_DAYS_BEFORE') ?: config('services.zalo.inspection_days_before'));
 
         $this->info("\n--- BẮT ĐẦU QUÉT LỊCH KIỂM ĐỊNH ---");
         if ($inspTemplateId && !empty($inspDays)) {

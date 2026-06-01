@@ -213,7 +213,7 @@ class ZaloService
     /**
      * Read a value directly from .env file (bypasses config cache)
      */
-    protected function readEnvValue(string $key): ?string
+    public function readEnvValue(string $key): ?string
     {
         $path = base_path('.env');
         if (!file_exists($path)) return null;

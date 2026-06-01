@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('notify:neglected-maintenance')->dailyAt('08:00');
-        $schedule->command('maintenance:send-reminders')->dailyAt('08:30');
+        $schedule->command('maintenance:send-reminders')->dailyAt('08:00');
         $schedule->command('zalo:refresh-token')->dailyAt('03:00');
         $schedule->command('trash:cleanup')->daily();
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\ZaloService;
 use App\Models\ZaloMessageLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 class ZaloSettingController extends Controller
 {
-    public function index()
+    public function index(ZaloService $zalo)
     {
         $parseDays = function($days) {
             if (empty($days)) return [];
@@ -25,15 +26,15 @@ class ZaloSettingController extends Controller
         };
 
         $settings = [
-            'app_id'                    => config('services.zalo.app_id'),
-            'app_secret'                => config('services.zalo.app_secret'),
-            'oa_id'                     => config('services.zalo.oa_id'),
-            'access_token'              => config('services.zalo.access_token'),
-            'refresh_token'             => config('services.zalo.refresh_token'),
-            'maintenance_template_id'   => config('services.zalo.maintenance_template_id'),
-            'maintenance_days_before'   => $parseDays(config('services.zalo.maintenance_days_before')),
-            'inspection_template_id'    => config('services.zalo.inspection_template_id'),
-            'inspection_days_before'    => $parseDays(config('services.zalo.inspection_days_before')),
+            'app_id'                    => $zalo->readEnvValue('ZALO_APP_ID') ?: config('services.zalo.app_id'),
+            'app_secret'                => $zalo->readEnvValue('ZALO_APP_SECRET') ?: config('services.zalo.app_secret'),
+            'oa_id'                     => $zalo->readEnvValue('ZALO_OA_ID') ?: config('services.zalo.oa_id'),
+            'access_token'              => $zalo->readEnvValue('ZALO_ACCESS_TOKEN') ?: config('services.zalo.access_token'),
+            'refresh_token'             => $zalo->readEnvValue('ZALO_REFRESH_TOKEN') ?: config('services.zalo.refresh_token'),
+            'maintenance_template_id'   => $zalo->readEnvValue('ZALO_MAINTENANCE_TEMPLATE_ID') ?: config('services.zalo.maintenance_template_id'),
+            'maintenance_days_before'   => $parseDays($zalo->readEnvValue('ZALO_MAINTENANCE_DAYS_BEFORE') ?: config('services.zalo.maintenance_days_before')),
+            'inspection_template_id'    => $zalo->readEnvValue('ZALO_INSPECTION_TEMPLATE_ID') ?: config('services.zalo.inspection_template_id'),
+            'inspection_days_before'    => $parseDays($zalo->readEnvValue('ZALO_INSPECTION_DAYS_BEFORE') ?: config('services.zalo.inspection_days_before')),
         ];
 
         $logs = ZaloMessageLog::latest()->take(15)->get();
@@ -73,6 +74,12 @@ class ZaloSettingController extends Controller
         ];
 
         $this->updateEnvFile($data);
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+        } catch (\Exception $e) {
+            // Ignore if config:clear fails
+        }
 
         return back()->with('success', 'Đã cập nhật cấu hình Zalo Business Service.');
     }
