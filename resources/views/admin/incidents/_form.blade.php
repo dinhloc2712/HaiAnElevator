@@ -2,7 +2,7 @@
     <!-- Chọn Thang máy -->
     <div class="col-lg-12">
         <label class="form-label fw-bold text-dark"><i class="fas fa-elevator me-1"></i> Thang máy & Tòa nhà <span class="text-danger">*</span></label>
-        <select name="elevator_id" class="form-select form-control p-3 rounded-4 shadow-sm @error('elevator_id') is-invalid @enderror" required>
+        <select name="elevator_id" id="select-elevator" class="form-select form-control p-3 rounded-4 shadow-sm @error('elevator_id') is-invalid @enderror" required style="width:100%;">
             <option value="">-- Chọn thang máy --</option>
             @foreach($elevators as $elv)
                 <option value="{{ $elv->id }}" {{ (isset($incident) && $incident->elevator_id == $elv->id) || old('elevator_id') == $elv->id ? 'selected' : '' }}>
@@ -38,7 +38,7 @@
     <!-- Phân công nhân viên -->
     <div class="col-lg-12">
         <label class="form-label fw-bold text-dark"><i class="fas fa-tools me-1"></i> Nhân viên xử lý</label>
-        <select name="staff_ids[]" class="form-select form-control p-3 rounded-4 shadow-sm @error('staff_ids') is-invalid @enderror">
+        <select name="staff_ids[]" id="select-staff" class="form-select form-control p-3 rounded-4 shadow-sm @error('staff_ids') is-invalid @enderror" style="width:100%;">
             <option value="">-- Chọn nhân viên xử lý --</option>
             @php 
                 // Since it's a single select now but sends an array, we get the first selected item

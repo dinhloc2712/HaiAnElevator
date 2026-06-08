@@ -3,6 +3,7 @@
 @section('title', 'Hoàn thành phiếu bảo trì')
 
 @section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .checklist-section-title {
             padding: 10px 0;
@@ -292,7 +293,7 @@
                                     @endphp
                                     @foreach ($selectedStaffIds as $index => $selectedId)
                                         <div class="d-flex mb-2 staff-row">
-                                            <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4"
+                                            <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4 select2-staff"
                                                 onchange="updateStaffOptionsEdit()">
                                                 <option value="">-- Chọn nhân viên --</option>
                                                 @foreach ($staffs as $staff)
@@ -341,8 +342,15 @@
                                     const firstRow = container.querySelector('.staff-row');
                                     const newRow = firstRow.cloneNode(true);
 
+                                    // Xóa Select2 wrapper HTML trong clone (Select2 chèn span bên cạnh select)
+                                    $(newRow).find('.select2-container').remove();
+
+                                    // Hiện lại <select> gốc mà Select2 đã ẩn
+                                    const newSelect = newRow.querySelector('select');
+                                    $(newSelect).show().css('display', '');
+
                                     // Reset value
-                                    newRow.querySelector('select').value = '';
+                                    newSelect.value = '';
 
                                     // Change button to minus
                                     const actionBtn = newRow.querySelector('button');
@@ -351,6 +359,15 @@
                                     actionBtn.setAttribute('onclick', 'removeStaffRow(this)');
 
                                     container.appendChild(newRow);
+
+                                    // Khởi tạo Select2 cho select vừa thêm
+                                    $(newSelect).select2({
+                                        placeholder: '-- Chọn nhân viên --',
+                                        allowClear: false,
+                                        width: '100%',
+                                        language: { noResults: function() { return 'Không tìm thấy'; } }
+                                    }).on('change', function() { updateStaffOptionsEdit(); });
+
                                     updateStaffOptionsEdit();
                                 }
 
@@ -504,3 +521,22 @@
         </div>
     </form>
 @endsection
+
+@section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Select2 cho tất cả staff selects hiện có
+            $('.select2-staff').each(function() {
+                $(this).select2({
+                    placeholder: '-- Chọn nhân viên --',
+                    allowClear: false,
+                    width: '100%',
+                    language: { noResults: function() { return 'Không tìm thấy'; } }
+                }).on('change', function() { updateStaffOptionsEdit(); });
+            });
+        });
+    </script>
+@endsection
+

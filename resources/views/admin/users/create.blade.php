@@ -2,6 +2,21 @@
 
 @section('title', 'Thêm mới tài khoản')
 
+@section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 45px;
+            border-radius: 8px;
+            border: 1px solid #d1d3e2;
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 43px; }
+        .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 45px; padding-left: 12px; }
+    </style>
+@endsection
+
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -110,7 +125,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold small text-uppercase text-muted">Chi nhánh</label>
-                    <select name="branch_id" class="form-select modern-form-control">
+                    <select name="branch_id" id="select-branch" class="form-select modern-form-control" style="width:100%;">
                         <option value="">-- Chọn chi nhánh --</option>
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
@@ -265,6 +280,8 @@
 @endsection
 
 @section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     function initializeAddressPicker() {
        const provinceSelect = document.getElementById('province');
@@ -410,5 +427,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', initializeAddressPicker);
+
+    // Initialize Select2 for branch
+    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+        $('#select-branch').select2({
+            placeholder: '-- Chọn chi nhánh --',
+            allowClear: true,
+            width: '100%',
+            language: { noResults: function() { return 'Không tìm thấy'; } }
+        });
+    }
 </script>
 @endsection

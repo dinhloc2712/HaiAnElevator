@@ -2,6 +2,22 @@
 
 @section('title', 'Cập nhật sự cố: ' . $incident->code)
 
+@section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 52px; border-radius: 1rem; border: 1px solid #d1d3e2; display: flex; align-items: center;
+            background-color: #fff; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 50px; }
+        .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 52px; padding-left: 16px; font-size: 0.95rem; }
+        .select2-dropdown { border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .select2-search--dropdown .select2-search__field { border-radius: 8px; padding: 8px 12px; border: 1px solid #e2e8f0; }
+        .select2-results__option { padding: 10px 14px; border-radius: 8px; margin-bottom: 2px; }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: #4e73df; }
+    </style>
+@endsection
+
 @section('content')
 <div class="mb-4">
     <nav aria-label="breadcrumb">
@@ -40,4 +56,25 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#select-elevator').select2({
+                placeholder: '-- Chọn thang máy --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy thang máy'; } }
+            });
+            $('#select-staff').select2({
+                placeholder: '-- Chọn nhân viên xử lý --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy nhân viên'; } }
+            });
+        });
+    </script>
 @endsection

@@ -3,6 +3,7 @@
 @section('title', 'Lập phiếu bảo trì thang máy')
 
 @section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .checklist-section-title {
             padding: 10px 0;
@@ -141,7 +142,7 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Chọn Thang máy</label>
-                                <select name="elevator_id" class="form-select modern-form-control p-3 bg-white border-0 shadow-sm" style="border-radius: 12px;" onchange="window.location.href='?elevator_id='+this.value">
+                                <select name="elevator_id" id="select-elevator" class="form-select modern-form-control p-3 bg-white border-0 shadow-sm" style="border-radius: 12px; width:100%;">
                                     <option value="">-- Chọn thang máy --</option>
                                     @foreach($elevators as $elevator)
                                         <option value="{{ $elevator->id }}" {{ ($selectedElevator && $selectedElevator->id == $elevator->id) ? 'selected' : '' }}>
@@ -179,7 +180,7 @@
                                 <label class="form-label small fw-bold text-muted text-uppercase">Cán bộ kỹ thuật</label>
                                 <div id="staff-container-create">
                                     <div class="d-flex mb-2 staff-row">
-                                        <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4" onchange="updateStaffOptionsCreate()">
+                                        <select name="staff_ids[]" class="form-select bg-light border-0 p-3 rounded-4 select2-staff" onchange="updateStaffOptionsCreate()">
                                             <option value="">-- Chọn nhân viên --</option>
                                             @foreach($staffs as $staff)
                                                 <option value="{{ $staff->id }}">{{ $staff->name }}</option>
@@ -215,15 +216,30 @@
                                     const container = document.getElementById('staff-container-create');
                                     const firstRow = container.querySelector('.staff-row');
                                     const newRow = firstRow.cloneNode(true);
-                                    
-                                    newRow.querySelector('select').value = '';
-                                    
+
+                                    // Xóa Select2 wrapper HTML trong clone (Select2 chèn span bên cạnh select)
+                                    $(newRow).find('.select2-container').remove();
+
+                                    // Hiện lại <select> gốc mà Select2 đã ẩn
+                                    const newSelect = newRow.querySelector('select');
+                                    $(newSelect).show().css('display', '');
+                                    newSelect.value = '';
+
                                     const actionBtn = newRow.querySelector('button');
                                     actionBtn.className = 'btn btn-outline-danger rounded-4 ms-2 px-3 fw-bold';
                                     actionBtn.textContent = '-';
                                     actionBtn.setAttribute('onclick', 'removeStaffRowCreate(this)');
-                                    
+
                                     container.appendChild(newRow);
+
+                                    // Khởi tạo Select2 cho select vừa thêm
+                                    $(newSelect).select2({
+                                        placeholder: '-- Chọn nhân viên --',
+                                        allowClear: false,
+                                        width: '100%',
+                                        language: { noResults: function() { return 'Không tìm thấy'; } }
+                                    }).on('change', function() { updateStaffOptionsCreate(); });
+
                                     updateStaffOptionsCreate();
                                 }
                                 function removeStaffRowCreate(btn) {
@@ -290,4 +306,32 @@
             </div>
         </div>
     </form>
+@endsection
+
+@section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Select2 cho chọn thang máy (redirect URL khi chọn)
+            $('#select-elevator').select2({
+                placeholder: '-- Chọn thang máy --',
+                allowClear: false,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
+            }).on('change', function() {
+                window.location.href = '?elevator_id=' + $(this).val();
+            });
+
+            // Select2 cho tất cả staff selects hiện có
+            $('.select2-staff').each(function() {
+                $(this).select2({
+                    placeholder: '-- Chọn nhân viên --',
+                    allowClear: false,
+                    width: '100%',
+                    language: { noResults: function() { return 'Không tìm thấy'; } }
+                }).on('change', function() { updateStaffOptionsCreate(); });
+            });
+        });
+    </script>
 @endsection

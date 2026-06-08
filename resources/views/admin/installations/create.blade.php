@@ -62,7 +62,7 @@
                             {{-- Chi nhánh --}}
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Chi nhánh</label>
-                                <select name="branch_id" class="form-select modern-form-control p-3 bg-light border-0 fw-bold" required>
+                                <select name="branch_id" id="select-branch" class="form-select modern-form-control p-3 bg-light border-0 fw-bold" required style="width:100%;">
                                     <option value="">-- Chọn chi nhánh --</option>
                                     @foreach($branches as $branch)
                                         <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
@@ -98,7 +98,7 @@
                             {{-- Nhân viên phụ trách --}}
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Nhân viên phụ trách</label>
-                                <select name="user_id" class="form-select modern-form-control p-3 bg-light border-0 fw-bold" required>
+                                <select name="user_id" id="select-user" class="form-select modern-form-control p-3 bg-light border-0 fw-bold" required style="width:100%;">
                                     <option value="">-- Chọn nhân viên --</option>
                                     @foreach($staffs as $staff)
                                         <option value="{{ $staff->id }}" {{ old('user_id') == $staff->id ? 'selected' : '' }}>{{ $staff->name }} ({{ $staff->role->display_name ?? 'NV' }})</option>
@@ -162,6 +162,20 @@
                         return "Không tìm thấy. Gõ phím bất kỳ và ấn Enter để tạo mới";
                     }
                 }
+            });
+
+            $('#select-branch').select2({
+                placeholder: '-- Chọn chi nhánh --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
+            });
+
+            $('#select-user').select2({
+                placeholder: '-- Chọn nhân viên --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
             });
 
             // Auto-populate phone number

@@ -182,7 +182,7 @@
                             </div>
                             <div class="col-6 mb-3">
                                 <label class="form-label fw-bold small text-uppercase text-muted">Chi nhánh</label>
-                                <select name="branch_id" class="form-select modern-form-control">
+                                <select name="branch_id" id="select-branch" class="form-select modern-form-control" style="width:100%;">
                                     <option value="">-- Chọn chi nhánh (Không bắt buộc) --</option>
                                     @foreach ($branches as $branch)
                                         <option value="{{ $branch->id }}"
@@ -375,6 +375,14 @@
                 placeholder: "-- Chọn tòa nhà --",
                 allowClear: true,
                 width: '100%'
+            });
+
+            // Select2 for branch
+            $('#select-branch').select2({
+                placeholder: '-- Chọn chi nhánh --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
             });
 
             // Auto-fill building info

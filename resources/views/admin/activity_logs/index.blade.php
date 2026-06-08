@@ -2,6 +2,27 @@
 
 @section('title', 'Lịch sử hệ thống')
 
+@section('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            border-radius: 6px;
+            border: 1px solid #d1d3e2;
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px;
+            padding-left: 12px;
+            font-size: 0.875rem;
+        }
+    </style>
+@endsection
+
 @section('content')
 
 @php
@@ -124,7 +145,7 @@
         <!-- Filter Form -->
         <form method="GET" action="{{ route('admin.activity-logs.index') }}" class="mb-4 row g-3">
             <div class="col-md-3">
-                <select name="subject_type" class="form-select">
+                <select name="subject_type" id="select-subject-type" class="form-select" style="width:100%;">
                     <option value="">-- Tất cả Đối tượng --</option>
                     @foreach($subjectTypes as $type)
                         @if($type)
@@ -151,7 +172,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select name="causer_id" class="form-select">
+                <select name="causer_id" id="select-causer-id" class="form-select" style="width:100%;">
                     <option value="">-- Tất cả Người dùng --</option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}" {{ request('causer_id') == $user->id ? 'selected' : '' }}>
@@ -332,4 +353,25 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#select-subject-type').select2({
+                placeholder: '-- Tất cả Đối tượng --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
+            });
+            $('#select-causer-id').select2({
+                placeholder: '-- Tất cả Người dùng --',
+                allowClear: true,
+                width: '100%',
+                language: { noResults: function() { return 'Không tìm thấy'; } }
+            });
+        });
+    </script>
 @endsection
